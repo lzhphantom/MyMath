@@ -7,7 +7,7 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "Manager",
 			Router:           `/admin`,
@@ -16,7 +16,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "BasicCommon",
 			Router:           `/admin/basicCommon`,
@@ -25,7 +25,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "BasicContent",
 			Router:           `/admin/basicContent/:id`,
@@ -34,7 +34,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "AddBasicCommon",
 			Router:           `/admin/basicType/:cop`,
@@ -43,7 +43,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "DelBasicContent",
 			Router:           `/admin/delBasicContent`,
@@ -52,7 +52,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "DelBasicCommon",
 			Router:           `/admin/delBasicType`,
@@ -61,7 +61,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "AddPublishContent",
 			Router:           `/admin/publishContent/:area`,
@@ -70,7 +70,7 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["MyMath/controllers/admin:AdminController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers/admin:AdminController"],
 		beego.ControllerComments{
 			Method:           "ShowChangeContent",
 			Router:           `/admin/showChangeContent`,

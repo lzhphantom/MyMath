@@ -1,9 +1,9 @@
 package routers
 
 import (
-	"MyMath/controllers"
-	"MyMath/controllers/admin"
 	"github.com/astaxie/beego"
+	"github.com/lzhphantom/MyMath/controllers"
+	"github.com/lzhphantom/MyMath/controllers/admin"
 )
 
 func init() {

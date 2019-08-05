@@ -7,7 +7,7 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["MyMath/controllers:MainController"] = append(beego.GlobalControllerRouter["MyMath/controllers:MainController"],
+	beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers:MainController"] = append(beego.GlobalControllerRouter["github.com/lzhphantom/MyMath/controllers:MainController"],
 		beego.ControllerComments{
 			Method:           "Get",
 			Router:           `/`,

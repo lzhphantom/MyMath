@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "MyMath/models"
-	_ "MyMath/routers"
 	"github.com/astaxie/beego"
+	_ "github.com/lzhphantom/MyMath/models"
+	_ "github.com/lzhphantom/MyMath/routers"
 )
 
 func main() {

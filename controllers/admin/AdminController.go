@@ -1,9 +1,9 @@
 package admin
 
 import (
-	"MyMath/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/lzhphantom/MyMath/models"
 	"reflect"
 	"strconv"
 )

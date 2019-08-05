@@ -291,3 +291,16 @@ func (c *AdminController) ShowChangeContent() {
 	c.Data["json"] = content
 	c.ServeJSON()
 }
+
+//修改基础知识内容
+// @router /admin/changeContent [post]
+func (c *AdminController) ChangeContent() {
+	id, err := c.GetInt("id")
+	if err != nil {
+		beego.Debug("修改基础知识内容=>获取id失败")
+	}
+	content1 := c.GetSession("content1")
+	beego.Info(id)
+	beego.Info(content1)
+	c.ServeJSON()
+}

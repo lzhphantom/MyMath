@@ -78,6 +78,48 @@ $(function () {
                 chooseContentShow(document.getElementById("basic-content"), data);
             });
     });
+
+    //修改基础知识内容
+    $("#contentChange").on("click", function () {
+        let modalBody = $("#basicContentChange").find(".modal-body");
+        let id = $(modalBody).find("#typeSelect").data("id");
+        let content1 = {};
+        let content2 = {};
+        let content3 = {};
+        let content4 = {};
+        let content5 = {};
+        let textAreas = $(modalBody).find("textarea[id^=basicPublishContent]");
+        for (let i = 0; i < textAreas.length; i++) {
+            let key = $(textAreas[i]).attr("id").substr($(textAreas[i]).attr("id").length - 1, 1)
+            if (/^basicPublishContent1.*$/.test($(textAreas[i]).attr("id"))) {
+                content1[key] = $(textAreas[i]).val();
+            } else if (/^basicPublishContent2.*$/.test($(textAreas[i]).attr("id"))) {
+                content2[key] = $(textAreas[i]).val();
+            } else if (/^basicPublishContent3.*$/.test($(textAreas[i]).attr("id"))) {
+                content3[key] = $(textAreas[i]).val();
+            } else if (/^basicPublishContent4.*$/.test($(textAreas[i]).attr("id"))) {
+                content4[key] = $(textAreas[i]).val();
+            } else if (/^basicPublishContent5.*$/.test($(textAreas[i]).attr("id"))) {
+                content5[key] = $(textAreas[i]).val();
+            }
+        }
+
+        $.post(
+            "/admin/changeContent",
+            {
+                id: id,
+                content1: content1,
+                content2: content2,
+                content3: content3,
+                content4: content4,
+                content5: content5,
+            },
+            function (data, status) {
+
+            },
+            "json"
+        );
+    });
 });
 
 //返回基础知识选择界面
@@ -201,7 +243,7 @@ function showChangeBasicContent(id, changeModal) {
         "/admin/showChangeContent",
         {id: id},
         function (data, status) {
-            $(changeModal).find("#typeSelect").val(data.Title).attr("disabled", true);
+            $(changeModal).find("#typeSelect").val(data.Title).attr("disabled", true).attr("data-id", id);
             $(changeModal).find("option[value='5']").attr("selected", true);
             $(changeModal).find("#publishArea").empty();
             $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent5" cols="30" rows="10" class="form-control">` + data.Concept + `</textarea>`);
@@ -235,8 +277,8 @@ function showChangeBasicContent(id, changeModal) {
 
                 for (let i = 0; i < areaChildren.length; i++) {
                     if (checkFist.test($(areaChildren[i]).attr('id'))) {
-                        $(areaChildren[i]).removeAttr("class","hidden");
-                    }else{
+                        $(areaChildren[i]).removeAttr("class", "hidden");
+                    } else {
                         $(areaChildren[i]).addClass("hidden");
                     }
 

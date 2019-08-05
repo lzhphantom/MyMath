@@ -1,0 +1,22 @@
+.panel.panel-success .panel-heading a {
+  color:#fff;
+  text-decoration:none;
+}
+
+.panel.panel-success .panel-heading a:hover {
+  text-decoration:none;
+}
+
+.nav-stacked > li > a {
+  padding:0 10px;
+}
+
+.nav-stacked > li > a:hover {
+  color:#4caf50;
+}
+
+.nav-tabs > li > a:focus {
+  background-color:#bbbbbb !important;
+  font-weight:bolder;
+}
+

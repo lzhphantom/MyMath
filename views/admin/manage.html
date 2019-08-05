@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>manage</title>
+    <link href="static/lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/simple-footer.css">
+    <link rel="stylesheet" href="static/css/manage.css">
+</head>
+
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header"><a class="navbar-brand" href="#">后台管理系统</a>
+            <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span
+                        class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
+                        class="icon-bar"></span><span class="icon-bar"></span></button>
+        </div>
+        <div
+                class="collapse navbar-collapse" id="navcol-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active" role="presentation"><a href="#">First Item</a></li>
+                <li role="presentation"><a href="#">Second Item</a></li>
+                <li role="presentation"><a href="#">Third Item</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div id="main" class="col-sm-3 col-md-2">
+            <ul class="nav nav-pills nav-stacked" role="tablist">
+                <li class="active" role="presentation"><a href="#home" aria-controls="home" role="tab"
+                                                          data-toggle="tab">基础知识</a></li>
+                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">题目上传</a>
+                </li>
+                <li role="presentation"><a href="#messages" aria-controls="profile" role="tab" data-toggle="tab">统计</a>
+                </li>
+                <li role="presentation"><a href="#settings" aria-controls="profile" role="tab"
+                                           data-toggle="tab">用户管理</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-md-10 tab-content">
+            <div id="home" class="tab-pane active" role="tabpanel">
+                <div id="choose">
+                    <div>
+                        <h1 class="text-center"><a href="javascript:void(0);" class="btn btn-primary btn-block"
+                                                   id="chooseType">基础知识大纲</a>
+                        </h1>
+                    </div>
+                    <div>
+                        <h1 class="text-center"><a href="javascript:void(0);" class="btn btn-primary btn-block"
+                                                   id="chooseContent">基础知识内容</a></h1>
+                    </div>
+                </div>
+                <div id="basic-type" class="hidden">
+                    <div id="basic-title">
+                        <h3 class="pull-left">
+                            <i class="glyphicon glyphicon-user"></i>
+                            <span class="break"></span>
+                            基础知识大纲
+                        </h3>
+                        <div class="pull-right">
+                            <a data-toggle="modal" data-target="#basicAdd" id="basicAddBtn"><i
+                                        class="glyphicon glyphicon-plus-sign"></i></a>
+                            <a href="javascript:void(0);" onclick="backToBasic();"><i
+                                        class="glyphicon glyphicon-share-alt"></i></a>
+                        </div>
+                    </div>
+                    <table class="table table-bordered text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center">编号</th>
+                            <th class="text-center">分类</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="basic-content" class="hidden">
+                    <div id="basic-title">
+                        <h3 class="pull-left">
+                            <i class="glyphicon glyphicon-user"></i>
+                            <span class="break"></span>
+                            基础知识大纲
+                        </h3>
+                        <div class="pull-right">
+                            <a data-toggle="modal" data-target="#basicContentAdd" id="basicContentAddBtn"><i
+                                        class="glyphicon glyphicon-plus-sign"></i></a>
+                            <a href="javascript:void(0);" onclick="backToBasic();"><i
+                                        class="glyphicon glyphicon-share-alt"></i></a>
+                        </div>
+                    </div>
+                    <table class="table table-bordered text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center">编号</th>
+                            <th class="text-center">种类</th>
+                            <th class="text-center">题目</th>
+                            <th class="text-center">概念</th>
+                            <th class="text-center">知识点精讲</th>
+                            <th class="text-center">相关公式</th>
+                            <th class="text-center">考点</th>
+                            <th class="text-center">重难点</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 种类Modal -->
+                <div class="modal fade" id="basicAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true" id="btnClose">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">添加基础知识大纲</h4>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="cop" value="1">
+                                <div class="input-group">
+                                    <label for="newBasicType">新分类名：</label>
+                                    <input type="text" placeholder="请输入新分类名" id="newBasicType"
+                                           style="border-radius: 5px;">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="basicTypeAdd">添加</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 内容Modal -->
+                <div class="modal fade" id="basicContentAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true" id="btnClose">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">添加基础知识内容</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="typeSelect" class="control-label">类型：</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <select name="type" id="typeSelect" class="form-control">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="contentSelect" class="control-label">版块：</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <select name="area" id="contentSelect" class="form-control">
+                                                <option value="0">==请选择===</option>
+                                                <option value="1">知识点</option>
+                                                <option value="2">相关公式</option>
+                                                <option value="3">考点</option>
+                                                <option value="4">重难点</option>
+                                                <option value="5">概念</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="basicPublishContent" class="control-label">内容</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <textarea name="" id="basicPublishContent" cols="30" rows="10" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="contentAdd">添加</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 内容Modal -->
+                <div class="modal fade" id="basicContentChange" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true" id="btnClose">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">修改基础知识内容</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="typeSelect" class="control-label">类型：</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="text" id="typeSelect">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="contentSelect" class="control-label">版块：</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <select name="area" id="contentSelect" class="form-control">
+                                                <option value="0">==请选择===</option>
+                                                <option value="1">知识点</option>
+                                                <option value="2">相关公式</option>
+                                                <option value="3">考点</option>
+                                                <option value="4">重难点</option>
+                                                <option value="5">概念</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="basicPublishContent" class="control-label">内容</label>
+                                        </div>
+                                        <div class="col-sm-6" id="publishArea">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="contentAdd">添加</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="profile" class="tab-pane" role="tabpanel">
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传填空题</a></h1>
+                </div>
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传选择题</a></h1>
+                </div>
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传解答题</a></h1>
+                </div>
+            </div>
+            <div id="messages" class="tab-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>学生姓名</th>
+                            <th>答题数量</th>
+                            <th>正确数量</th>
+                            <th>准确率</th>
+                            <th>排名</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Cell 1</td>
+                            <td>Cell 2</td>
+                            <td>Cell 1</td>
+                            <td>Cell 2</td>
+                            <td>Cell 1</td>
+                            <td>Cell 2</td>
+                        </tr>
+                        <tr>
+                            <td>Cell 3</td>
+                            <td>Cell 4</td>
+                            <td>Cell 3</td>
+                            <td>Cell 4</td>
+                            <td>Cell 3</td>
+                            <td>Cell 4</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="settings" class="tab-pane" role="tabpanel">
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">学生管理</a></h1>
+                </div>
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">教师管理</a></h1>
+                </div>
+                <div>
+                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">管理员管理</a></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer navbar-fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-8">
+                <p class="text-left" style="margin-top:5%;margin-bottom:3%;">© 2017 Centercom Global BPO</p>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <p class="text-right" style="margin-top:5%;margin-bottom:8%%;font-size:1em;">Privacy Policy</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="static/js/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<script src="static/js/manage.js"></script>
+
+</body>
+
+</html>

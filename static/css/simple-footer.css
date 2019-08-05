@@ -1,0 +1,11 @@
+.footer {
+  background-color:#231f20;
+  color:rgb(255,255,255);
+}
+
+@media (max-width: 767px) {
+  .footer p {
+    text-align:center;
+  }
+}
+

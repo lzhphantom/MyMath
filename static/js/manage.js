@@ -108,11 +108,11 @@ $(function () {
             "/admin/changeContent",
             {
                 id: id,
-                content1: content1,
-                content2: content2,
-                content3: content3,
-                content4: content4,
-                content5: content5,
+                content1: JSON.stringify(content1),
+                content2: JSON.stringify(content2),
+                content3: JSON.stringify(content3),
+                content4: JSON.stringify(content4),
+                content5: JSON.stringify(content5),
             },
             function (data, status) {
 

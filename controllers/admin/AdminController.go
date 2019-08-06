@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/models"
@@ -299,8 +300,53 @@ func (c *AdminController) ChangeContent() {
 	if err != nil {
 		beego.Debug("修改基础知识内容=>获取id失败")
 	}
-	content1 := c.GetSession("content1")
 	beego.Info(id)
-	beego.Info(content1)
+	content1 := c.GetString("content1")
+	content2 := c.GetString("content2")
+	content3 := c.GetString("content3")
+	content4 := c.GetString("content4")
+	content5 := c.GetString("content5")
+	content1Map := make(map[string]interface{})
+	content2Map := make(map[string]interface{})
+	content3Map := make(map[string]interface{})
+	content4Map := make(map[string]interface{})
+	content5Map := make(map[string]interface{})
+	err = json.Unmarshal([]byte(content1), &content1Map)
+	err = json.Unmarshal([]byte(content2), &content2Map)
+	err = json.Unmarshal([]byte(content3), &content3Map)
+	err = json.Unmarshal([]byte(content4), &content4Map)
+	err = json.Unmarshal([]byte(content5), &content5Map)
+	if err != nil {
+		beego.Debug("content*转换失败")
+	} else {
+		beego.Info(content1Map, content2Map, content3Map, content4Map, content5Map)
+	}
+
+	o := orm.NewOrm()
+	content := models.BasicContent{}
+	err = o.QueryTable("basic_content").Filter("id", id).RelatedSel().One(&content)
+	if err != nil {
+		beego.Debug("basic_content=>showChangeContent失败")
+	}
+	_, err = o.QueryTable("formula").Filter("basic_content_id", id).All(&content.Formula)
+	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).All(&content.KnowledgeImportant)
+	_, err = o.QueryTable("examination_center").Filter("basic_content_id", id).All(&content.ExaminationCenter)
+	_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).All(&content.HDifficulty)
+
+	content.Concept = content5Map["5"].(string)
+	for key, value := range content.KnowledgeImportant {
+		(*value).Content = content1Map[strconv.Itoa(key)].(string)
+		beego.Info((*value).Content)
+	}
+	for key, value := range content.HDifficulty {
+		value.Content = content4Map[strconv.Itoa(key)].(string)
+	}
+	for key, value := range content.Formula {
+		value.Content = content2Map[strconv.Itoa(key)].(string)
+	}
+	for key, value := range content.ExaminationCenter {
+		value.Content = content3Map[strconv.Itoa(key)].(string)
+	}
+
 	c.ServeJSON()
 }

@@ -137,6 +137,13 @@ $(function () {
         );
     });
 });
+//返回上传界面
+function backToUp() {
+    $("#chooseUp").removeClass("hidden");
+    $("#blankUp").addClass("hidden");
+    $("#mulChoiceUp").addClass("hidden");
+    $("#solveUp").addClass("hidden");
+}
 
 //返回基础知识选择界面
 function backToBasic() {

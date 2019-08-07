@@ -334,19 +334,23 @@ func (c *AdminController) ChangeContent() {
 	_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).All(&content.HDifficulty)
 
 	content.Concept = content5Map["5"].(string)
+	o.Update(&content)
 	for key, value := range content.KnowledgeImportant {
 		(*value).Content = content1Map[strconv.Itoa(key)].(string)
-		beego.Info((*value).Content)
+		o.Update(value)
 	}
 	for key, value := range content.HDifficulty {
 		value.Content = content4Map[strconv.Itoa(key)].(string)
+		o.Update(value)
 	}
 	for key, value := range content.Formula {
 		value.Content = content2Map[strconv.Itoa(key)].(string)
+		o.Update(value)
 	}
 	for key, value := range content.ExaminationCenter {
 		value.Content = content3Map[strconv.Itoa(key)].(string)
+		o.Update(value)
 	}
 
-	c.ServeJSON()
+	c.Redirect("/admin/basicContent/-1", 302)
 }

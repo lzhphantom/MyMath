@@ -115,7 +115,8 @@ $(function () {
                 content5: JSON.stringify(content5),
             },
             function (data, status) {
-
+                chooseContentShow(document.getElementById("basic-content"), data);
+                $("#basicContentChange").modal('hide');
             },
             "json"
         );

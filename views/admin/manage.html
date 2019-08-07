@@ -248,15 +248,30 @@
 
             </div>
             <div id="profile" class="tab-pane" role="tabpanel">
-                <div>
-                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传填空题</a></h1>
+                <div id="chooseUp">
+                    <div>
+                        <h1 class="text-center"><a href="javascript:void(0);" class="btn btn-primary btn-block" id="blankType">上传填空题</a></h1>
+                    </div>
+                    <div>
+                        <h1 class="text-center"><a href="javascript:void(0);" class="btn btn-primary btn-block" id="mulChoiceType">上传选择题</a></h1>
+                    </div>
+                    <div>
+                        <h1 class="text-center"><a href="javascript:void(0);" class="btn btn-primary btn-block" id="solveType">上传解答题</a></h1>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传选择题</a></h1>
+                <div id="blankUp" class="hidden">
+                    <h1 class="text-center text-muted">填空题上传</h1>
+                    <form action="">
+
+                    </form>
                 </div>
-                <div>
-                    <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">上传解答题</a></h1>
+                <div id="mulChoiceUp" class="hidden">
+                    <h1>选择</h1>
                 </div>
+                <div id="solveUp" class="hidden">
+                    <h1>解答</h1>
+                </div>
+
             </div>
             <div id="messages" class="tab-pane" role="tabpanel">
                 <div class="table-responsive">

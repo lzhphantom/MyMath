@@ -22,6 +22,21 @@ $(function () {
         basicContent.className = "";
     });
 
+    $("#blankType").on("click",function () {
+       $("#chooseUp").addClass("hidden");
+       $("#blankUp").removeClass("hidden");
+    });
+
+    $("#mulChoiceType").on("click",function () {
+        $("#chooseUp").addClass("hidden");
+        $("#mulChoiceUp").removeClass("hidden");
+    });
+    $("#solveType").on("click",function () {
+        $("#chooseUp").addClass("hidden");
+        $("#solveUp").removeClass("hidden");
+    });
+
+
     //基础知识大纲添加
     let basicTypeAdd = document.getElementById("basicTypeAdd");
     $(basicTypeAdd).on("click", function () {

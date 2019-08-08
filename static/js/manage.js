@@ -27,6 +27,7 @@ $(function () {
     $("#blankType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#blankUp").removeClass("hidden");
+        editorCheck();
     });
 
     $("#mulChoiceType").on("click", function () {
@@ -139,12 +140,17 @@ $(function () {
         );
     });
 
+
+});
+
+//准备生成富文本编辑器
+function editorCheck() {
     let knowFlag = false;
     var editorCheck = setInterval(() => {
-        if (editor !== undefined && !knowFlag) {
+        if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
                 $("#showBlank").html(editor.getData());
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"showBlank"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "showBlank"]);
             });
             knowFlag = true
         }
@@ -152,7 +158,7 @@ $(function () {
             clearInterval(editorCheck);
         }
     }, 1000);
-});
+}
 
 //返回上传界面
 function backToUp() {
@@ -160,6 +166,11 @@ function backToUp() {
     $("#blankUp").addClass("hidden");
     $("#mulChoiceUp").addClass("hidden");
     $("#solveUp").addClass("hidden");
+    if(typeof($("#showBlank").attr("data-content"))!=="undefined"){
+        $("#showBlank").removeAttr("data-content");
+    }
+    $("#showBlank").html("暂无内容");
+
 }
 
 //返回基础知识选择界面
@@ -219,6 +230,20 @@ function chooseContentShow(basicContent, data) {
     }
 }
 
+//提交富文本编辑器内容
+function backToLast() {
+    const data = editor.getData();
+    editor.destroy().catch(error => {
+        console.log(error);
+    });
+    editor = null;
+    $("#showBlank").attr("onclick", "showEditor(this);");
+    $("#showBlank").attr("data-content", data);
+    $($("#backGroup").children("div")[0]).removeClass("hidden");
+    $($("#backGroup").children("div")[1]).addClass("hidden");
+
+    editorCheck();
+}
 
 //显示富文本编辑器
 async function showEditor(obj) {
@@ -232,7 +257,12 @@ async function showEditor(obj) {
     }).catch(error => {
         console.error(error);
     });
-    editor.setData($(obj).html());
+    if (typeof ($(obj).attr("data-content")) !== "undefined") {
+        editor.setData($(obj).attr("data-content"));
+    } else {
+        editor.setData($(obj).html());
+    }
+
     $($("#backGroup").children("div")[0]).addClass("hidden");
     $($("#backGroup").children("div")[1]).removeClass("hidden");
 }

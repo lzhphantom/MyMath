@@ -282,13 +282,16 @@
                         <div class="form-group">
                             <textarea name="content" id="editor" class="hidden"></textarea>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="backGroup">
                             <div class="col-md-3 col-md-offset-9">
                                 <button type="submit" class="btn btn-primary btn-lg">上传</button>
-                                <a type="button" class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
+                                <a class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
+                            </div>
+                            <div class="col-md-3 col-md-offset-9 hidden">
+                                <a class="btn btn-primary btn-lg" onclick="backToLast();">确认</a>
+                                <a class="btn btn-success btn-lg" onclick="backToLast();">返回</a>
                             </div>
                         </div>
-
                     </form>
                 </div>
                 <div id="mulChoiceUp" class="hidden">
@@ -404,7 +407,7 @@
                 <p class="text-left" style="margin-top:5%;margin-bottom:3%;">© 2017 Centercom Global BPO</p>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12">
-                <p class="text-right" style="margin-top:5%;margin-bottom:8%%;font-size:1em;">Privacy Policy</p>
+                <p class="text-right" style="margin-top:5%;margin-bottom:8%;font-size:1em;">Privacy Policy</p>
             </div>
         </div>
     </div>

@@ -144,7 +144,7 @@ $(function () {
         if (editor !== undefined && !knowFlag) {
             editor.model.document.on("change:data", () => {
                 $("#showBlank").html(editor.getData());
-                MathJax.Hub.Queue(["Text", $("#showBlank"), "x+1"]);
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"showBlank"]);
             });
             knowFlag = true
         }
@@ -223,7 +223,6 @@ function chooseContentShow(basicContent, data) {
 //显示富文本编辑器
 async function showEditor(obj) {
     $(obj).removeAttr("onclick");
-
     await ClassicEditor.create(document.querySelector('#editor'), {
         toolbar: ["Heading", "|", "ImageUpload", "BlockQuote", "Bold", "Italic"],
         language: 'zh-cn'
@@ -234,6 +233,8 @@ async function showEditor(obj) {
         console.error(error);
     });
     editor.setData($(obj).html());
+    $($("#backGroup").children("div")[0]).addClass("hidden");
+    $($("#backGroup").children("div")[1]).removeClass("hidden");
 }
 
 //基础知识大纲刷新--通用

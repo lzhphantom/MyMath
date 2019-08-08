@@ -1,3 +1,5 @@
+var editor;
+
 $(function () {
     let chooseType = document.getElementById("chooseType");
     let chooseContent = document.getElementById("chooseContent");
@@ -22,16 +24,16 @@ $(function () {
         basicContent.className = "";
     });
 
-    $("#blankType").on("click",function () {
-       $("#chooseUp").addClass("hidden");
-       $("#blankUp").removeClass("hidden");
+    $("#blankType").on("click", function () {
+        $("#chooseUp").addClass("hidden");
+        $("#blankUp").removeClass("hidden");
     });
 
-    $("#mulChoiceType").on("click",function () {
+    $("#mulChoiceType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#mulChoiceUp").removeClass("hidden");
     });
-    $("#solveType").on("click",function () {
+    $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
     });
@@ -136,7 +138,19 @@ $(function () {
             "json"
         );
     });
+
+    let knowFlag = false;
+    setInterval(() => {
+        if (editor !== undefined && !knowFlag) {
+            editor.model.document.on("change:data", () => {
+                $(obj).html(editor.getData());
+                // MathJax.Hub.Queue(["Text", $(obj), "x+1"]);
+            });
+            knowFlag = true
+        }
+    }, 1000);
 });
+
 //返回上传界面
 function backToUp() {
     $("#chooseUp").removeClass("hidden");
@@ -200,6 +214,23 @@ function chooseContentShow(basicContent, data) {
             });
         }
     }
+}
+
+
+//显示富文本编辑器
+async function showEditor(obj) {
+    $(obj).removeAttr("onclick");
+
+    await ClassicEditor.create(document.querySelector('#editor'), {
+        toolbar: ["Heading", "|", "ImageUpload", "BlockQuote", "Bold", "Italic"],
+        language: 'zh-cn'
+    }).then(newEditor => {
+        editor = newEditor;
+
+    }).catch(error => {
+        console.error(error);
+    });
+    editor.setData($(obj).html());
 }
 
 //基础知识大纲刷新--通用

@@ -140,13 +140,16 @@ $(function () {
     });
 
     let knowFlag = false;
-    setInterval(() => {
+    var editorCheck = setInterval(() => {
         if (editor !== undefined && !knowFlag) {
             editor.model.document.on("change:data", () => {
-                $(obj).html(editor.getData());
-                // MathJax.Hub.Queue(["Text", $(obj), "x+1"]);
+                $("#showBlank").html(editor.getData());
+                MathJax.Hub.Queue(["Text", $("#showBlank"), "x+1"]);
             });
             knowFlag = true
+        }
+        if (knowFlag) {
+            clearInterval(editorCheck);
         }
     }, 1000);
 });

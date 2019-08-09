@@ -354,3 +354,38 @@ func (c *AdminController) ChangeContent() {
 
 	c.Redirect("/admin/basicContent/-1", 302)
 }
+
+//上传题
+// @router /admin/uploadQuestion [post]
+func (c *AdminController) UploadQuestion() {
+	newQuestion := models.Question{}
+
+	data := c.GetString("data")
+	dataMap := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &dataMap)
+	if err != nil {
+		beego.Debug("json解析失败")
+	}
+
+	newQuestion.Content = dataMap["content"].(string)
+	role, err := c.GetUint8("role")
+	if err != nil {
+		beego.Debug("未获取题型类型")
+	}
+	beego.Debug(role)
+	newQuestion.RoleQuestion = uint8(role)
+
+	if role == 1 { //如果是选择题，则录入选项
+		newQuestion.Choices = dataMap["choices"].(string)
+	}
+
+	if answer, ok := dataMap["answer"].(string); ok {
+		newQuestion.Answer = answer
+	}
+	beego.Debug(newQuestion)
+
+	o := orm.NewOrm()
+	o.Insert(&newQuestion)
+	c.ServeJSON()
+
+}

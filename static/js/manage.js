@@ -140,6 +140,32 @@ $(function () {
         );
     });
 
+    $("#blankUpBtn").on("click", () => {
+        let blank = $("#showBlank");
+        if (typeof ($(blank).attr("data-content")) === "undefined") {
+            alert("无可上传的内容");
+        } else {
+            let content = $(blank).attr("data-content");
+            if (content.length > 0) {
+                $.post(
+                    "/admin/uploadQuestion",
+                    {
+                        data: JSON.stringify({
+                            content: content,
+                        }),
+                        role: 2,
+                    },
+                    (data, status) => {
+                        if (status === "success") {
+                            backToUp()
+                        }
+                    }
+                );
+            } else {
+                alert("无可上传的内容")
+            }
+        }
+    });
 
 });
 
@@ -166,7 +192,7 @@ function backToUp() {
     $("#blankUp").addClass("hidden");
     $("#mulChoiceUp").addClass("hidden");
     $("#solveUp").addClass("hidden");
-    if(typeof($("#showBlank").attr("data-content"))!=="undefined"){
+    if (typeof ($("#showBlank").attr("data-content")) !== "undefined") {
         $("#showBlank").removeAttr("data-content");
     }
     $("#showBlank").html("暂无内容");

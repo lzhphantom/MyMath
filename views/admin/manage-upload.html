@@ -19,19 +19,19 @@
             <div class="form-group row">
                 <label for="blankContent" class="col-sm-2 control-label">题目：</label>
                 <div class="col-sm-10">
-                    <a href="javascript:void(0);" onclick="showEditor(this);" id="showBlank">暂无内容</a>
+                    <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backBlankGroup');" id="showBlank">暂无内容</a>
                 </div>
             </div>
             <div class="form-group">
-                <textarea name="content" id="editor" class="hidden"></textarea>
+                <textarea name="content" id="blankEditor" class="hidden"></textarea>
             </div>
-            <div class="form-group row" id="backGroup">
+            <div class="form-group row" id="backBlankGroup">
                 <div class="col-md-3 col-md-offset-9">
                     <a class="btn btn-primary btn-lg" id="blankUpBtn">上传</a>
-                    <a class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
+                    <a class="btn btn-success btn-lg" onclick="backToUp('#showBlank');">返回</a>
                 </div>
                 <div class="col-md-3 col-md-offset-9 hidden">
-                    <a class="btn btn-primary btn-lg" onclick="backToLast();">确认</a>
+                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backBlankGroup','#showBlank');">确认</a>
                 </div>
             </div>
         </form>
@@ -76,20 +76,25 @@
     </div>
     <div id="solveUp" class="hidden">
         <h1 class="text-center text-muted">解答题上传</h1>
-        <form action="" class="text-muted">
+        <form class="text-muted">
             <div class="form-group row">
                 <label for="blankContent" class="col-sm-2 control-label">题目：</label>
                 <div class="col-sm-10">
-                    <textarea name="blackContent" id="blankContent" cols="100" rows="10"></textarea>
+                    <a href="javascript:void(0);" onclick="showEditor(this,'#solveEditor','#backSolveGroup');" id="showSolve">暂无内容</a>
                 </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group">
+                <textarea name="content" id="solveEditor" class="hidden"></textarea>
+            </div>
+            <div class="form-group row" id="backSolveGroup">
                 <div class="col-md-3 col-md-offset-9">
-                    <button type="submit" class="btn btn-primary btn-lg">上传</button>
-                    <a type="button" class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
+                    <a class="btn btn-primary btn-lg" id="blankUpBtn">上传</a>
+                    <a class="btn btn-success btn-lg" onclick="backToUp('#showSolve');">返回</a>
+                </div>
+                <div class="col-md-3 col-md-offset-9 hidden">
+                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backSolveGroup','#showSolve');">确认</a>
                 </div>
             </div>
-
         </form>
     </div>
 

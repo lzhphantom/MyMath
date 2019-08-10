@@ -1,4 +1,5 @@
 var editor;
+var showContentName;
 
 $(function () {
     let chooseType = document.getElementById("chooseType");
@@ -27,7 +28,6 @@ $(function () {
     $("#blankType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#blankUp").removeClass("hidden");
-        editorCheck('#showBlank');
     });
 
     $("#mulChoiceType").on("click", function () {
@@ -37,7 +37,6 @@ $(function () {
     $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
-        editorCheck('#showSolve');
     });
 
 
@@ -214,15 +213,15 @@ function editorCheck(show) {
 }
 
 //返回上传界面
-function backToUp(show) {
+function backToUp() {
     $("#chooseUp").removeClass("hidden");
     $("#blankUp").addClass("hidden");
     $("#mulChoiceUp").addClass("hidden");
     $("#solveUp").addClass("hidden");
-    if (typeof ($(show).attr("data-content")) !== "undefined") {
-        $(show).removeAttr("data-content");
+    if (typeof ($(showContentName).attr("data-content")) !== "undefined") {
+        $(showContentName).removeAttr("data-content");
     }
-    $(show).html("暂无内容");
+    $(showContentName).html("暂无内容");
 
 }
 
@@ -284,22 +283,27 @@ function chooseContentShow(basicContent, data) {
 }
 
 //提交富文本编辑器内容
-function backToLast(backGroup, show,editorName) {
+function backToLast(backGroup, editorName) {
     const data = editor.getData();
+    editor.model.document.off("change:data");
     editor.destroy().catch(error => {
         console.log(error);
     });
     editor = null;
-    $(show).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
-    $(show).attr("data-content", data);
+    $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
+    $(showContentName).attr("data-content", data);
     $($(backGroup).children("div")[0]).removeClass("hidden");
     $($(backGroup).children("div")[1]).addClass("hidden");
 
-    editorCheck(show);
+    editorCheck(showContentName);
 }
 
 //显示富文本编辑器
 async function showEditor(obj, editorName, backGroup) {
+    if (typeof (editor) !== "undefined" && editor != null) {
+        alert("正在编辑中...");
+        return
+    }
     $(obj).removeAttr("onclick");
     await ClassicEditor.create(document.querySelector(editorName), {
         toolbar: ["Heading", "|", "ImageUpload", "BlockQuote", "Bold", "Italic"],
@@ -314,9 +318,12 @@ async function showEditor(obj, editorName, backGroup) {
     } else {
         editor.setData($(obj).html());
     }
+    showContentName = "#" + $(obj).attr("id");
 
     $($(backGroup).children("div")[0]).addClass("hidden");
     $($(backGroup).children("div")[1]).removeClass("hidden");
+
+    editorCheck(showContentName);
 }
 
 //基础知识大纲刷新--通用

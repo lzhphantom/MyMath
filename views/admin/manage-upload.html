@@ -28,10 +28,10 @@
             <div class="form-group row" id="backBlankGroup">
                 <div class="col-md-3 col-md-offset-9">
                     <a class="btn btn-primary btn-lg" id="blankUpBtn">上传</a>
-                    <a class="btn btn-success btn-lg" onclick="backToUp('#showBlank');">返回</a>
+                    <a class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
                 </div>
                 <div class="col-md-3 col-md-offset-9 hidden">
-                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backBlankGroup','#showBlank','#blankEditor');">确认</a>
+                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backBlankGroup','#blankEditor');">确认</a>
                 </div>
             </div>
         </form>
@@ -40,27 +40,27 @@
         <h1 class="text-center text-muted">选择题上传</h1>
         <form action="" class="text-muted">
             <div class="form-group row">
-                <label for="selectContent" class="col-sm-2 control-label">题目：</label>
+                <label for="showSelectContent" class="col-sm-2 control-label">题目：</label>
                 <div class="col-sm-10">
                     <a href="javascript:void(0);" onclick="showEditor(this,'#selectEditor','#backSelectGroup');" id="showSelectContent">暂无内容</a>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="selectContentA" class="col-sm-1 control-label">A.</label>
+                <label for="showSelectA" class="col-sm-1 control-label">A.</label>
                 <div class="col-sm-5">
                     <a href="javascript:void(0);" onclick="showEditor(this,'#selectEditor','#backSelectGroup');" id="showSelectA">暂无内容</a>
                 </div>
-                <label for="selectContentB" class="col-sm-1 control-label">B.</label>
+                <label for="showSelectB" class="col-sm-1 control-label">B.</label>
                 <div class="col-sm-5">
                     <a href="javascript:void(0);" onclick="showEditor(this,'#selectEditor','#backSelectGroup');" id="showSelectB">暂无内容</a>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="selectContentC" class="col-sm-1 control-label">C.</label>
+                <label for="showSelectC" class="col-sm-1 control-label">C.</label>
                 <div class="col-sm-5">
                     <a href="javascript:void(0);" onclick="showEditor(this,'#selectEditor','#backSelectGroup');" id="showSelectC">暂无内容</a>
                 </div>
-                <label for="selectContentD" class="col-sm-1 control-label">D.</label>
+                <label for="showSelectD" class="col-sm-1 control-label">D.</label>
                 <div class="col-sm-5">
                     <a href="javascript:void(0);" onclick="showEditor(this,'#selectEditor','#backSelectGroup');" id="showSelectD">暂无内容</a>
                 </div>
@@ -70,11 +70,11 @@
             </div>
             <div class="form-group row" id="backSelectGroup">
                 <div class="col-md-3 col-md-offset-9">
-                    <a class="btn btn-primary btn-lg" id="blankUpBtn">上传</a>
-                    <a class="btn btn-success btn-lg" onclick="backToUp('#showBlank');">返回</a>
+                    <a class="btn btn-primary btn-lg" id="mulChoiceUpBtn">上传</a>
+                    <a class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
                 </div>
                 <div class="col-md-3 col-md-offset-9 hidden">
-                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backSelectGroup','#showBlank','#selectEditor');">确认</a>
+                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backSelectGroup','#selectEditor');">确认</a>
                 </div>
             </div>
 
@@ -95,10 +95,10 @@
             <div class="form-group row" id="backSolveGroup">
                 <div class="col-md-3 col-md-offset-9">
                     <a class="btn btn-primary btn-lg" id="solveUpBtn">上传</a>
-                    <a class="btn btn-success btn-lg" onclick="backToUp('#showSolve');">返回</a>
+                    <a class="btn btn-success btn-lg" onclick="backToUp();">返回</a>
                 </div>
                 <div class="col-md-3 col-md-offset-9 hidden">
-                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backSolveGroup','#showSolve','#solveEditor');">确认</a>
+                    <a class="btn btn-primary btn-lg" onclick="backToLast('#backSolveGroup','#solveEditor');">确认</a>
                 </div>
             </div>
         </form>

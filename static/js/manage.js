@@ -37,6 +37,7 @@ $(function () {
     $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
+        editorCheck('#showSolve');
     });
 
 
@@ -157,7 +158,33 @@ $(function () {
                     },
                     (data, status) => {
                         if (status === "success") {
-                            backToUp()
+                            backToUp("#showBlank")
+                        }
+                    }
+                );
+            } else {
+                alert("无可上传的内容")
+            }
+        }
+    });
+    $("#solveUpBtn").on("click", () => {
+        let blank = $("#showSolve");
+        if (typeof ($(blank).attr("data-content")) === "undefined") {
+            alert("无可上传的内容");
+        } else {
+            let content = $(blank).attr("data-content");
+            if (content.length > 0) {
+                $.post(
+                    "/admin/uploadQuestion",
+                    {
+                        data: JSON.stringify({
+                            content: content,
+                        }),
+                        role: 3,
+                    },
+                    (data, status) => {
+                        if (status === "success") {
+                            backToUp("#showSolve")
                         }
                     }
                 );
@@ -257,13 +284,13 @@ function chooseContentShow(basicContent, data) {
 }
 
 //提交富文本编辑器内容
-function backToLast(backGroup, show) {
+function backToLast(backGroup, show,editorName) {
     const data = editor.getData();
     editor.destroy().catch(error => {
         console.log(error);
     });
     editor = null;
-    $(show).attr("onclick", "showEditor(this" + ",'" + show + "','" + backGroup + "');");
+    $(show).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
     $(show).attr("data-content", data);
     $($(backGroup).children("div")[0]).removeClass("hidden");
     $($(backGroup).children("div")[1]).addClass("hidden");

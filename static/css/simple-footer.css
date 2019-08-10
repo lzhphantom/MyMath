@@ -3,6 +3,30 @@
   color:rgb(255,255,255);
 }
 
+#Footer{
+  margin-bottom: 0;
+}
+@media screen and (max-width: 767px) {
+  #Content-Body{
+    min-height: 495px;
+  }
+}
+@media screen and (min-width: 768px) {
+  #Content-Body{
+    min-height: 530px;
+  }
+}
+@media screen and (min-width: 992px) {
+  #Content-Body{
+    min-height: 637px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #Content-Body{
+    min-height: 771px;
+  }
+}
+
 @media (max-width: 767px) {
   .footer p {
     text-align:center;

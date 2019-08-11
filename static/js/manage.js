@@ -193,6 +193,34 @@ $(function () {
         }
     });
 
+    $("#mulChoiceUpBtn").on("click", () => {
+        let blank = $("#mulChoiceUp").find("a[id=showSelect]");
+        if (typeof ($(blank).attr("data-content")) === "undefined") {
+            alert("无可上传的内容");
+        } else {
+            let content = $(blank).attr("data-content");
+            if (content.length > 0) {
+                $.post(
+                    "/admin/uploadQuestion",
+                    {
+                        data: JSON.stringify({
+                            content: content,
+                            choices:"",
+                        }),
+                        role: 3,
+                    },
+                    (data, status) => {
+                        if (status === "success") {
+                            backToUp("#showSolve")
+                        }
+                    }
+                );
+            } else {
+                alert("无可上传的内容")
+            }
+        }
+    });
+
 });
 
 //准备生成富文本编辑器
@@ -202,26 +230,38 @@ function editorCheck(show) {
         if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
                 $(show).html(editor.getData());
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "showBlank"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
             });
             knowFlag = true
         }
         if (knowFlag) {
             clearInterval(editorCheck);
         }
-    }, 1000);
+    }, 100);
 }
 
 //返回上传界面
-function backToUp() {
+function backToUp(obj) {
     $("#chooseUp").removeClass("hidden");
     $("#blankUp").addClass("hidden");
     $("#mulChoiceUp").addClass("hidden");
     $("#solveUp").addClass("hidden");
-    if (typeof ($(showContentName).attr("data-content")) !== "undefined") {
-        $(showContentName).removeAttr("data-content");
+    let isSelect = $(obj).closest("#mulChoiceUp");
+    if (isSelect.length>0){
+        let selectAll=$(isSelect[0]).find("a[id^=showSelect]");
+        for (let i = 0; i < selectAll.length; i++) {
+            if(typeof ($(selectAll[i]).attr("data-content"))!=="undefined"){
+                $(selectAll[i]).removeAttr("data-content")
+            }
+            $(selectAll[i]).html("暂无内容");
+        }
+    }else {
+        if (typeof ($(showContentName).attr("data-content")) !== "undefined") {
+            $(showContentName).removeAttr("data-content");
+        }
+        $(showContentName).html("暂无内容");
     }
-    $(showContentName).html("暂无内容");
+
 
 }
 
@@ -294,8 +334,6 @@ function backToLast(backGroup, editorName) {
     $(showContentName).attr("data-content", data);
     $($(backGroup).children("div")[0]).removeClass("hidden");
     $($(backGroup).children("div")[1]).addClass("hidden");
-
-    editorCheck(showContentName);
 }
 
 //显示富文本编辑器

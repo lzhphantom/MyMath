@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/orm"
 	_ "mysql"
 	"time"
@@ -15,8 +17,25 @@ type Admin struct {
 }
 
 func init() {
+	conf, err := config.NewConfig("ini", "conf/app.conf")
+	if err != nil {
+		beego.Debug("获取配置文件失败")
+	}
+	section, err := conf.GetSection("mysql")
+	if err != nil {
+		beego.Debug("获取配置文件内容失败")
+	}
+	connectIp := section["connect_ip"]
+	port := section["port"]
+	username := section["username"]
+	password := section["password"]
+	dbName := section["db_name"]
+	dataSource := username + ":" + password + "@tcp(" + connectIp + ":" + port + ")/" + dbName + "?charset=utf8"
 	//设置数据库基本信息
-	orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/mymath?charset=utf8")
+	err = orm.RegisterDataBase("default", "mysql", dataSource)
+	if err != nil {
+		beego.Debug("注册数据库失败")
+	}
 	//映射model数据
 	orm.RegisterModel(new(Admin), new(BasicCommon), new(BasicContent), new(KnowledgeImportant), new(Formula), new(ExaminationCenter), new(HDifficulty), new(User), new(UserInfo), new(Question))
 	//生成表

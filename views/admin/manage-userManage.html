@@ -1,11 +1,60 @@
 <div id="settings" class="tab-pane" role="tabpanel">
-    <div>
-        <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">学生管理</a></h1>
+    <div id="userModal">
+        <div>
+            <h1 class="text-center">
+                <a href="javascript:void(0);" class="btn btn-primary btn-block" for-id="#studentManage">学生管理</a>
+            </h1>
+        </div>
+        <div>
+            <h1 class="text-center">
+                <a href="javascript:void(0);" class="btn btn-primary btn-block" for-id="#teacherManage">教师管理</a>
+            </h1>
+        </div>
+        <div>
+            <h1 class="text-center">
+                <a href="javascript:void(0);" class="btn btn-primary btn-block" for-id="#adminManage">管理员管理</a>
+            </h1>
+        </div>
+        <div>
+            <h1 class="text-center">
+                <a href="javascript:void(0);" class="btn btn-primary btn-block" for-id="#userAdd">用户添加</a>
+            </h1>
+        </div>
+        <div>
+            <h1 class="text-center">
+                <a href="javascript:void(0);" class="btn btn-primary btn-block" for-id="#userModify">用户修改</a>
+            </h1>
+        </div>
     </div>
-    <div>
-        <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">教师管理</a></h1>
+
+    <div id="studentManage" class="hidden">
+        <h1 class="text-center text-muted">学生管理</h1>
+        <div id="userBackGroup">
+            <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+        </div>
     </div>
-    <div>
-        <h1 class="text-center"><a href="#" class="btn btn-primary btn-block">管理员管理</a></h1>
+    <div id="teacherManage" class="hidden">
+        <h1 class="text-center text-muted">教师管理</h1>
+        <div id="userBackGroup">
+            <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+        </div>
+    </div>
+    <div id="adminManage" class="hidden">
+        <h1 class="text-muted text-center">管理员管理</h1>
+        <div id="userBackGroup">
+            <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+        </div>
+    </div>
+    <div id="userAdd" class="hidden">
+        <h1 class="text-center text-muted">用户添加</h1>
+        <div id="userBackGroup">
+            <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+        </div>
+    </div>
+    <div id="userModify" class="hidden">
+        <h1 class="text-muted text-center">用户修改</h1>
+        <div id="userBackGroup">
+            <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+        </div>
     </div>
 </div>

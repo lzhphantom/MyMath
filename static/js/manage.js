@@ -147,12 +147,17 @@ $(function () {
         } else {
             let content = $(blank).attr("data-content");
             if (content.length > 0) {
+                let db = {
+                    content: content,
+                }
+                let ans = $("#showAnswerBlank");
+                if (typeof ($(ans).attr("data-content")) !== "undefined") {
+                    db.answer = $(ans).attr("data-content");
+                }
                 $.post(
                     "/admin/uploadQuestion",
                     {
-                        data: JSON.stringify({
-                            content: content,
-                        }),
+                        data: JSON.stringify(db),
                         role: 2,
                     },
                     (data, status) => {
@@ -172,13 +177,18 @@ $(function () {
             alert("无可上传的内容");
         } else {
             let content = $(blank).attr("data-content");
+            let db = {
+                content: content,
+            };
+            let ans = $("#showAnswerSolve");
+            if (typeof ($(ans).attr("data-content")) !== "undefined") {
+                db.answer = $(ans).attr("data-content");
+            }
             if (content.length > 0) {
                 $.post(
                     "/admin/uploadQuestion",
                     {
-                        data: JSON.stringify({
-                            content: content,
-                        }),
+                        data: JSON.stringify(db),
                         role: 3,
                     },
                     (data, status) => {
@@ -216,6 +226,7 @@ $(function () {
             alert("选择数量不足，至少3个")
         } else {
             let content = $(select).attr("data-content");
+            let ans = $("#showAnswerSelect").val();
             if (content.length > 0) {
                 $.post(
                     "/admin/uploadQuestion",
@@ -223,6 +234,7 @@ $(function () {
                         data: JSON.stringify({
                             content: content,
                             choices: choice,
+                            answer: ans,
                         }),
                         role: 1,
                     },
@@ -273,11 +285,16 @@ function backToUp(obj) {
             }
             $(selectAll[i]).html("暂无内容");
         }
+        $("#showAnswerSelect").empty().append(`<option value="-">==暂无答案==</option>`)
     } else {
-        if (typeof ($(showContentName).attr("data-content")) !== "undefined") {
-            $(showContentName).removeAttr("data-content");
+        let allShow = $(obj).closest("form").find("a[id^=show]");
+        for (let i = 0; i < allShow.length; i++) {
+            if (typeof ($(allShow[i]).attr("data-content")) !== "undefined") {
+                $(allShow[i]).removeAttr("data-content");
+            }
+            $(allShow[i]).html("暂无内容");
         }
-        $(showContentName).html("暂无内容");
+
     }
 
 
@@ -350,6 +367,41 @@ function backToLast(backGroup, editorName) {
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
     $(showContentName).attr("data-content", data);
+    //选择题答案添加
+    if (showContentName === "#showSelectA" || showContentName === "#showSelectB"
+        || showContentName === "#showSelectC" || showContentName === "#showSelectD") {
+        let selectA = $("#showSelectA");
+        let selectB = $("#showSelectB");
+        let selectC = $("#showSelectC");
+        let selectD = $("#showSelectD");
+        $("#showAnswerSelect").empty();
+        if (typeof ($(selectA).attr("data-content")) !== "undefined") {
+            let content = $(selectA).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">A</option>`)
+            }
+        }
+        if (typeof ($(selectB).attr("data-content")) !== "undefined") {
+            let content = $(selectB).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">B</option>`)
+            }
+        }
+        if (typeof ($(selectC).attr("data-content")) !== "undefined") {
+            let content = $(selectC).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">C</option>`)
+            }
+        }
+        if (typeof ($(selectD).attr("data-content")) !== "undefined") {
+            let content = $(selectD).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">D</option>`)
+            }
+
+        }
+
+    }
     $($(backGroup).children("div")[0]).removeClass("hidden");
     $($(backGroup).children("div")[1]).addClass("hidden");
 }

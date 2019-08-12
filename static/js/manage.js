@@ -194,24 +194,41 @@ $(function () {
     });
 
     $("#mulChoiceUpBtn").on("click", () => {
-        let blank = $("#mulChoiceUp").find("a[id=showSelect]");
-        if (typeof ($(blank).attr("data-content")) === "undefined") {
-            alert("无可上传的内容");
+        let allSelect = $("#mulChoiceUp").find("a[id^=showSelect]");
+        let select;
+        let choice = "";
+        let choiceNum = 0;
+        for (let i = 0; i < allSelect.length; i++) {
+            if ($(allSelect[i]).attr("id") === "showSelectContent") {
+                select = $(allSelect[i]);
+            } else {
+                if (typeof ($(allSelect[i]).attr("data-content")) !== "undefined") {
+                    choice += $(allSelect[i]).attr("data-content") + "~￥";
+                    choiceNum++;
+                }
+            }
+        }
+        if (typeof ($(select).attr("data-content")) === "undefined") {
+            alert("无可上传的内容,select");
+        } else if (choice.length <= 0) {
+            alert("无可上传的内容,length");
+        } else if (choiceNum <= 2) {
+            alert("选择数量不足，至少3个")
         } else {
-            let content = $(blank).attr("data-content");
+            let content = $(select).attr("data-content");
             if (content.length > 0) {
                 $.post(
                     "/admin/uploadQuestion",
                     {
                         data: JSON.stringify({
                             content: content,
-                            choices:"",
+                            choices: choice,
                         }),
-                        role: 3,
+                        role: 1,
                     },
                     (data, status) => {
                         if (status === "success") {
-                            backToUp("#showSolve")
+                            backToUp("#showSelectContent")
                         }
                     }
                 );
@@ -221,7 +238,8 @@ $(function () {
         }
     });
 
-});
+})
+;
 
 //准备生成富文本编辑器
 function editorCheck(show) {
@@ -247,15 +265,15 @@ function backToUp(obj) {
     $("#mulChoiceUp").addClass("hidden");
     $("#solveUp").addClass("hidden");
     let isSelect = $(obj).closest("#mulChoiceUp");
-    if (isSelect.length>0){
-        let selectAll=$(isSelect[0]).find("a[id^=showSelect]");
+    if (isSelect.length > 0) {
+        let selectAll = $(isSelect[0]).find("a[id^=showSelect]");
         for (let i = 0; i < selectAll.length; i++) {
-            if(typeof ($(selectAll[i]).attr("data-content"))!=="undefined"){
+            if (typeof ($(selectAll[i]).attr("data-content")) !== "undefined") {
                 $(selectAll[i]).removeAttr("data-content")
             }
             $(selectAll[i]).html("暂无内容");
         }
-    }else {
+    } else {
         if (typeof ($(showContentName).attr("data-content")) !== "undefined") {
             $(showContentName).removeAttr("data-content");
         }

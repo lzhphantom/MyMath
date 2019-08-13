@@ -30,7 +30,7 @@ func init() {
 	username := section["username"]
 	password := section["password"]
 	dbName := section["db_name"]
-	dataSource := username + ":" + password + "@tcp(" + connectIp + ":" + port + ")/" + dbName + "?charset=utf8"
+	dataSource := username + ":" + password + "@tcp(" + connectIp + ":" + port + ")/" + dbName + "?charset=utf8&loc=Local"
 	//设置数据库基本信息
 	err = orm.RegisterDataBase("default", "mysql", dataSource)
 	if err != nil {

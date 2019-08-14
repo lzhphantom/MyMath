@@ -69,44 +69,74 @@
     </div>
     <div id="userAdd" class="hidden">
         <h1 class="text-center text-muted">用户添加</h1>
-        <form action="" class="form-horizontal" id="userAddForm">
-            <div class="form-group row">
+        <form action="/admin/userAdd" method="post" class="form-horizontal" id="userAddForm">
+            <div class="form-group row control-group">
                 <label for="userName" class="control-label col-sm-1 col-sm-offset-4">用户名：</label>
-                <input type="text" id="userName" name="userName" placeholder="输入用户名" class="col-sm-3">
+                <div class="controls">
+                    <input type="text" name="userName" placeholder="输入用户名" class="col-sm-3"
+                           minlength="4" maxlength="18" required data-validation-minlength-message="最小长度4位"
+                           pattern="[0-9a-zA-Z_]{1,18}" data-validation-pattern-message="由任意字母、下划线和数字组成">
+                    <p class="help-block"></p>
+                </div>
+
             </div>
-            <div class="form-group row">
+            <div class="form-group row control-group">
                 <label for="pwd" class="control-label col-sm-1 col-sm-offset-4">密码：</label>
-                <input type="password" id="pwd" name="password" placeholder="输入密码" class="col-sm-2">
+                <div class="controls">
+                    <input type="password" name="password" placeholder="输入密码" class="col-sm-2"
+                           minlength="6" maxlength="20" required
+                           pattern="(?!\d+$)(?![a-zA-Z]+$)(?![@#$%^&]+$)[\da-zA-Z@#$%^&]+"
+                           data-validation-minlength-message="最小长度6位"
+                           data-validation-pattern-message="必须由数字、字母和特殊字符组成">
+                    <p class="help-block"></p>
+                </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row control-group">
                 <label for="pwd2" class="control-label col-sm-1 col-sm-offset-4">确认密码：</label>
-                <input type="password" id="pwd2" name="password2" placeholder="再次输入密码" class="col-sm-2">
+                <div class="controls">
+                    <input type="password" name="password2" placeholder="再次输入密码" class="col-sm-2"
+                           minlength="6" maxlength="20" data-validation-matches-match="password"
+                           data-validation-matches-message="必须和上面的密码一致" required>
+                    <p class="help-block"></p>
+                </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row control-group">
                 <label for="name" class="control-label col-sm-1 col-sm-offset-4">姓名：</label>
-                <input type="text" id="name" name="name" placeholder="姓名" class="col-sm-3">
+                <div class="controls">
+                    <input type="text" name="name" placeholder="姓名" class="col-sm-3"
+                           minlength="2" maxlength="20"
+                           data-validation-minlength-message="最小长度2"
+                           pattern="[\u4e00-\u9fa5]{1,20}"
+                           data-validation-pattern-message="只能用中文" required>
+                    <p class="help-block"></p>
+                </div>
             </div>
             <div class="form-group row">
                 <label for="sex" class="control-label col-sm-1 col-sm-offset-4">性别：</label>
                 <div class="col-sm-1">
                     <label for="man">男</label>
-                    <input type="radio" name="sex" id="man">
+                    <input type="radio" name="sex" id="man" value="0">
                 </div>
                 <div class="col-sm-1">
                     <label for="woman">女</label>
-                    <input type="radio" name="sex" id="woman">
+                    <input type="radio" name="sex" id="woman" value="1">
+                </div>
+            </div>
+            <div class="form-group row control-group">
+                <label for="tel" class="control-label col-sm-1 col-sm-offset-4">手机：</label>
+                <div class="controls">
+                    <input type="text" name="tel" placeholder="手机号码" maxlength="11" minlength="11"
+                           pattern="1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}"
+                           data-validation-pattern-message="手机号码不符合" class="col-sm-2">
+                    <p class="help-block"></p>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="tel" class="control-label col-sm-1 col-sm-offset-4">手机：</label>
-                <input type="text" id="tel" name="tel" placeholder="手机号码" maxlength="11" minlength="11">
-            </div>
-            <div class="form-group row">
-                <label for="city" class="control-label col-sm-1 col-sm-offset-4">地址：</label>
+                <label for="province" class="control-label col-sm-1 col-sm-offset-4">地址：</label>
                 <div data-toggle="distpicker">
-                    <select data-province="---- 选择省 ----"></select>
-                    <select data-city="---- 选择市 ----"></select>
-                    <select data-district="---- 选择区 ----"></select>
+                    <select data-province="---- 选择省 ----" name="province"></select>
+                    <select data-city="---- 选择市 ----" name="city"></select>
+                    <select data-district="---- 选择区 ----" name="street"></select>
                 </div>
             </div>
             <div class="form-group row">
@@ -117,17 +147,13 @@
                     <option value="0">管理员</option>
                 </select>
             </div>
-            <div id="errorMessages" class="form-group row">
-                <div id="error_tips" class="col-sm-offset-4"></div>
-                <ul></ul>
+            <div id="userBackGroup" class="form-group row">
+                <div class="col-sm-offset-5">
+                    <button type="submit" class="btn btn-primary btn-lg" id="userAddBtn">添加</button>
+                    <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
+                </div>
             </div>
         </form>
-        <div id="userBackGroup" class="form-group row">
-            <div class="col-sm-offset-5">
-                <a class="btn btn-primary btn-lg" id="userAdd">添加</a>
-                <a class="btn btn-success btn-lg" onclick="backToUserModal(this)">返回</a>
-            </div>
-        </div>
     </div>
     <div id="userModify" class="hidden">
         <h1 class="text-muted text-center">用户修改</h1>

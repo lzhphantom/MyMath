@@ -1,7 +1,9 @@
 package admin
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/models"
@@ -388,4 +390,47 @@ func (c *AdminController) UploadQuestion() {
 	o.Insert(&newQuestion)
 	c.ServeJSON()
 
+}
+
+//添加用户
+// @router /admin/userAdd [post]
+func (c *AdminController) UserAdd() {
+	userName := c.GetString("userName")
+	pwd := c.GetString("password")
+	name := c.GetString("name")
+	sex, _ := c.GetInt("sex")
+	tel := c.GetString("tel")
+	province := c.GetString("province")
+	city := c.GetString("city")
+	street := c.GetString("street")
+	userGroup, _ := c.GetInt("userGroup")
+
+	//密码加密
+	pwdData := []byte(pwd)
+	has := md5.Sum(pwdData)
+	md5pwd := fmt.Sprintf("%x", has)
+
+	user := models.User{
+		UserName: userName,
+		Password: md5pwd,
+		Role:     byte(userGroup),
+	}
+	o := orm.NewOrm()
+	_, err := o.Insert(&user)
+	if err != nil {
+		beego.Debug("用户表添加失败：", err)
+	}
+
+	userInfo := models.UserInfo{
+		Name:    name,
+		Sex:     byte(sex),
+		Tel:     tel,
+		Address: province + " " + city + " " + street,
+		User:    &user,
+	}
+	_, err = o.Insert(&userInfo)
+	if err != nil {
+		beego.Debug("用户信息表添加失败：", err)
+	}
+	c.Redirect("/admin", 302)
 }

@@ -69,31 +69,37 @@
     </div>
     <div id="userAdd" class="hidden">
         <h1 class="text-center text-muted">用户添加</h1>
-        <form action="">
+        <form action="" class="form-horizontal" id="userAddForm">
             <div class="form-group row">
                 <label for="userName" class="control-label col-sm-1 col-sm-offset-4">用户名：</label>
-                <input type="text" id="userName" placeholder="输入用户名" class="col-sm-3">
+                <input type="text" id="userName" name="userName" placeholder="输入用户名" class="col-sm-3">
             </div>
             <div class="form-group row">
                 <label for="pwd" class="control-label col-sm-1 col-sm-offset-4">密码：</label>
-                <input type="password" id="pwd" placeholder="输入密码" class="col-sm-2">
+                <input type="password" id="pwd" name="password" placeholder="输入密码" class="col-sm-2">
             </div>
             <div class="form-group row">
                 <label for="pwd2" class="control-label col-sm-1 col-sm-offset-4">确认密码：</label>
-                <input type="password" id="pwd2" placeholder="再次输入密码" class="col-sm-2">
+                <input type="password" id="pwd2" name="password2" placeholder="再次输入密码" class="col-sm-2">
             </div>
             <div class="form-group row">
                 <label for="name" class="control-label col-sm-1 col-sm-offset-4">姓名：</label>
-                <input type="text" id="name" placeholder="姓名" class="col-sm-3">
+                <input type="text" id="name" name="name" placeholder="姓名" class="col-sm-3">
             </div>
             <div class="form-group row">
                 <label for="sex" class="control-label col-sm-1 col-sm-offset-4">性别：</label>
-                <input type="radio" name="sex" id="sex" value="男">
-                <input type="radio" name="sex" id="sex" value="女">
+                <div class="col-sm-1">
+                    <label for="man">男</label>
+                    <input type="radio" name="sex" id="man">
+                </div>
+                <div class="col-sm-1">
+                    <label for="woman">女</label>
+                    <input type="radio" name="sex" id="woman">
+                </div>
             </div>
             <div class="form-group row">
                 <label for="tel" class="control-label col-sm-1 col-sm-offset-4">手机：</label>
-                <input type="text" id="tel" placeholder="手机号码" maxlength="11" minlength="11">
+                <input type="text" id="tel" name="tel" placeholder="手机号码" maxlength="11" minlength="11">
             </div>
             <div class="form-group row">
                 <label for="city" class="control-label col-sm-1 col-sm-offset-4">地址：</label>
@@ -110,6 +116,10 @@
                     <option value="2">教师</option>
                     <option value="0">管理员</option>
                 </select>
+            </div>
+            <div id="errorMessages" class="form-group row">
+                <div id="error_tips" class="col-sm-offset-4"></div>
+                <ul></ul>
             </div>
         </form>
         <div id="userBackGroup" class="form-group row">

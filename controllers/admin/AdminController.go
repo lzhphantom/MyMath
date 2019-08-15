@@ -434,3 +434,30 @@ func (c *AdminController) UserAdd() {
 	}
 	c.Redirect("/admin", 302)
 }
+
+//查找用户信息
+// @router /admin/searchUser [post]
+func (c *AdminController) SearchUser() {
+	userGroup, err := c.GetInt("group")
+	if err != nil {
+		beego.Debug("获取用户分组失败")
+	}
+	users := make([]models.User, 0)
+	o := orm.NewOrm()
+	num, err := o.QueryTable("user").Filter("role", byte(userGroup)).All(&users)
+
+	for _, user := range users {
+		t := models.UserInfo{}
+		o.QueryTable("user_info").Filter("user_id", user.Id).One(&t)
+		*user.UserInfo = t
+	}
+	if err != nil {
+		beego.Debug("获取user表失败")
+	} else {
+		beego.Debug("获取了", num, "条")
+	}
+	beego.Debug(users)
+
+	c.Data["json"] = users
+	c.ServeJSON()
+}

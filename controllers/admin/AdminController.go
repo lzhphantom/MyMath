@@ -446,17 +446,17 @@ func (c *AdminController) SearchUser() {
 	o := orm.NewOrm()
 	num, err := o.QueryTable("user").Filter("role", byte(userGroup)).All(&users)
 
-	for _, user := range users {
+	//range 会为每个元素生成一个副本
+	for i := 0; i < len(users); i++ {
 		t := models.UserInfo{}
-		o.QueryTable("user_info").Filter("user_id", user.Id).One(&t)
-		*user.UserInfo = t
+		o.QueryTable("user_info").Filter("user_id", users[i].Id).One(&t)
+		users[i].UserInfo = &t
 	}
 	if err != nil {
 		beego.Debug("获取user表失败")
 	} else {
 		beego.Debug("获取了", num, "条")
 	}
-	beego.Debug(users)
 
 	c.Data["json"] = users
 	c.ServeJSON()

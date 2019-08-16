@@ -3,24 +3,42 @@ $(() => {
     for (let i = 0; i < aList.length; i++) {
         $(aList[i]).on("click", () => {
             let id = $(aList[i]).attr("for-id");
-            if (id === "#studentManage") {
+            if (id === "#studentManage" || id === "#teacherManage" || id === "#adminManage") {
+                let reqData = {};
+                if (id === "#studentManage") {
+                    reqData.group = 1
+                } else if (id === "#teacherManage") {
+                    reqData.group = 2
+                } else if (id === "#adminManage") {
+                    reqData.group = 0
+                }
                 $.post(
                     "/admin/searchUser",
-                    {group: 1},
+                    reqData,
                     function (data, status) {
                         console.log(data);
-                        console.log(data[0].UserInfo);
+                        $(id).find("tbody").empty();
+                        for (let i = 0; i < data.length; i++) {
+                            let sex = "";
+                            if (data[i].UserInfo.Sex === 0) {
+                                sex = "女"
+                            } else {
+                                sex = "男"
+                            }
+                            $(id).find("tbody").append(`
+                            <tr>
+                                <td>` + data[i].Id + `</td>
+                                <td>` + data[i].UserName + `</td>
+                                <td>` + data[i].Password + `</td>
+                                <td>` + data[i].UserInfo.Name + `</td>
+                                <td>` + sex + `</td>
+                                <td>` + data[i].UserInfo.Tel + `</td>
+                                <td>` + data[i].UserInfo.Address + `</td>
+                            </tr>`)
+                        }
                     }
                 )
-                $(id).find("tbody").empty().append(`<tr>
-                    <td>1</td>
-                    <td>luotest</td>
-                    <td>1234</td>
-                    <td>罗</td>
-                    <td>男</td>
-                    <td>1321456</td>
-                    <td>地址</td>
-                </tr>`)
+
             }
             $("#userModal").addClass("hidden");
             $(id).removeClass("hidden");
@@ -32,6 +50,12 @@ $(() => {
 });
 
 function backToUserModal(obj) {
-    $(obj).parent("div").parent("div").addClass("hidden");
+    let userAdd=$(obj).closest("#userAdd");
+    if(userAdd.length>0){
+        $("#userAdd").addClass("hidden");
+    }else {
+        $(obj).parent("div").parent("div").addClass("hidden");
+    }
     $("#userModal").removeClass("hidden");
+
 }

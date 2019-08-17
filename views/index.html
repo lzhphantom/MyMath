@@ -23,6 +23,7 @@
                 <div class="panel-heading">
                     <h3 class="text-center text-muted">数学</h3>
                 </div>
+                <!-- 基础知识版块 -->
                 <div class="panel panel-success">
                     <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"><a
                                 href="javascript:void(0);">基础知识</a></div>
@@ -34,19 +35,24 @@
                         </div>
                     </div>
                 </div>
+                <!-- 在线练习版块 -->
                 <div class="panel panel-success">
                     <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo"><a
                                 href="#">在线练习</a></div>
                     <div id="collapseTwo" class="panel-collapse collapse">
                         <div class="panel-body">
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">选择题</a></li>
-                                <li><a href="#">填空题</a></li>
-                                <li><a href="#">解答题</a></li>
+                                <li role="presentation"><a href="#Select" aria-controls="Select" role="tab"
+                                                           data-toggle="tab">选择题</a></li>
+                                <li role="presentation"><a href="#Blank" aria-controls="Blank" role="tab"
+                                                           data-toggle="tab">填空题</a></li>
+                                <li role="presentation"><a href="#Solve" aria-controls="Solve" role="tab"
+                                                           data-toggle="tab">解答题</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
+                <!-- 专项练习版块 -->
                 <div class="panel panel-success">
                     <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree"><a
                                 href="#">专项练习</a></div>
@@ -81,12 +87,20 @@
             </div>
         </div>
         <div class="col-sm-9 tab-content">
-            <div id="jihe" class="tab-pane fade in active" role="tabpanel">
+            <div id="Basic">
+                <div id="jihe" class="tab-pane fade in active" role="tabpanel">
 
-            </div>
-            <div id="sjhs" class="tab-pane fade" role="tabpanel">
+                </div>
+                <div id="sjhs" class="tab-pane fade" role="tabpanel">
 
+                </div>
             </div>
+            <div id="Training">
+                <div id="Select" class="tab-pane fade" role="tabpanel">
+
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

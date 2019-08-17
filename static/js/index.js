@@ -14,13 +14,18 @@ $(function () {
                 }
             }
 
+            $('a[data-toggle="tab"]').on('hide.bs.tab', (e) => {
+                let controls = $(e.target).attr("href");
+                $(controls).empty();
+            });
+
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 let id = $(e.target).attr("data-id");
                 let controls = $(e.target).attr("href");
                 $.get("/admin/basicContent/" + id, function (data, status) {
                     let $modal = $(controls);
                     $($modal).empty();
-                    $($modal).append(`<h1 class="text-center">基础知识</h1>`);
+                    $($modal).append(`<h1 class="text-center text-muted">基础知识</h1>`);
 
                     $($modal).append(`<div>
                     <h2>` + data.Name + `</h2>
@@ -90,5 +95,75 @@ $(function () {
         });
     });
 
+    $('#collapseTwo').on('show.bs.collapse', () => {
+
+        $('a[data-toggle="tab"]').on('hide.bs.tab', (e) => {
+            let controls = $(e.target).attr("href");
+            $(controls).empty();
+        });
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
+            let controls = $(e.target).attr("href");
+            if (controls === "#Select") {
+                getSelect(controls);
+            }
+        });
+
+    });
+
 });
+
+
+function getSelect(controls) {
+    $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger" style="width: 30%">
+                            <span>30% </span>
+                        </div>
+                    </div>
+                    <div id="Content">
+                        
+                    </div>
+                    <div id="backGroup" class="row">
+                        <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                        <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
+                    </div>`);
+    let content = $(controls).find("#Content");
+    console.log($(content));
+    $.get("/admin/getQuestion/1", (data) => {
+        console.log(data);
+        let choices = ``;
+        let letterNumber = 65;
+        for (let i = 0; i < data.Choices.length; i++) {
+            choices += `<div>
+                            <label for="">
+                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            </label>
+                        </div>`
+        }
+        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).append(choices);
+        $(content).find("p").css("display", "inline");
+    });
+
+    $("#nextQuestion").on("click", (e) => {
+        let parent = $(e.target).parent("div").parent("div");
+        if ($(parent).attr("id") === "Select") {
+            let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+            if (userAnswer !== undefined) {
+                $(parent).empty();
+                getSelect("#Select");
+            } else {
+                alert("请选择你认为正确的答案！");
+            }
+        }
+    });
+}
 

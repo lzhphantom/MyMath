@@ -7,8 +7,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/models"
+	"math/rand"
 	"reflect"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type AdminController struct {
@@ -459,5 +462,39 @@ func (c *AdminController) SearchUser() {
 	}
 
 	c.Data["json"] = users
+	c.ServeJSON()
+}
+
+//随机获取一道所需要的题
+// @router /admin/getQuestion/:role [get]
+func (c *AdminController) GetQuestion() {
+	role := c.Ctx.Input.Param(":role")
+	o := orm.NewOrm()
+	var questions []*models.Question
+	num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
+	rand.Seed(time.Now().UnixNano())
+	question := questions[rand.Intn(len(questions))]
+	choices := strings.Split(question.Choices, "~￥")
+	for i := 0; i < len(choices); i++ {
+		if len(choices[i]) == 0 {
+			choices = append(choices[:i], choices[i+1:]...)
+		}
+	}
+	data := struct {
+		Id      int
+		Choices []string
+		Content string
+	}{
+		Id:      question.Id,
+		Choices: choices,
+		Content: question.Content,
+	}
+	if err != nil {
+		beego.Debug("获取题失败：", err)
+	} else {
+		beego.Info("一共获取了", num, "条")
+	}
+
+	c.Data["json"] = data
 	c.ServeJSON()
 }

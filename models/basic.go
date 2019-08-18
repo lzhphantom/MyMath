@@ -5,6 +5,7 @@ type BasicCommon struct {
 	Id           int
 	Name         string
 	BasicContent []*BasicContent `orm:"reverse(many)"`
+	Question     []*Question     `orm:"reverse(many)"`
 }
 
 // 基础知识内容

@@ -390,7 +390,11 @@ func (c *AdminController) UploadQuestion() {
 	beego.Debug(newQuestion)
 
 	o := orm.NewOrm()
-	o.Insert(&newQuestion)
+	newQuestion.BasicCommon = &models.BasicCommon{}
+	_, err = o.Insert(&newQuestion)
+	if err != nil {
+		beego.Debug("插入失败：", err)
+	}
 	c.ServeJSON()
 
 }
@@ -471,30 +475,61 @@ func (c *AdminController) GetQuestion() {
 	role := c.Ctx.Input.Param(":role")
 	o := orm.NewOrm()
 	var questions []*models.Question
-	num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
 	rand.Seed(time.Now().UnixNano())
-	question := questions[rand.Intn(len(questions))]
-	choices := strings.Split(question.Choices, "~￥")
-	for i := 0; i < len(choices); i++ {
-		if len(choices[i]) == 0 {
-			choices = append(choices[:i], choices[i+1:]...)
+	if role == "-1" {
+		num, err := o.Raw("SELECT id,content FROM question WHERE role_question != ?", 1).QueryRows(&questions)
+		if err != nil {
+			beego.Debug("获取题失败：", err)
+		} else {
+			beego.Info("一共获取了", num, "条")
 		}
+		question := questions[rand.Intn(len(questions))]
+		c.Data["json"] = question
+	} else {
+		num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
+		if err != nil {
+			beego.Debug("获取题失败：", err)
+		} else {
+			beego.Info("一共获取了", num, "条")
+		}
+
+		question := questions[rand.Intn(len(questions))]
+		choices := strings.Split(question.Choices, "~￥")
+		for i := 0; i < len(choices); i++ {
+			if len(choices[i]) == 0 {
+				choices = append(choices[:i], choices[i+1:]...)
+			}
+		}
+		data := struct {
+			Id      int
+			Choices []string
+			Content string
+		}{
+			Id:      question.Id,
+			Choices: choices,
+			Content: question.Content,
+		}
+		c.Data["json"] = data
 	}
-	data := struct {
-		Id      int
-		Choices []string
-		Content string
-	}{
-		Id:      question.Id,
-		Choices: choices,
-		Content: question.Content,
-	}
+	c.ServeJSON()
+}
+
+//随机获取一道特定范围的题
+// @router /admin/getQuestionByCommonId/:id [get]
+func (c *AdminController) GetQuestionByCommonId() {
+	role := c.Ctx.Input.Param(":id")
+	o := orm.NewOrm()
+	var questions []*models.Question
+	rand.Seed(time.Now().UnixNano())
+	num, err := o.QueryTable("question").Filter("basic_common_id", role).All(&questions)
 	if err != nil {
 		beego.Debug("获取题失败：", err)
 	} else {
 		beego.Info("一共获取了", num, "条")
 	}
+	question := questions[rand.Intn(len(questions))]
+	question.Answer = ""
 
-	c.Data["json"] = data
+	c.Data["json"] = question
 	c.ServeJSON()
 }

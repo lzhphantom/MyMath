@@ -1,26 +1,32 @@
 $(function () {
     let mathBasic = document.getElementById("math_basic");
     $('#collapseOne').on('show.bs.collapse', function () {
+        $("#collapseTwo").collapse('hide');
+        $("#collapseThree").collapse('hide');
+        $("#collapse4").collapse('hide');
         $.get("/admin/basicCommon", function (data, status) {
             let oneUl = $('#collapseOne').children('div').children('ul');
             $(oneUl).empty();
             for (let i = 0; i < data.length; i++) {
                 if ((i + 1) % 2 === 0) {
                     $(oneUl).append(`<li role="presentation"><a href="#jihe" aria-controls="jihe" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
                 } else {
                     $(oneUl).append(`<li role="presentation"><a href="#sjhs" aria-controls="sjhs" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
                 }
             }
 
-            $('a[data-toggle="tab"]').on('hide.bs.tab', (e) => {
+            $('a[role-tab="basic"]').on('hide.bs.tab', (e) => {
                 let controls = $(e.target).attr("href");
                 $(controls).empty();
             });
 
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('a[role-tab="basic"]').on('shown.bs.tab', function (e) {
                 let id = $(e.target).attr("data-id");
+                if (id === undefined) {
+                    return
+                }
                 let controls = $(e.target).attr("href");
                 $.get("/admin/basicContent/" + id, function (data, status) {
                     let $modal = $(controls);
@@ -94,13 +100,22 @@ $(function () {
             });
         });
     });
+    $("#collapseOne").on("hide.bs.collapse", () => {
+        $(this).closest("ul").empty();
+        $('a[role-tab="basic"]').off("hide.bs.tab shown.bs.tab");
+        $("#jihe").empty();
+        $("#sjhs").empty();
+    });
 
     $('#collapseTwo').on('show.bs.collapse', () => {
-        $('a[data-toggle="tab"]').on('hide.bs.tab', (e) => {
+        $("#collapseOne").collapse('hide');
+        $("#collapseThree").collapse('hide');
+        $("#collapse4").collapse('hide');
+        $('a[role-tab="training"]').on('hide.bs.tab', (e) => {
             let controls = $(e.target).attr("href");
             $(controls).empty();
         });
-        $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
+        $('a[role-tab="training"]').on('shown.bs.tab', (e) => {
             let controls = $(e.target).attr("href");
             if (controls === "#Select") {
                 getSelect(controls);
@@ -109,64 +124,46 @@ $(function () {
             }
         });
     });
+    $("#collapseTwo").on("hide.bs.collapse", () => {
+        $('a[role-tab="training"]').off("hide.bs.tab shown.bs.tab");
+        $("#Select").empty();
+        $("#Blank").empty();
+    })
 
     $("#collapseThree").on("show.bs.collapse", () => {
+        $("#collapseOne").collapse('hide');
+        $("#collapseTwo").collapse('hide');
+        $("#collapse4").collapse('hide');
         $.get("/admin/basicCommon", (data) => {
             let threeUl = $('#collapseThree').find('ul');
             $(threeUl).empty();
             for (let i = 0; i < data.length; i++) {
                 $(threeUl).append(`<li role="presentation"><a href="#SpecialPractice" aria-controls="SpecialPractice" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="sp">` + data[i].Name + `<br></a></li>`);
             }
             // /admin/getQuestionByCommonId/:id
-            $('a[data-toggle="tab"]').on('hide.bs.tab', (e) => {
+            $('a[role-tab="sp"]').on('hide.bs.tab', (e) => {
                 let controls = $(e.target).attr("href");
                 $(controls).empty();
             });
-            $('a[data-toggle="tab"]').on("shown.bs.tab", (e) => {
+            $('a[role-tab="sp"]').on("shown.bs.tab", (e) => {
                 let id = $(e.target).attr("data-id");
-                $.get("/admin/getQuestionByCommonId/" + id, (data) => {
-                    console.log(data);
-                    let sp = $("#SpecialPractice");
-                    $(sp).empty().append(`<h1>专项练习</h1>
-                        <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                        <span>30% </span>
-                        </div>
-                        </div>
-                        <div id="SpecialPracticeContent">
-
-                        </div>
-                        <div id="backGroup" class="row">
-                        </div>`);
-                    let content = $(sp).find("#SpecialPracticeContent");
-                    if (data.RoleQuestion === 1) {
-                        let choices = ``;
-                        let letterNumber = 65;
-                        for (let i = 0; i < data.Choices.length; i++) {
-                            choices += `<div>
-                            <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
-                            </label>
-                        </div>`
-                        }
-                        $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`)
-                        $()
-                    } else {
-
-                    }
-
-                })
+                let sp = $("#SpecialPractice");
+                getSpecialPractice(sp, id);
             })
         });
     });
+
+    $("#collapseThree").on("hide.bs.collapse", () => {
+        $('a[role-tab="sp"]').off("hide.bs.tab shown.bs.tab");
+        $("#SpecialPractice").empty();
+    })
+
+    $("#collapse4").on("show.bs.collapse", () => {
+        $("#collapseOne").collapse('hide');
+        $("#collapseThree").collapse('hide');
+        $("#collapseTwo").collapse('hide');
+    })
 
 });
 
@@ -332,5 +329,89 @@ function getSelect(controls) {
             }
         }
     });
+}
+
+//专项练习获取题
+function getSpecialPractice(sp, id) {
+    $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
+                        <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 35%">
+                        <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
+                        <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger" style="width: 30%">
+                        <span>30% </span>
+                        </div>
+                        </div>
+                        <div id="SpecialPracticeContent">
+
+                        </div>
+                        <div id="backGroup" class="row">
+                        </div>`);
+    let content = $(sp).find("#SpecialPracticeContent");
+    let backGroup = $(sp).find("#backGroup");
+    let role = -1;
+    $.get("/admin/getQuestionByCommonId/" + id, (data) => {
+        role = data.Role
+        if (data.Role === 1) {
+            let choices = ``;
+            let letterNumber = 65;
+            for (let i = 0; i < data.Choices.length; i++) {
+                choices += `<div>
+                            <label for="">
+                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            </label>
+                        </div>`
+            }
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(choices);
+            $(content).find("p").css("display", "inline");
+            $(backGroup).empty().append(`<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                        <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`)
+            $("#nextSPQuestion").on("click", (e) => {
+                let parent = $(e.target).parent("div").parent("div");
+                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+                if (userAnswer !== undefined) {
+                    $(parent).empty();
+                    getSpecialPractice(sp, id);
+                } else {
+                    alert("请选择你认为正确的答案！");
+                }
+
+            });
+        } else {
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(`<div>
+                            <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
+                               id="showSPEditor">填写你认为正确的答案</a>
+                        </div>
+                        <div>
+                            <textarea name="content" id="SPEditor" class="hidden"></textarea>
+                        </div>`)
+            $(backGroup).empty().append(`<div class="col-sm-offset-9">
+                            <a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>
+                        </div>
+                        <div class="col-sm-offset-9 hidden">
+                            <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
+                        </div>`);
+            $("#nextSPQuestion").on("click", (e) => {
+
+                let parent = $(e.target).parent("div").parent("div").parent("div");
+                let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
+                if (userAnswer !== undefined && userAnswer.length > 0) {
+                    $(parent).empty();
+                    getSpecialPractice(sp, id)
+                } else {
+                    alert("请填写你的答案！");
+                }
+            });
+        }
+    });
+
+
 }
 

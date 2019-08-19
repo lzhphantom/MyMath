@@ -528,8 +528,38 @@ func (c *AdminController) GetQuestionByCommonId() {
 		beego.Info("一共获取了", num, "条")
 	}
 	question := questions[rand.Intn(len(questions))]
-	question.Answer = ""
 
-	c.Data["json"] = question
+	if question.RoleQuestion == 1 {
+		choices := strings.Split(question.Choices, "~￥")
+		for i := 0; i < len(choices); i++ {
+			if len(choices[i]) == 0 {
+				choices = append(choices[:i], choices[i+1:]...)
+			}
+		}
+		data := struct {
+			Id      int
+			Content string
+			Choices []string
+			Role    uint8
+		}{
+			question.Id,
+			question.Content,
+			choices,
+			question.RoleQuestion,
+		}
+		c.Data["json"] = data
+	} else {
+		data := struct {
+			Id      int
+			Content string
+			Role    uint8
+		}{
+			question.Id,
+			question.Content,
+			question.RoleQuestion,
+		}
+		c.Data["json"] = data
+	}
+
 	c.ServeJSON()
 }

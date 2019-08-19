@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/orm"
-	_ "mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"time"
 )
 

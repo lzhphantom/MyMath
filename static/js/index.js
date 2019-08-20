@@ -171,15 +171,114 @@ $(function () {
         $('a[role-tab="upload"]').on("hide.bs.tab", (e) => {
             let target = $(e.target).attr("href");
             $(target).addClass("hidden");
-        })
+        });
+        $("#mulChoiceUpBtn").on("click", () => {
+            let allSelect = $("#UploadSelect").find("a[id^=showSelect]");
+            let select;
+            let choice = "";
+            let choiceNum = 0;
+            for (let i = 0; i < allSelect.length; i++) {
+                if ($(allSelect[i]).attr("id") === "showSelectContent") {
+                    select = $(allSelect[i]);
+                } else {
+                    if (typeof ($(allSelect[i]).attr("data-content")) !== "undefined") {
+                        choice += $(allSelect[i]).attr("data-content") + "~￥";
+                        choiceNum++;
+                    }
+                }
+            }
+            if (typeof ($(select).attr("data-content")) === "undefined") {
+                alert("无可上传的内容");
+            } else if (choice.length <= 0) {
+                alert("请填写选择选项");
+            } else if (choiceNum <= 3) {
+                alert("选择数量不足");
+            } else {
+                let content = $(select).attr("data-content");
+                let ans = $("#showAnswerSelect").val();
+                if (content.length > 0) {
+                    $.post(
+                        "/admin/uploadQuestion",
+                        {
+                            data: JSON.stringify({
+                                content: content,
+                                choices: choice,
+                                answer: ans,
+                            }),
+                            role: 1,
+                        },
+                        (data, status) => {
+                            if (status === "success") {
+                                clearSelect();
+                            }
+                        }
+                    );
+                } else {
+                    alert("无可上传的内容")
+                }
+            }
+        });
+        $("#solveUpBtn").on("click", () => {
+            let blank = $("#showSolve");
+            if (typeof ($(blank).attr("data-content")) === "undefined") {
+                alert("无可上传的内容");
+            } else {
+                let content = $(blank).attr("data-content");
+                let db = {
+                    content: content,
+                };
+                let ans = $("#showAnswerSolve");
+                if (typeof ($(ans).attr("data-content")) !== "undefined") {
+                    db.answer = $(ans).attr("data-content");
+                }
+                if (content.length > 0) {
+                    $.post(
+                        "/admin/uploadQuestion",
+                        {
+                            data: JSON.stringify(db),
+                            role: 3,
+                        },
+                        (data, status) => {
+                            if (status === "success") {
+                                clearBlank();
+                            }
+                        }
+                    );
+                } else {
+                    alert("无可上传的内容")
+                }
+            }
+        });
     });
 
     $("#collapse4").on("hide.bs.collapse", () => {
         $("#Upload").addClass("hidden");
-
+        $("#mulChoiceUpBtn").off("click");
+        $("#solveUpBtn").off("click");
     })
 
 });
+
+function clearSelect() {
+    let selectAll = $("#UploadSelect").find("a[id^=showSelect]");
+    for (let i = 0; i < selectAll.length; i++) {
+        if (typeof ($(selectAll[i]).attr("data-content")) !== "undefined") {
+            $(selectAll[i]).removeAttr("data-content")
+        }
+        $(selectAll[i]).html("暂无内容");
+    }
+    $("#showAnswerSelect").empty().append(`<option value="-">==暂无答案==</option>`)
+}
+
+function clearBlank() {
+    let allShow = $("#UploadBlank").find("a[id^=show]");
+    for (let i = 0; i < allShow.length; i++) {
+        if (typeof ($(allShow[i]).attr("data-content")) !== "undefined") {
+            $(allShow[i]).removeAttr("data-content");
+        }
+        $(allShow[i]).html("暂无内容");
+    }
+}
 
 var editor;
 

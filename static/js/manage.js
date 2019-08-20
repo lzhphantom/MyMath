@@ -219,11 +219,11 @@ $(function () {
             }
         }
         if (typeof ($(select).attr("data-content")) === "undefined") {
-            alert("无可上传的内容,select");
+            alert("无可上传的内容");
         } else if (choice.length <= 0) {
-            alert("无可上传的内容,length");
-        } else if (choiceNum <= 2) {
-            alert("选择数量不足，至少3个")
+            alert("请填写选择选项");
+        } else if (choiceNum <= 3) {
+            alert("选择数量不足")
         } else {
             let content = $(select).attr("data-content");
             let ans = $("#showAnswerSelect").val();

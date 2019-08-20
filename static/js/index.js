@@ -128,7 +128,7 @@ $(function () {
         $('a[role-tab="training"]').off("hide.bs.tab shown.bs.tab");
         $("#Select").empty();
         $("#Blank").empty();
-    })
+    });
 
     $("#collapseThree").on("show.bs.collapse", () => {
         $("#collapseOne").collapse('hide');
@@ -157,12 +157,26 @@ $(function () {
     $("#collapseThree").on("hide.bs.collapse", () => {
         $('a[role-tab="sp"]').off("hide.bs.tab shown.bs.tab");
         $("#SpecialPractice").empty();
-    })
+    });
 
     $("#collapse4").on("show.bs.collapse", () => {
+        $("#Upload").removeClass("hidden");
         $("#collapseOne").collapse('hide');
         $("#collapseThree").collapse('hide');
         $("#collapseTwo").collapse('hide');
+        $('a[role-tab="upload"]').on("shown.bs.tab", (e) => {
+            let target = $(e.target).attr("href");
+            $(target).removeClass("hidden");
+        });
+        $('a[role-tab="upload"]').on("hide.bs.tab", (e) => {
+            let target = $(e.target).attr("href");
+            $(target).addClass("hidden");
+        })
+    });
+
+    $("#collapse4").on("hide.bs.collapse", () => {
+        $("#Upload").addClass("hidden");
+
     })
 
 });
@@ -176,7 +190,7 @@ async function showEditor(obj, editorName, backGroup) {
     }
     $(obj).removeAttr("onclick");
     await ClassicEditor.create(document.querySelector(editorName), {
-        toolbar: ["Heading", "|", "ImageUpload", "BlockQuote", "Bold", "Italic"],
+        toolbar: ["ImageUpload", "BlockQuote", "Bold", "Italic"],
         language: 'zh-cn'
     }).then(newEditor => {
         editor = newEditor;
@@ -185,6 +199,8 @@ async function showEditor(obj, editorName, backGroup) {
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
         editor.setData($(obj).attr("data-content"));
+    } else {
+        editor.setData($(obj).html());
     }
     showContentName = "#" + $(obj).attr("id");
 
@@ -221,6 +237,41 @@ function backToLast(backGroup, editorName) {
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
     $(showContentName).attr("data-content", data);
+    //选择题答案添加
+    if (showContentName === "#showSelectA" || showContentName === "#showSelectB"
+        || showContentName === "#showSelectC" || showContentName === "#showSelectD") {
+        let selectA = $("#showSelectA");
+        let selectB = $("#showSelectB");
+        let selectC = $("#showSelectC");
+        let selectD = $("#showSelectD");
+        $("#showAnswerSelect").empty();
+        if (typeof ($(selectA).attr("data-content")) !== "undefined") {
+            let content = $(selectA).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">A</option>`)
+            }
+        }
+        if (typeof ($(selectB).attr("data-content")) !== "undefined") {
+            let content = $(selectB).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">B</option>`)
+            }
+        }
+        if (typeof ($(selectC).attr("data-content")) !== "undefined") {
+            let content = $(selectC).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">C</option>`)
+            }
+        }
+        if (typeof ($(selectD).attr("data-content")) !== "undefined") {
+            let content = $(selectD).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerSelect").append(`<option value="` + content + `">D</option>`)
+            }
+
+        }
+
+    }
 
     $($(backGroup).children("div")[0]).removeClass("hidden");
     $($(backGroup).children("div")[1]).addClass("hidden");
@@ -323,7 +374,7 @@ function getSelect(controls) {
             let userAnswer = $(parent).find('input[name="choice"]:checked').val();
             if (userAnswer !== undefined) {
                 $(parent).empty();
-                getSelect("#Select");
+                getSelect(controls);
             } else {
                 alert("请选择你认为正确的答案！");
             }
@@ -354,7 +405,10 @@ function getSpecialPractice(sp, id) {
     let backGroup = $(sp).find("#backGroup");
     let role = -1;
     $.get("/admin/getQuestionByCommonId/" + id, (data) => {
-        role = data.Role
+        if (data.Content === undefined) {
+            $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
+            return
+        }
         if (data.Role === 1) {
             let choices = ``;
             let letterNumber = 65;

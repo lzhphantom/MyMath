@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="static/img/logo.png" type="image/x-icon">
+    <title>eqntest</title>
+</head>
+<body>
+<a id="test">123</a>
+<form action="">
+    <textarea name="editor" id="editor1" cols="80" rows="10"></textarea>
+</form>
+<script src="static/js/jquery.min.js"></script>
+<script type="text/javascript" src="static/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/javascript" src="static/lib/ckeditor5-build-classic/build/ckeditor.js"></script>
+<script>
+    // CKEDITOR.replace('editor1');
+
+    ClassicEditor.create(document.querySelector('#editor1')).then(newEditor => {
+        newEditor.model.document.on("change:data", () => {
+            let data = newEditor.getData();
+            let content = data.match(/<p>(.*)<\/p>/);
+            if (content !== null) {
+                $("#test").html(`<p>$$` + content[1] + `$$</p>`);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "test"]);
+            }else {
+                $("#test").html(data);
+            }
+        });
+    });
+
+
+</script>
+</body>
+</html>

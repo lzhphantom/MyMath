@@ -15,15 +15,34 @@
 <script type="text/javascript" src="static/lib/ckeditor5-build-classic/build/ckeditor.js"></script>
 <script>
     // CKEDITOR.replace('editor1');
+    function matchAll(str, reg) {
+        var res = []
+        var match
+        while (match = reg.exec(str)) {
+            res.push(match)
+        }
+        return res
+    }
 
     ClassicEditor.create(document.querySelector('#editor1')).then(newEditor => {
         newEditor.model.document.on("change:data", () => {
             let data = newEditor.getData();
-            let content = data.match(/<p>(.*)<\/p>/);
-            if (content !== null) {
-                $("#test").html(`<p>$$` + content[1] + `$$</p>`);
+            let arr = data.split(/<p>|<\/p>/);
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] == "") {
+                    arr.splice(i, 1);
+                    i--;
+                }
+            }
+            let content = ``;
+            for (let i = 0; i < arr.length; i++) {
+                content += `<p>\\(` + arr[i] + `\\)</p>`;
+            }
+
+            if (content.length > 0) {
+                $("#test").html(content);
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, "test"]);
-            }else {
+            } else {
                 $("#test").html(data);
             }
         });

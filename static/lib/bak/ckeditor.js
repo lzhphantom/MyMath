@@ -94,9 +94,6 @@ ClassicEditor.builtinPlugins = [
 ClassicEditor.defaultConfig = {
 	toolbar: {
 		items: [
-			'bold',
-			'italic',
-			'|',
 			'TimesPlugin',
 			'SqrtPlugin',
 			'FracPlugin',
@@ -158,12 +155,12 @@ import angle from "@ckeditor/ckeditor5-core/theme/icons/angle.svg"
 import because from "@ckeditor/ckeditor5-core/theme/icons/because.svg"
 import in1 from "@ckeditor/ckeditor5-core/theme/icons/in.svg"
 import notin from "@ckeditor/ckeditor5-core/theme/icons/notin.svg"
-import lim from "@ckeditor/ckeditor5-core/theme/icons/times.svg"
+import lim from "@ckeditor/ckeditor5-core/theme/icons/lim.svg"
 import triangle from "@ckeditor/ckeditor5-core/theme/icons/triangle.svg"
 import pm from "@ckeditor/ckeditor5-core/theme/icons/pm.svg"
 import bot from "@ckeditor/ckeditor5-core/theme/icons/bot.svg"
-import sim from "@ckeditor/ckeditor5-core/theme/icons/times.svg"
-import cong from "@ckeditor/ckeditor5-core/theme/icons/times.svg"
+import sim from "@ckeditor/ckeditor5-core/theme/icons/sim.svg"
+import cong from "@ckeditor/ckeditor5-core/theme/icons/cong.svg"
 import le from "@ckeditor/ckeditor5-core/theme/icons/le.svg"
 import sqrt1 from "@ckeditor/ckeditor5-core/theme/icons/sqrt1.svg"
 import frac from "@ckeditor/ckeditor5-core/theme/icons/frac.svg"
@@ -1047,7 +1044,7 @@ class TablePlugin extends Plugin {
 			});
 			view.on('execute',()=>{
 				editor.model.change(writer=>{
-					editor.model.insertContent(writer.createText('{\\begin{array}{c|lcr}                                                                                                                                          n & \\text{Left} & \\text{Center} & \\text{Right}\\\\                                                                                                \\hline 1 & 0.24 & 1 & 125 \\\\                                                                                                                                      2 & -1 & 189 & -8 \\\\                                                                                                                                        3 & -20 & 2000 & 1+10i\\end{array}}'));
+					editor.model.insertContent(writer.createText('{\\begin{array}{c|lcr}  n & \\text{Left} & \\text{Center} & \\text{Right}\\\\  \\hline 1 & 0.24 & 1 & 125 \\\\ 2 & -1 & 189 & -8 \\\\ 3 & -20 & 2000 & 1+10i\\end{array}}'));
 				});
 			});
 			return view;

@@ -288,16 +288,14 @@ async function showEditor(obj, editorName, backGroup) {
         return
     }
     $(obj).removeAttr("onclick");
-    await ClassicEditor.create(document.querySelector(editorName), {
-        toolbar: ["ImageUpload", "BlockQuote", "Bold", "Italic"],
-        language: 'zh-cn'
-    }).then(newEditor => {
+    await ClassicEditor.create(document.querySelector(editorName)).then(newEditor => {
         editor = newEditor;
     }).catch(error => {
         console.error(error);
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
-        editor.setData($(obj).attr("data-content"));
+        let content=$(obj).attr("data-content");
+        editor.setData(unregularEditorContent(content));
     } else {
         editor.setData($(obj).html());
     }
@@ -309,14 +307,49 @@ async function showEditor(obj, editorName, backGroup) {
     editorCheck(showContentName);
 }
 
+function unregularEditorContent(data) {
+    let arr=data.split(/\\\(|\\\)/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+    let content="";
+    for (let i=0;i<arr.length;i++){
+        content+=arr[i];
+    }
+    return content
+}
+
+function regularEditorContent(data) {
+    let arr = data.split(/<p>|<\/p>/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+    let content = ``;
+    for (let i = 0; i < arr.length; i++) {
+        content += `<p>\\(` + arr[i] + `\\)</p>`;
+    }
+    return content
+}
 //准备生成富文本编辑器
 function editorCheck(show) {
     let knowFlag = false;
     var editorCheck = setInterval(() => {
         if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
-                $(show).html(editor.getData());
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
+                let data = editor.getData();
+                let content =regularEditorContent(data);
+                if (content.length > 0) {
+                    $(show).html(content);
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
+                } else {
+                    $(show).html(data);
+                }
             });
             knowFlag = true
         }
@@ -328,7 +361,7 @@ function editorCheck(show) {
 
 //提交富文本编辑器内容
 function backToLast(backGroup, editorName) {
-    const data = editor.getData();
+    const data = regularEditorContent(editor.getData());
     editor.model.document.off("change:data");
     editor.destroy().catch(error => {
         console.log(error);
@@ -563,6 +596,7 @@ function getSpecialPractice(sp, id) {
                 }
             });
         }
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
     });
 
 

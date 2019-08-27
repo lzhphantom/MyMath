@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/models"
 	"math/rand"
@@ -26,15 +27,14 @@ func (c *AdminController) Manager() {
 // 检索基础知识种类
 // @router /admin/basicCommon [get]
 func (c *AdminController) BasicCommon() {
-
 	var basicCommons []*models.BasicCommon
 
 	newOrm := orm.NewOrm()
 	num, err := newOrm.QueryTable("basic_common").All(&basicCommons)
 	if err != nil {
-		beego.Debug("基础知识种类获取失败！")
+		logs.Debug("基础知识种类获取失败！")
 	} else {
-		beego.Debug("基础知识种类共获取:", num, "个")
+		logs.Debug("基础知识种类共获取:", num, "个")
 	}
 	c.Data["json"] = basicCommons
 	c.ServeJSON()
@@ -47,7 +47,7 @@ func (c *AdminController) AddBasicCommon() {
 
 	typeName := c.GetString("typeName")
 	if typeName == "" {
-		beego.Debug("没有获取到新分类名")
+		logs.Debug("没有获取到新分类名")
 	}
 
 	var basicCommon models.BasicCommon
@@ -56,20 +56,20 @@ func (c *AdminController) AddBasicCommon() {
 	if cop == "1" { // 1 ：添加新基础知识种类
 		id, err := o.Insert(&basicCommon)
 		if err != nil {
-			beego.Debug("新分类名添加失败")
+			logs.Debug("新分类名添加失败")
 		} else {
-			beego.Debug("新分类名添加成功:", id)
+			logs.Debug("新分类名添加成功:", id)
 		}
 	} else {
 		id, err := c.GetInt("ti")
 		if err != nil {
-			beego.Debug("获取ti失败")
+			logs.Debug("获取ti失败")
 		}
 		basicCommon.Id = id
 		if num, err := o.Update(&basicCommon); err != nil {
-			beego.Debug("更新失败")
+			logs.Debug("更新失败")
 		} else {
-			beego.Debug("更新成功，影响", num)
+			logs.Debug("更新成功，影响", num)
 		}
 	}
 
@@ -81,13 +81,13 @@ func (c *AdminController) AddBasicCommon() {
 func (c *AdminController) DelBasicCommon() {
 	typeId, err := c.GetInt("id")
 	if err != nil {
-		beego.Debug("id获取失败")
+		logs.Debug("id获取失败")
 	}
 	o := orm.NewOrm()
 	if num, err := o.Delete(&models.BasicCommon{Id: typeId}); err != nil {
-		beego.Debug("删除失败")
+		logs.Debug("删除失败")
 	} else {
-		beego.Debug("删除编号为：", num)
+		logs.Debug("删除编号为：", num)
 	}
 	c.Redirect("/admin/basicCommon", 302)
 }
@@ -96,7 +96,7 @@ func (c *AdminController) DelBasicCommon() {
 // @router /admin/basicContent/:id [get]
 func (c *AdminController) BasicContent() {
 	id := c.Ctx.Input.Param(":id")
-	beego.Debug("获取", id, reflect.TypeOf(id))
+	logs.Debug("获取", id, reflect.TypeOf(id))
 	o := orm.NewOrm()
 	if id == "-1" {
 		var basicContents []*models.BasicCommon
@@ -104,7 +104,7 @@ func (c *AdminController) BasicContent() {
 		for _, common := range basicContents {
 			_, err := o.QueryTable("basic_content").Filter("basic_common_id", (*common).Id).RelatedSel().All(&common.BasicContent)
 			if err != nil {
-				beego.Debug("BasicContent 获取失败")
+				logs.Debug("BasicContent 获取失败")
 			}
 			for _, value := range common.BasicContent {
 				_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
@@ -112,19 +112,19 @@ func (c *AdminController) BasicContent() {
 				_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
 				_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
 				if err != nil {
-					beego.Debug("BasicContent 其他信息获取失败")
+					logs.Debug("BasicContent 其他信息获取失败")
 				}
 			}
 		}
 		if err != nil {
-			beego.Debug("基础知识详情获取失败1")
+			logs.Debug("基础知识详情获取失败1")
 		}
 		c.Data["json"] = basicContents
 		c.ServeJSON()
 	} else {
 		Id, err := strconv.Atoi(id)
 		if err != nil {
-			beego.Debug("id转换int失败")
+			logs.Debug("id转换int失败")
 		}
 		basicContent := models.BasicCommon{Id: Id}
 
@@ -132,7 +132,7 @@ func (c *AdminController) BasicContent() {
 
 		_, err = o.QueryTable("basic_content").Filter("basic_common_id", basicContent.Id).RelatedSel().All(&basicContent.BasicContent)
 		if err != nil {
-			beego.Debug("BasicContent 获取失败")
+			logs.Debug("BasicContent 获取失败")
 		}
 		for _, value := range basicContent.BasicContent {
 			_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
@@ -140,12 +140,12 @@ func (c *AdminController) BasicContent() {
 			_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
 			_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
 			if err != nil {
-				beego.Debug("BasicContent 其他信息获取失败")
+				logs.Debug("BasicContent 其他信息获取失败")
 			}
 		}
 
 		if err != nil {
-			beego.Debug("基础知识详情获取失败1")
+			logs.Debug("基础知识详情获取失败1")
 		}
 		c.Data["json"] = basicContent
 		c.ServeJSON()
@@ -159,7 +159,7 @@ func (c *AdminController) AddPublishContent() {
 	var err error
 	id, err := c.GetInt("typeId")
 	if err != nil {
-		beego.Debug("添加版块内容->获取id失败")
+		logs.Debug("添加版块内容->获取id失败")
 	}
 	content := c.GetString("content")
 	o := orm.NewOrm()
@@ -172,7 +172,7 @@ func (c *AdminController) AddPublishContent() {
 	err = o.Read(&basicCommon)
 	err = o.QueryTable("basic_content").Filter("basic_common_id", id).RelatedSel().One(&basicContent)
 	if basicContent.BasicCommon == nil {
-		beego.Info("无记录")
+		logs.Info("无记录")
 		basicContent.Title = basicCommon.Name
 		if area == "5" {
 			basicContent.Concept = content
@@ -180,15 +180,15 @@ func (c *AdminController) AddPublishContent() {
 		basicContent.BasicCommon = &basicCommon
 		okId, err = o.Insert(&basicContent)
 		if err != nil {
-			beego.Debug("插入失败", err)
+			logs.Debug("插入失败", err)
 		} else {
-			beego.Debug("插入成功", okId)
+			logs.Debug("插入成功", okId)
 		}
 	} else {
 		if area == "5" {
 			basicContent.Concept = content
 			if _, err := o.Update(&basicContent); err == nil {
-				beego.Debug("Concept添加成功")
+				logs.Debug("Concept添加成功")
 			}
 		}
 		okId = int64(basicContent.Id)
@@ -228,9 +228,9 @@ func (c *AdminController) AddPublishContent() {
 		okId, err = o.Insert(&hd)
 	}
 	if err != nil {
-		beego.Debug("插入失败", err)
+		logs.Debug("插入失败", err)
 	} else {
-		beego.Debug("插入成功", okId)
+		logs.Debug("插入成功", okId)
 	}
 	c.Redirect("/admin/basicContent/-1", 302)
 }
@@ -240,38 +240,38 @@ func (c *AdminController) AddPublishContent() {
 func (c *AdminController) DelBasicContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		beego.Debug("获取Id失败")
+		logs.Debug("获取Id失败")
 	}
 	o := orm.NewOrm()
 	delNum, err := o.QueryTable("examination_center").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		beego.Debug("examination_center表删除数据失败")
+		logs.Debug("examination_center表删除数据失败")
 	} else {
-		beego.Debug("examination_center删除", delNum, "条数据")
+		logs.Debug("examination_center删除", delNum, "条数据")
 	}
 	delNum, err = o.QueryTable("formula").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		beego.Debug("formula表删除数据失败")
+		logs.Debug("formula表删除数据失败")
 	} else {
-		beego.Debug("formula删除", delNum, "条数据")
+		logs.Debug("formula删除", delNum, "条数据")
 	}
 	delNum, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		beego.Debug("h_difficulty表删除数据失败")
+		logs.Debug("h_difficulty表删除数据失败")
 	} else {
-		beego.Debug("h_difficulty删除", delNum, "条数据")
+		logs.Debug("h_difficulty删除", delNum, "条数据")
 	}
 	delNum, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		beego.Debug("knowledge_important表删除数据失败")
+		logs.Debug("knowledge_important表删除数据失败")
 	} else {
-		beego.Debug("knowledge_important删除", delNum, "条数据")
+		logs.Debug("knowledge_important删除", delNum, "条数据")
 	}
 	delNum, err = o.QueryTable("basic_content").Filter("id", id).Delete()
 	if err != nil {
-		beego.Debug("basic_content表删除数据失败")
+		logs.Debug("basic_content表删除数据失败")
 	} else {
-		beego.Debug("basic_content删除", delNum, "条数据")
+		logs.Debug("basic_content删除", delNum, "条数据")
 	}
 	c.Redirect("/admin/basicContent/-1", 302)
 }
@@ -281,13 +281,13 @@ func (c *AdminController) DelBasicContent() {
 func (c *AdminController) ShowChangeContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		beego.Debug("获取id失败")
+		logs.Debug("获取id失败")
 	}
 	content := models.BasicContent{}
 	o := orm.NewOrm()
 	err = o.QueryTable("basic_content").Filter("id", id).RelatedSel().One(&content)
 	if err != nil {
-		beego.Debug("basic_content=>showChangeContent失败")
+		logs.Debug("basic_content=>showChangeContent失败")
 	}
 	_, err = o.QueryTable("formula").Filter("basic_content_id", id).All(&content.Formula)
 	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).All(&content.KnowledgeImportant)
@@ -303,9 +303,9 @@ func (c *AdminController) ShowChangeContent() {
 func (c *AdminController) ChangeContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		beego.Debug("修改基础知识内容=>获取id失败")
+		logs.Debug("修改基础知识内容=>获取id失败")
 	}
-	beego.Info(id)
+	logs.Info(id)
 	content1 := c.GetString("content1")
 	content2 := c.GetString("content2")
 	content3 := c.GetString("content3")
@@ -322,16 +322,16 @@ func (c *AdminController) ChangeContent() {
 	err = json.Unmarshal([]byte(content4), &content4Map)
 	err = json.Unmarshal([]byte(content5), &content5Map)
 	if err != nil {
-		beego.Debug("content*转换失败")
+		logs.Debug("content*转换失败")
 	} else {
-		beego.Info(content1Map, content2Map, content3Map, content4Map, content5Map)
+		logs.Info(content1Map, content2Map, content3Map, content4Map, content5Map)
 	}
 
 	o := orm.NewOrm()
 	content := models.BasicContent{}
 	err = o.QueryTable("basic_content").Filter("id", id).RelatedSel().One(&content)
 	if err != nil {
-		beego.Debug("basic_content=>showChangeContent失败")
+		logs.Debug("basic_content=>showChangeContent失败")
 	}
 	_, err = o.QueryTable("formula").Filter("basic_content_id", id).All(&content.Formula)
 	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).All(&content.KnowledgeImportant)
@@ -369,15 +369,15 @@ func (c *AdminController) UploadQuestion() {
 	dataMap := make(map[string]interface{})
 	err := json.Unmarshal([]byte(data), &dataMap)
 	if err != nil {
-		beego.Debug("json解析失败")
+		logs.Debug("json解析失败")
 	}
 
 	newQuestion.Content = dataMap["content"].(string)
 	role, err := c.GetUint8("role")
 	if err != nil {
-		beego.Debug("未获取题型类型")
+		logs.Debug("未获取题型类型")
 	}
-	beego.Debug(role)
+	logs.Debug(role)
 	newQuestion.RoleQuestion = uint8(role)
 
 	if role == 1 { //如果是选择题，则录入选项
@@ -387,13 +387,13 @@ func (c *AdminController) UploadQuestion() {
 	if answer, ok := dataMap["answer"].(string); ok {
 		newQuestion.Answer = answer
 	}
-	beego.Debug(newQuestion)
+	logs.Debug(newQuestion)
 
 	o := orm.NewOrm()
 	newQuestion.BasicCommon = &models.BasicCommon{}
 	_, err = o.Insert(&newQuestion)
 	if err != nil {
-		beego.Debug("插入失败：", err)
+		logs.Debug("插入失败：", err)
 	}
 	c.ServeJSON()
 
@@ -425,7 +425,7 @@ func (c *AdminController) UserAdd() {
 	o := orm.NewOrm()
 	_, err := o.Insert(&user)
 	if err != nil {
-		beego.Debug("用户表添加失败：", err)
+		logs.Debug("用户表添加失败：", err)
 	}
 
 	userInfo := models.UserInfo{
@@ -437,7 +437,7 @@ func (c *AdminController) UserAdd() {
 	}
 	_, err = o.Insert(&userInfo)
 	if err != nil {
-		beego.Debug("用户信息表添加失败：", err)
+		logs.Debug("用户信息表添加失败：", err)
 	}
 	c.Redirect("/admin", 302)
 }
@@ -447,7 +447,7 @@ func (c *AdminController) UserAdd() {
 func (c *AdminController) SearchUser() {
 	userGroup, err := c.GetInt("group")
 	if err != nil {
-		beego.Debug("获取用户分组失败")
+		logs.Debug("获取用户分组失败")
 	}
 	users := make([]models.User, 0)
 	o := orm.NewOrm()
@@ -460,9 +460,9 @@ func (c *AdminController) SearchUser() {
 		users[i].UserInfo = &t
 	}
 	if err != nil {
-		beego.Debug("获取user表失败")
+		logs.Debug("获取user表失败")
 	} else {
-		beego.Debug("获取了", num, "条")
+		logs.Debug("获取了", num, "条")
 	}
 
 	c.Data["json"] = users
@@ -479,18 +479,18 @@ func (c *AdminController) GetQuestion() {
 	if role == "-1" {
 		num, err := o.Raw("SELECT id,content FROM question WHERE role_question != ?", 1).QueryRows(&questions)
 		if err != nil {
-			beego.Debug("获取题失败：", err)
+			logs.Debug("获取题失败：", err)
 		} else {
-			beego.Info("一共获取了", num, "条")
+			logs.Info("一共获取了", num, "条")
 		}
 		question := questions[rand.Intn(len(questions))]
 		c.Data["json"] = question
 	} else {
 		num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
 		if err != nil {
-			beego.Debug("获取题失败：", err)
+			logs.Debug("获取题失败：", err)
 		} else {
-			beego.Info("一共获取了", num, "条")
+			logs.Info("一共获取了", num, "条")
 		}
 
 		question := questions[rand.Intn(len(questions))]
@@ -523,9 +523,9 @@ func (c *AdminController) GetQuestionByCommonId() {
 	rand.Seed(time.Now().UnixNano())
 	num, err := o.QueryTable("question").Filter("basic_common_id", role).All(&questions)
 	if err != nil {
-		beego.Debug("获取题失败：", err)
+		logs.Debug("获取题失败：", err)
 	} else {
-		beego.Info("一共获取了", num, "条")
+		logs.Info("一共获取了", num, "条")
 	}
 	question := questions[rand.Intn(len(questions))]
 

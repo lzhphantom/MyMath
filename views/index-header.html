@@ -8,11 +8,20 @@
         <div class="collapse navbar-collapse" id="navcol-1">
             <ul class="nav navbar-nav navbar-right mr-20">
                 {{if .isExist}}
-                    <li class="active" role="presentation"><a href="#">First Item</a></li>
-                    <li role="presentation"><a href="#">个人中心</a></li>
-                    <li role="presentation"><a>{{.user.Name}}</a></li>
+                    <li role="presentation"><a href="javascript:void(0);" onclick="UNACTION()">...</a></li>
+                    <li role="presentation"><a href="javascript:void(0);" onclick="UNACTION()">个人中心</a></li>
+                    <li role="presentation">
+                        <div class="dropdown">
+                            <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{.user.Name}}<span class="caret"></span></a>
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                <li><a href="/logout">退出</a></li>
+                                <li><a data-toggle="modal" data-target="#changPassword">修改密码</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li role="presentation"><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
                 {{else}}
-                    <li role="presentation"><a href="#" class="btn btn-primary" data-toggle="modal"
+                    <li role="presentation"><a class="btn btn-primary" data-toggle="modal"
                                                data-target="#login">登录</a></li>
                 {{end}}
             </ul>

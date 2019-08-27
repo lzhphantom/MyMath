@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"crypto/md5"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"github.com/lzhphantom/MyMath/common"
 	"github.com/lzhphantom/MyMath/models"
 )
 
@@ -12,39 +13,64 @@ type LoginController struct {
 	beego.Controller
 }
 
-type LoginUser struct {
-	Name string
-	Role byte
-}
-
 // @router /login [post]
-func (c *MainController) Login() {
+func (c *LoginController) Login() {
 
 	username := c.GetString("username")
 	pwd := c.GetString("password")
-	pwdData := []byte(pwd)
-	has := md5.Sum(pwdData)
-	md5pwd := fmt.Sprintf("%x", has)
+	md5pwd := fmt.Sprintf("%x", common.MD5Password(pwd))
 	o := orm.NewOrm()
 	var user models.User
 	err := o.QueryTable("user").Filter("user_name", username).One(&user)
 	if err != nil {
-		beego.Debug("改用户不存在")
+		logs.Debug("改用户不存在")
 	}
 
 	if md5pwd == user.Password {
-		beego.Debug("验证通过")
+		logs.Debug("验证通过")
 	} else {
-		beego.Debug("密码不正确")
+		logs.Debug("密码不正确")
 	}
 
 	var userInfo models.UserInfo
 	o.QueryTable("user_info").Filter("user_id", user.Id).One(&userInfo)
 
-	loginUser := LoginUser{
+	loginUser := common.LoginUser{
+		user.Id,
 		userInfo.Name,
 		user.Role,
 	}
 	c.SetSession("loginUser", loginUser)
 	c.Redirect("/", 302)
+}
+
+// @router /logout [get]
+func (c *LoginController) LoginOut() {
+	c.DelSession("loginUser")
+	c.Redirect("/", 302)
+}
+
+// @router /changePwd [post]
+func (c *LoginController) ChangePassword() {
+	user := c.GetSession("loginUser").(common.LoginUser)
+	oldPwd := c.GetString("oldPwd")
+
+	o := orm.NewOrm()
+	var u models.User
+	o.QueryTable("user").Filter("id", user.Id).One(&u)
+	oldMD5Pwd := fmt.Sprintf("%x", common.MD5Password(oldPwd))
+	if u.Password == oldMD5Pwd {
+		newpwd := c.GetString("newPwd")
+		newMD5Pwd := fmt.Sprintf("%x", common.MD5Password(newpwd))
+		u.Password = newMD5Pwd
+		if num, err := o.Update(&u); err != nil {
+			logs.Warning("更新失败")
+		} else {
+			logs.Info("更了", num, "条")
+		}
+	} else {
+		logs.Debug("密码不正确")
+	}
+	c.Redirect("/", 302)
+
 }

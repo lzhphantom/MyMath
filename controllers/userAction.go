@@ -36,8 +36,10 @@ func (c *MainController) Login() {
 	var userInfo models.UserInfo
 	o.QueryTable("user_info").Filter("user_id", user.Id).One(&userInfo)
 
-	c.Data["user"] = userInfo
-	c.Data["isExist"] = true
-	c.TplName = "index.html"
-	//c.Redirect("/", 302)
+	loginUser := LoginUser{
+		userInfo.Name,
+		user.Role,
+	}
+	c.SetSession("loginUser", loginUser)
+	c.Redirect("/", 302)
 }

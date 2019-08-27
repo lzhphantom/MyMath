@@ -17,3 +17,8 @@
 <script type="text/javascript" src="static/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script type="text/javascript" src="static/lib/ckeditor5/ckeditor.js"></script>
 <script src="static/js/index.js"></script>
+{{if .isExist}}
+{{else}}
+    <script src="static/js/login.js"></script>
+    <script src="static/js/register.js"></script>
+{{end}}

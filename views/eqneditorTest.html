@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="static/img/logo.png" type="image/x-icon">
     <title>eqntest</title>
+    <link href="https://cdn.bootcss.com/font-awesome/5.7.2/css/all.min.css" rel="stylesheet">
+    <link href="static/lib/sliderCaptcha/src/disk/slidercaptcha.css" rel="stylesheet">
+
 </head>
 <body>
 <a id="test">123</a>
 <form action="">
     <textarea name="editor" id="editor1" cols="80" rows="10"></textarea>
+    <div id="captcha"></div>
 </form>
 <script src="static/js/jquery.min.js"></script>
 <script type="text/javascript" src="static/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script type="text/javascript" src="static/lib/ckeditor5-build-classic/build/ckeditor.js"></script>
+<script type="text/javascript" src="static/lib/sliderCaptcha/src/disk/longbow.slidercaptcha.js"></script>
 <script>
     // CKEDITOR.replace('editor1');
     function matchAll(str, reg) {
@@ -49,6 +54,31 @@
     });
 
 
+</script>
+<script>
+    $("#captcha").sliderCaptcha({
+        // width: 280,//背景图片宽度
+        // height: 150,//背景图标高度
+        // sliderL: 42,//拼图宽度
+        // sliderR: 9,//拼图突出半径
+        // offset: 5,//验证容错偏差值 默认5个像素偏差即认为验证通过
+        // loadingText: '正在加载中...',//图片加载时显示的文本信息
+        // failedText: '再试一次',//验证失败时显示的文本信息
+        // barText: '向右滑动填充拼图',//拖动滑块准备拖动时显示的文本信息
+        repeatIcon: 'fa fa-redo',//重新加载图标 需引用 font-awesome
+        setSrc: function () {//设置图片加载路径
+            return 'http://images.sdgxgz.com/Pic' + Math.round(Math.random() * 136) + '.jpg';
+        },
+        onSuccess: function () {//验证通过时回调此函数
+            console.log("验证成功");
+        },
+        onFail: function () {//验证失败时回调此函数
+
+        },
+        onRefresh: function () {//点击重新加载图标时回调此函数
+
+        }
+    });
 </script>
 </body>
 </html>

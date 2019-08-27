@@ -8,11 +8,6 @@ type MainController struct {
 	beego.Controller
 }
 
-type LoginUser struct {
-	Name string
-	Role byte
-}
-
 // @router / [get]
 func (c *MainController) Get() {
 	user := c.GetSession("loginUser")

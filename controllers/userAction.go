@@ -12,6 +12,11 @@ type LoginController struct {
 	beego.Controller
 }
 
+type LoginUser struct {
+	Name string
+	Role byte
+}
+
 // @router /login [post]
 func (c *MainController) Login() {
 

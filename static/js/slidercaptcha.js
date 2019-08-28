@@ -23,7 +23,7 @@
         repeatIcon: 'fa fa-repeat',
         maxLoadCount: 3,
         localImages: function () {
-            return 'images/Pic' + Math.round(Math.random() * 4) + '.jpg';
+            return 'static/img/slider/Pic' + Math.round(Math.random() * 4) + '.jpg';
         }
     };
 
@@ -256,7 +256,7 @@
                 setTimeout(function () {
                     that.text.text(that.options.failedText);
                     that.reset();
-                }, 1000);
+                }, 100);
             }
         };
 

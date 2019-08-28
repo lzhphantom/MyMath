@@ -5,7 +5,8 @@
     <link rel="shortcut icon" href="static/img/logo.png" type="image/x-icon">
     <title>eqntest</title>
     <link href="https://cdn.bootcss.com/font-awesome/5.7.2/css/all.min.css" rel="stylesheet">
-    <link href="static/lib/sliderCaptcha/src/disk/slidercaptcha.css" rel="stylesheet">
+    <link href="static/css/slidercaptcha.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
 <body>
@@ -17,7 +18,7 @@
 <script src="static/js/jquery.min.js"></script>
 <script type="text/javascript" src="static/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script type="text/javascript" src="static/lib/ckeditor5-build-classic/build/ckeditor.js"></script>
-<script type="text/javascript" src="static/lib/sliderCaptcha/src/disk/longbow.slidercaptcha.js"></script>
+<script type="text/javascript" src="static/js/slidercaptcha.js"></script>
 <script>
     // CKEDITOR.replace('editor1');
     function matchAll(str, reg) {
@@ -67,10 +68,13 @@
         // barText: '向右滑动填充拼图',//拖动滑块准备拖动时显示的文本信息
         repeatIcon: 'fa fa-redo',//重新加载图标 需引用 font-awesome
         setSrc: function () {//设置图片加载路径
-            return 'http://images.sdgxgz.com/Pic' + Math.round(Math.random() * 136) + '.jpg';
+            return 'static/img/slider/Pic' + Math.round(Math.random() * 4) + '.jpg';
         },
         onSuccess: function () {//验证通过时回调此函数
-            console.log("验证成功");
+            let hideSlider = setInterval(() => {
+                $("#captcha").addClass("hidden");
+                clearInterval(hideSlider);
+            }, 1500)
         },
         onFail: function () {//验证失败时回调此函数
 

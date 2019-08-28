@@ -24,12 +24,16 @@ func (c *LoginController) Login() {
 	err := o.QueryTable("user").Filter("user_name", username).One(&user)
 	if err != nil {
 		logs.Debug("改用户不存在")
+		c.Redirect("/", 302)
+		return
 	}
 
 	if md5pwd == user.Password {
 		logs.Debug("验证通过")
 	} else {
 		logs.Debug("密码不正确")
+		c.Redirect("/", 302)
+		return
 	}
 
 	var userInfo models.UserInfo

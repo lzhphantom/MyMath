@@ -1,3 +1,4 @@
+
 $(function () {
     let mathBasic = document.getElementById("math_basic");
     $('#collapseOne').on('show.bs.collapse', function () {
@@ -7,9 +8,11 @@ $(function () {
         $.get("/admin/basicCommon",
             function (data, status, xhr) {
                 if (xhr.status === 264) {
-                    $("#collapseOne").collapse('hide');
                     notLogin();
-                    return
+                    setTimeout(()=>{
+                        $("#collapseOne").collapse('hide');
+                    },0);
+                    return;
                 }
                 let oneUl = $('#collapseOne').children('div').children('ul');
                 $(oneUl).empty();
@@ -143,8 +146,10 @@ $(function () {
         $("#collapse4").collapse('hide');
         $.get("/admin/basicCommon", (data, status, xhr) => {
             if (xhr.status === 264) {
-                $("#collapseThree").collapse('hide');
                 notLogin();
+                setTimeout(()=>{
+                    $("#collapseThree").collapse('hide');
+                },0);
                 return
             }
             let threeUl = $('#collapseThree').find('ul');
@@ -425,10 +430,12 @@ function backToLast(backGroup, editorName) {
 //获取非选择题
 function getUnSelect(controls) {
 
-    $.get("/admin/getQuestion/-1", (data,status,xhr) => {
-        if(xhr.status==264){
-            $("#collapseTwo").collapse('hide');
+    $.get("/admin/getQuestion/-1", (data, status, xhr) => {
+        if (xhr.status == 264) {
             notLogin();
+            setTimeout(()=>{
+                $("#collapseTwo").collapse('hide');
+            },0);
             return
         }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
@@ -485,8 +492,10 @@ function getSelect(controls) {
 
     $.get("/admin/getQuestion/1", (data, status, xhr) => {
         if (xhr.status === 264) {
-            $("#collapseTwo").collapse('hide');
             notLogin();
+            setTimeout(()=>{
+                $("#collapseTwo").collapse('hide');
+            },0);
             return
         }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>

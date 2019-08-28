@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/lzhphantom/MyMath/common"
 )
 
 type MainController struct {
@@ -10,7 +11,7 @@ type MainController struct {
 
 // @router / [get]
 func (c *MainController) Get() {
-	user := c.GetSession("loginUser")
+	user := c.GetSession(common.KeyLoginUser)
 	if user != nil {
 		c.Data["user"] = user
 		c.Data["isExist"] = true

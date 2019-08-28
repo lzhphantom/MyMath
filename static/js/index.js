@@ -4,101 +4,108 @@ $(function () {
         $("#collapseTwo").collapse('hide');
         $("#collapseThree").collapse('hide');
         $("#collapse4").collapse('hide');
-        $.get("/admin/basicCommon", function (data, status) {
-            let oneUl = $('#collapseOne').children('div').children('ul');
-            $(oneUl).empty();
-            for (let i = 0; i < data.length; i++) {
-                if ((i + 1) % 2 === 0) {
-                    $(oneUl).append(`<li role="presentation"><a href="#jihe" aria-controls="jihe" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
-                } else {
-                    $(oneUl).append(`<li role="presentation"><a href="#sjhs" aria-controls="sjhs" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
-                }
-            }
-
-            $('a[role-tab="basic"]').on('hide.bs.tab', (e) => {
-                let controls = $(e.target).attr("href");
-                $(controls).empty();
-            });
-
-            $('a[role-tab="basic"]').on('shown.bs.tab', function (e) {
-                let id = $(e.target).attr("data-id");
-                if (id === undefined) {
+        $.get("/admin/basicCommon",
+            function (data, status, xhr) {
+                if (xhr.status === 264) {
+                    $("#collapseOne").collapse('hide');
+                    notLogin();
                     return
                 }
-                let controls = $(e.target).attr("href");
-                $.get("/admin/basicContent/" + id, function (data, status) {
-                    let $modal = $(controls);
-                    $($modal).empty();
-                    $($modal).append(`<h1 class="text-center text-muted">基础知识</h1>`);
+                let oneUl = $('#collapseOne').children('div').children('ul');
+                $(oneUl).empty();
+                for (let i = 0; i < data.length; i++) {
+                    if ((i + 1) % 2 === 0) {
+                        $(oneUl).append(`<li role="presentation"><a href="#jihe" aria-controls="jihe" role="tab"
+                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
+                    } else {
+                        $(oneUl).append(`<li role="presentation"><a href="#sjhs" aria-controls="sjhs" role="tab"
+                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
+                    }
+                }
 
-                    $($modal).append(`<div>
+                $('a[role-tab="basic"]').on('hide.bs.tab', (e) => {
+                    let controls = $(e.target).attr("href");
+                    $(controls).empty();
+                });
+
+                $('a[role-tab="basic"]').on('shown.bs.tab', function (e) {
+                    let id = $(e.target).attr("data-id");
+                    if (id === undefined) {
+                        return
+                    }
+                    let controls = $(e.target).attr("href");
+                    $.get("/admin/basicContent/" + id, function (data, status) {
+                        let $modal = $(controls);
+                        $($modal).empty();
+                        $($modal).append(`<h1 class="text-center text-muted">基础知识</h1>`);
+
+                        $($modal).append(`<div>
                     <h2>` + data.Name + `</h2>
                 </div>`);
-                    //概念部分
-                    if (data.BasicContent[0] !== undefined) {
-                        $($modal).append(`<div>
+                        //概念部分
+                        if (data.BasicContent[0] !== undefined) {
+                            $($modal).append(`<div>
                     <h3>1.` + data.BasicContent[0].Title + `的概念</h3>
                     <p class="text-muted well">` + data.BasicContent[0].Concept + `</p>
                 </div>`);
-                        //知识点精讲部分
-                        if (data.BasicContent[0].KnowledgeImportant !== undefined) {
-                            let content = ``;
-                            let letterNumber = 97;
+                            //知识点精讲部分
+                            if (data.BasicContent[0].KnowledgeImportant !== undefined) {
+                                let content = ``;
+                                let letterNumber = 97;
 
-                            for (let i = 0; i < data.BasicContent[0].KnowledgeImportant.length; i++) {
-                                content += `<div>
+                                for (let i = 0; i < data.BasicContent[0].KnowledgeImportant.length; i++) {
+                                    content += `<div>
                         <h4>` + String.fromCharCode(letterNumber++) + `.</h4>
                         <p class="text-muted well">` + data.BasicContent[0].KnowledgeImportant[i].Content + `</p>
                     </div>`;
-                            }
-                            $($modal).append(`<div>
+                                }
+                                $($modal).append(`<div>
                     <h3>2.知识点精讲</h3>
                     ` + content + `
                 </div>`);
-                        }
-                        //公式部分
-                        if (data.BasicContent[0].Formula !== undefined) {
-                            let content = ``;
-                            for (let i = 0; i < data.BasicContent[0].Formula.length; i++) {
-                                content += `<p class="text-muted well">` + data.BasicContent[0].Formula[i].Content + `</p>`;
                             }
-                            $($modal).append(`<div>
+                            //公式部分
+                            if (data.BasicContent[0].Formula !== undefined) {
+                                let content = ``;
+                                for (let i = 0; i < data.BasicContent[0].Formula.length; i++) {
+                                    content += `<p class="text-muted well">` + data.BasicContent[0].Formula[i].Content + `</p>`;
+                                }
+                                $($modal).append(`<div>
                     <h3>3.相关公式</h3>
                     ` + content + `
                 </div>`);
-                        }
-                        //考点部分
-                        if (data.BasicContent[0].ExaminationCenter !== undefined) {
-                            let content = ``;
-                            for (let i = 0; i < data.BasicContent[0].ExaminationCenter.length; i++) {
-                                content += `<p class="text-muted well">` + data.BasicContent[0].ExaminationCenter[i].Content + `</p>`;
                             }
-                            $($modal).append(`<div>
+                            //考点部分
+                            if (data.BasicContent[0].ExaminationCenter !== undefined) {
+                                let content = ``;
+                                for (let i = 0; i < data.BasicContent[0].ExaminationCenter.length; i++) {
+                                    content += `<p class="text-muted well">` + data.BasicContent[0].ExaminationCenter[i].Content + `</p>`;
+                                }
+                                $($modal).append(`<div>
                     <h3 class="text-danger">4.考点</h3>
                     ` + content + `
                 </div>`);
-                        }
-                        //重难点部分
-                        if (data.BasicContent[0].HDifficulty !== undefined) {
-                            let content = ``;
-                            for (let i = 0; i < data.BasicContent[0].HDifficulty.length; i++) {
-                                content += `<p class="text-muted well">` + data.BasicContent[0].HDifficulty[i].Content + `</p>`;
                             }
-                            $($modal).append(`<div>
+                            //重难点部分
+                            if (data.BasicContent[0].HDifficulty !== undefined) {
+                                let content = ``;
+                                for (let i = 0; i < data.BasicContent[0].HDifficulty.length; i++) {
+                                    content += `<p class="text-muted well">` + data.BasicContent[0].HDifficulty[i].Content + `</p>`;
+                                }
+                                $($modal).append(`<div>
                     <h3 class="text-success">5.重难点</h3>
                     ` + content + `
                 </div>`);
-                        }
-                    } else {
-                        $($modal).append(`<div>
+                            }
+                        } else {
+                            $($modal).append(`<div>
                         <h3 class="text-center text-danger">抱歉！暂无内容！</h3>
                     </div>`);
-                    }
-                })
-            });
-        });
+                        }
+                    })
+                });
+            }
+        );
     });
     $("#collapseOne").on("hide.bs.collapse", () => {
         $(this).closest("ul").empty();
@@ -134,7 +141,12 @@ $(function () {
         $("#collapseOne").collapse('hide');
         $("#collapseTwo").collapse('hide');
         $("#collapse4").collapse('hide');
-        $.get("/admin/basicCommon", (data) => {
+        $.get("/admin/basicCommon", (data, status, xhr) => {
+            if (xhr.status === 264) {
+                $("#collapseThree").collapse('hide');
+                notLogin();
+                return
+            }
             let threeUl = $('#collapseThree').find('ul');
             $(threeUl).empty();
             for (let i = 0; i < data.length; i++) {
@@ -294,7 +306,7 @@ async function showEditor(obj, editorName, backGroup) {
         console.error(error);
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
-        let content=$(obj).attr("data-content");
+        let content = $(obj).attr("data-content");
         editor.setData(unregularEditorContent(content));
     } else {
         editor.setData($(obj).html());
@@ -308,16 +320,16 @@ async function showEditor(obj, editorName, backGroup) {
 }
 
 function unregularEditorContent(data) {
-    let arr=data.split(/\\\(|\\\)/);
+    let arr = data.split(/\\\(|\\\)/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
             arr.splice(i, 1);
             i--;
         }
     }
-    let content="";
-    for (let i=0;i<arr.length;i++){
-        content+=arr[i];
+    let content = "";
+    for (let i = 0; i < arr.length; i++) {
+        content += arr[i];
     }
     return content
 }
@@ -336,6 +348,7 @@ function regularEditorContent(data) {
     }
     return content
 }
+
 //准备生成富文本编辑器
 function editorCheck(show) {
     let knowFlag = false;
@@ -343,7 +356,7 @@ function editorCheck(show) {
         if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
                 let data = editor.getData();
-                let content =regularEditorContent(data);
+                let content = regularEditorContent(data);
                 if (content.length > 0) {
                     $(show).html(content);
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
@@ -411,7 +424,14 @@ function backToLast(backGroup, editorName) {
 
 //获取非选择题
 function getUnSelect(controls) {
-    $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
+
+    $.get("/admin/getQuestion/-1", (data,status,xhr) => {
+        if(xhr.status==264){
+            $("#collapseTwo").collapse('hide');
+            notLogin();
+            return
+        }
+        $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success" style="width: 35%">
                             <span>35% </span>
@@ -435,9 +455,8 @@ function getUnSelect(controls) {
                             <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#blankEditor');">确认</a>
                         </div>
                     </div>`);
-    let content = $(controls).find("#blankContent");
-    $.get("/admin/getQuestion/-1", (data) => {
-        console.log(data);
+        let content = $(controls).find("#blankContent");
+
         $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
         $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
@@ -463,7 +482,14 @@ function getUnSelect(controls) {
 
 //获取选择题
 function getSelect(controls) {
-    $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
+
+    $.get("/admin/getQuestion/1", (data, status, xhr) => {
+        if (xhr.status === 264) {
+            $("#collapseTwo").collapse('hide');
+            notLogin();
+            return
+        }
+        $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success" style="width: 35%">
                             <span>35% </span>
@@ -482,9 +508,7 @@ function getSelect(controls) {
                         <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
                         <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
                     </div>`);
-    let content = $(controls).find("#selectContent");
-    $.get("/admin/getQuestion/1", (data) => {
-        console.log(data);
+        let content = $(controls).find("#selectContent");
         let choices = ``;
         let letterNumber = 65;
         for (let i = 0; i < data.Choices.length; i++) {

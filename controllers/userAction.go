@@ -40,19 +40,19 @@ func (c *LoginController) Login() {
 		userInfo.Name,
 		user.Role,
 	}
-	c.SetSession("loginUser", loginUser)
+	c.SetSession(common.KeyLoginUser, loginUser)
 	c.Redirect("/", 302)
 }
 
 // @router /logout [get]
 func (c *LoginController) LoginOut() {
-	c.DelSession("loginUser")
+	c.DelSession(common.KeyLoginUser)
 	c.Redirect("/", 302)
 }
 
 // @router /changePwd [post]
 func (c *LoginController) ChangePassword() {
-	user := c.GetSession("loginUser").(common.LoginUser)
+	user := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	oldPwd := c.GetString("oldPwd")
 
 	o := orm.NewOrm()

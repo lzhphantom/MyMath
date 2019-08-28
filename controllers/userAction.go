@@ -72,5 +72,23 @@ func (c *LoginController) ChangePassword() {
 		logs.Debug("密码不正确")
 	}
 	c.Redirect("/", 302)
+}
 
+// @router /register [post]
+func (c *LoginController) Register() {
+	loginName := c.GetString("registerName")
+	pwd := c.GetString("pwd")
+	user := models.User{
+		UserName: loginName,
+		Password: fmt.Sprintf("%x", common.MD5Password(pwd)),
+		Role:     common.KeyRoleStudent,
+	}
+	o := orm.NewOrm()
+	num, err := o.Insert(&user)
+	if err != nil {
+		logs.Warning("插入失败", err)
+	} else {
+		logs.Info("成功插入", num, "条")
+	}
+	c.Redirect("/", 302)
 }

@@ -386,7 +386,11 @@ function backToLast(backGroup, editorName) {
     });
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
-    $(showContentName).attr("data-content", data);
+    if(data.length<=0){
+        $(showContentName).html("暂无内容")
+    }else {
+        $(showContentName).attr("data-content", data);
+    }
     //选择题答案添加
     if (showContentName === "#showSelectA" || showContentName === "#showSelectB"
         || showContentName === "#showSelectC" || showContentName === "#showSelectD") {
@@ -431,7 +435,7 @@ function backToLast(backGroup, editorName) {
 function getUnSelect(controls) {
 
     $.get("/admin/getQuestion/-1", (data, status, xhr) => {
-        if (xhr.status == 264) {
+        if (xhr.status === 264) {
             notLogin();
             setTimeout(()=>{
                 $("#collapseTwo").collapse('hide');
@@ -471,20 +475,22 @@ function getUnSelect(controls) {
                         </div>
                         <div>
                             <textarea name="content" id="blankEditor" class="hidden"></textarea>
-                        </div>`)
-    });
-    $("#nextUnQuestion").on("click", (e) => {
-        let parent = $(e.target).parent("div").parent("div").parent("div");
-        if ($(parent).attr("id") === "Blank") {
-            let userAnswer = $(parent).find('#showEditor').attr("data-content");
-            if (userAnswer !== undefined && userAnswer.length > 0) {
-                $(parent).empty();
-                getUnSelect(controls)
-            } else {
-                alert("请填写你的答案！");
+                        </div>`);
+        $("#nextUnQuestion").on("click", (e) => {
+            console.log("123");
+            let parent = $(e.target).parent("div").parent("div").parent("div");
+            if ($(parent).attr("id") === "Blank") {
+                let userAnswer = $(parent).find('#showEditor').attr("data-content");
+                if (userAnswer !== undefined && userAnswer.length > 0) {
+                    $(parent).empty();
+                    getUnSelect(controls)
+                } else {
+                    alert("请填写你的答案！");
+                }
             }
-        }
+        });
     });
+
 }
 
 //获取选择题
@@ -531,20 +537,21 @@ function getSelect(controls) {
         $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
         $(content).append(choices);
         $(content).find("p").css("display", "inline");
+        $("#nextQuestion").on("click", (e) => {
+            let parent = $(e.target).parent("div").parent("div");
+            if ($(parent).attr("id") === "Select") {
+                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+                if (userAnswer !== undefined) {
+                    $(parent).empty();
+                    getSelect(controls);
+                } else {
+                    alert("请选择你认为正确的答案！");
+                }
+            }
+        });
     });
 
-    $("#nextQuestion").on("click", (e) => {
-        let parent = $(e.target).parent("div").parent("div");
-        if ($(parent).attr("id") === "Select") {
-            let userAnswer = $(parent).find('input[name="choice"]:checked').val();
-            if (userAnswer !== undefined) {
-                $(parent).empty();
-                getSelect(controls);
-            } else {
-                alert("请选择你认为正确的答案！");
-            }
-        }
-    });
+
 }
 
 //专项练习获取题

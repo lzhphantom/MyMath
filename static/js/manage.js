@@ -259,8 +259,14 @@ function editorCheck(show) {
     var editorCheck = setInterval(() => {
         if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
-                $(show).html(editor.getData());
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
+                let data = editor.getData();
+                let content = regularEditorContent(data);
+                if (content.length > 0) {
+                    $(show).html(content);
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);
+                } else {
+                    $(show).html(data);
+                }
             });
             knowFlag = true
         }
@@ -359,14 +365,18 @@ function chooseContentShow(basicContent, data) {
 
 //提交富文本编辑器内容
 function backToLast(backGroup, editorName) {
-    const data = editor.getData();
+    const data = regularEditorContent(editor.getData());
     editor.model.document.off("change:data");
     editor.destroy().catch(error => {
         console.log(error);
     });
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
-    $(showContentName).attr("data-content", data);
+    if(data.length<=0){
+        $(showContentName).html("暂无内容")
+    }else {
+        $(showContentName).attr("data-content", data);
+    }
     //选择题答案添加
     if (showContentName === "#showSelectA" || showContentName === "#showSelectB"
         || showContentName === "#showSelectC" || showContentName === "#showSelectD") {
@@ -413,18 +423,16 @@ async function showEditor(obj, editorName, backGroup) {
         return
     }
     $(obj).removeAttr("onclick");
-    await ClassicEditor.create(document.querySelector(editorName), {
-        toolbar: ["Heading", "|", "ImageUpload", "BlockQuote", "Bold", "Italic"],
-        language: 'zh-cn'
-    }).then(newEditor => {
+    await ClassicEditor.create(document.querySelector(editorName)).then(newEditor => {
         editor = newEditor;
     }).catch(error => {
         console.error(error);
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
-        editor.setData($(obj).attr("data-content"));
+        let content = $(obj).attr("data-content");
+        editor.setData(unregularEditorContent(content));
     } else {
-        editor.setData($(obj).html());
+        editor.setData("");
     }
     showContentName = "#" + $(obj).attr("id");
 
@@ -543,4 +551,34 @@ function showChangeBasicContent(id, changeModal) {
         "json",
     );
 
+}
+
+function regularEditorContent(data) {
+    let arr = data.split(/<p>|<\/p>/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+    let content = ``;
+    for (let i = 0; i < arr.length; i++) {
+        content += `<p>\\(` + arr[i] + `\\)</p>`;
+    }
+    return content
+}
+
+function unregularEditorContent(data) {
+    let arr = data.split(/\\\(|\\\)/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+    let content = "";
+    for (let i = 0; i < arr.length; i++) {
+        content += arr[i];
+    }
+    return content
 }

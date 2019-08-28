@@ -25,7 +25,7 @@ func main() {
 	FileterLogin := func(ctx *context2.Context) {
 		user := ctx.Input.CruSession.Get(common.KeyLoginUser)
 		logs.Info(ctx.Request.RequestURI)
-		if user == nil && !(ctx.Request.RequestURI == "/login" || ctx.Request.RequestURI == "/") {
+		if user == nil && !(ctx.Request.RequestURI == "/login" || ctx.Request.RequestURI == "/" || ctx.Request.RequestURI == "/register") {
 			ctx.ResponseWriter.WriteHeader(common.KeyNotLogin)
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"github.com/lzhphantom/MyMath/common"
 	"github.com/lzhphantom/MyMath/models"
 	"math/rand"
 	"reflect"
@@ -469,7 +470,7 @@ func (c *AdminController) SearchUser() {
 	c.ServeJSON()
 }
 
-//随机获取一道所需要的题
+//获取训练所需要的题
 // @router /admin/getQuestion/:role [get]
 func (c *AdminController) GetQuestion() {
 	role := c.Ctx.Input.Param(":role")
@@ -483,8 +484,29 @@ func (c *AdminController) GetQuestion() {
 		} else {
 			logs.Info("一共获取了", num, "条")
 		}
-		question := questions[rand.Intn(len(questions))]
-		c.Data["json"] = question
+		unSelects := make([]common.UnSelect, 0)
+		var start int
+		var end int
+		if num > 12 {
+			start = rand.Intn(len(questions) - 12)
+			end = start + 13
+		} else {
+			start = 0
+			end = len(questions)
+		}
+		for i := start; i < end; i++ {
+			newUnSelect := common.UnSelect{
+				Train: &common.TrainingUnSelect{
+					Id:      questions[i].Id,
+					Content: questions[i].Content,
+					Role:    questions[i].RoleQuestion,
+				},
+				Answer: questions[i].Answer,
+			}
+			unSelects = append(unSelects, newUnSelect)
+		}
+		c.SetSession(common.KeyUnSelects, unSelects)
+		c.Redirect("/getTrain/unselect/0", 302)
 	} else {
 		num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
 		if err != nil {
@@ -492,24 +514,56 @@ func (c *AdminController) GetQuestion() {
 		} else {
 			logs.Info("一共获取了", num, "条")
 		}
-
-		question := questions[rand.Intn(len(questions))]
-		choices := strings.Split(question.Choices, "~￥")
-		for i := 0; i < len(choices); i++ {
-			if len(choices[i]) == 0 {
-				choices = append(choices[:i], choices[i+1:]...)
+		selects := make([]common.Select, 0)
+		var start int
+		var end int
+		if num > 12 {
+			start = rand.Intn(len(questions) - 12)
+			end = start + 13
+		} else {
+			start = 0
+			end = len(questions)
+		}
+		for i := start; i < end; i++ {
+			choices := strings.Split(questions[i].Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
 			}
+			newSelect := common.Select{
+				Train: &common.TrainingSelect{
+					Id:      questions[i].Id,
+					Content: questions[i].Content,
+					Choices: choices,
+					Role:    questions[i].RoleQuestion,
+				},
+				Answer: questions[i].Answer,
+			}
+			selects = append(selects, newSelect)
 		}
-		data := struct {
-			Id      int
-			Choices []string
-			Content string
-		}{
-			Id:      question.Id,
-			Choices: choices,
-			Content: question.Content,
-		}
+		c.SetSession(common.KeySelects, selects)
+		c.Redirect("/getTrain/select/0", 302)
+	}
+}
+
+//从缓存冲抽取题目
+// @router /getTrain/:role/:num [get]
+func (c *AdminController) GetTrain() {
+	role := c.Ctx.Input.Param(":role")
+	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	if role == "select" {
+		selects := c.GetSession(common.KeySelects).([]common.Select)
+		data := selects[num].Train
+		data.QueueNum = num
 		c.Data["json"] = data
+	} else if role == "unselect" {
+		unSelects := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
+		data := unSelects[num].Train
+		data.QueueNum = num
+		c.Data["json"] = data
+	} else {
+		logs.Warning("不存在这样的选择")
 	}
 	c.ServeJSON()
 }
@@ -527,39 +581,67 @@ func (c *AdminController) GetQuestionByCommonId() {
 	} else {
 		logs.Info("一共获取了", num, "条")
 	}
-	question := questions[rand.Intn(len(questions))]
-
-	if question.RoleQuestion == 1 {
-		choices := strings.Split(question.Choices, "~￥")
-		for i := 0; i < len(choices); i++ {
-			if len(choices[i]) == 0 {
-				choices = append(choices[:i], choices[i+1:]...)
-			}
-		}
-		data := struct {
-			Id      int
-			Content string
-			Choices []string
-			Role    uint8
-		}{
-			question.Id,
-			question.Content,
-			choices,
-			question.RoleQuestion,
-		}
-		c.Data["json"] = data
+	var start int
+	var end int
+	if num > 12 {
+		start = rand.Intn(len(questions) - 12)
+		end = start + 13
 	} else {
-		data := struct {
-			Id      int
-			Content string
-			Role    uint8
-		}{
-			question.Id,
-			question.Content,
-			question.RoleQuestion,
-		}
-		c.Data["json"] = data
+		start = 0
+		end = len(questions)
 	}
+	practices := make([]interface{}, 0)
+	for i := start; i < end; i++ {
+		question := questions[i]
+		if question.RoleQuestion == 1 {
+			choices := strings.Split(question.Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
+			}
+			practiceSelect := common.Select{
+				Train: &common.TrainingSelect{
+					Id:      question.Id,
+					Content: question.Content,
+					Choices: choices,
+					Role:    question.RoleQuestion,
+				},
+				Answer: question.Answer,
+			}
+			practices = append(practices, practiceSelect)
+		} else {
+			practiceUnSelect := common.UnSelect{
+				Train: &common.TrainingUnSelect{
+					Id:      question.Id,
+					Content: question.Content,
+					Role:    question.RoleQuestion,
+				},
+				Answer: question.Answer,
+			}
+			practices = append(practices, practiceUnSelect)
+		}
+	}
+	c.SetSession(common.KeyPractices, practices)
+	c.Redirect("/getPractice/0", 302)
+}
 
+// @router /getPractice/:num [get]
+func (c *AdminController) GetPractice() {
+	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	test := c.GetSession(common.KeyPractices)
+	logs.Info("practice", test)
+	practices := test.([]interface{})
+	practice, ok := practices[num].(common.Select)
+	if ok {
+		practice.Train.QueueNum = num
+		c.Data["json"] = practice.Train
+	} else {
+		practice, ok := practices[num].(common.UnSelect)
+		if ok {
+			practice.Train.QueueNum = num
+			c.Data["json"] = practice.Train
+		}
+	}
 	c.ServeJSON()
 }

@@ -1,4 +1,3 @@
-
 $(function () {
     let mathBasic = document.getElementById("math_basic");
     $('#collapseOne').on('show.bs.collapse', function () {
@@ -9,9 +8,9 @@ $(function () {
             function (data, status, xhr) {
                 if (xhr.status === 264) {
                     notLogin();
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         $("#collapseOne").collapse('hide');
-                    },0);
+                    }, 0);
                     return;
                 }
                 let oneUl = $('#collapseOne').children('div').children('ul');
@@ -128,9 +127,9 @@ $(function () {
         $('a[role-tab="training"]').on('shown.bs.tab', (e) => {
             let controls = $(e.target).attr("href");
             if (controls === "#Select") {
-                getSelect(controls);
+                getSelectFirst(controls);
             } else if (controls === "#Blank") {
-                getUnSelect(controls);
+                getUnSelectFirst(controls);
             }
         });
     });
@@ -147,9 +146,9 @@ $(function () {
         $.get("/admin/basicCommon", (data, status, xhr) => {
             if (xhr.status === 264) {
                 notLogin();
-                setTimeout(()=>{
+                setTimeout(() => {
                     $("#collapseThree").collapse('hide');
-                },0);
+                }, 0);
                 return
             }
             let threeUl = $('#collapseThree').find('ul');
@@ -166,7 +165,7 @@ $(function () {
             $('a[role-tab="sp"]').on("shown.bs.tab", (e) => {
                 let id = $(e.target).attr("data-id");
                 let sp = $("#SpecialPractice");
-                getSpecialPractice(sp, id);
+                getSpecialPracticeFirst(sp, id);
             })
         });
     });
@@ -386,9 +385,9 @@ function backToLast(backGroup, editorName) {
     });
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
-    if(data.length<=0){
+    if (data.length <= 0) {
         $(showContentName).html("暂无内容")
-    }else {
+    } else {
         $(showContentName).attr("data-content", data);
     }
     //选择题答案添加
@@ -432,14 +431,14 @@ function backToLast(backGroup, editorName) {
 }
 
 //获取非选择题
-function getUnSelect(controls) {
+function getUnSelectFirst(controls) {
 
     $.get("/admin/getQuestion/-1", (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
-            setTimeout(()=>{
+            setTimeout(() => {
                 $("#collapseTwo").collapse('hide');
-            },0);
+            }, 0);
             return
         }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
@@ -477,31 +476,91 @@ function getUnSelect(controls) {
                             <textarea name="content" id="blankEditor" class="hidden"></textarea>
                         </div>`);
         $("#nextUnQuestion").on("click", (e) => {
-            console.log("123");
             let parent = $(e.target).parent("div").parent("div").parent("div");
             if ($(parent).attr("id") === "Blank") {
                 let userAnswer = $(parent).find('#showEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    getUnSelect(controls)
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    getUnSelect(controls, QueueNum)
                 } else {
                     alert("请填写你的答案！");
                 }
             }
         });
     });
+}
 
+function getUnSelect(controls, num) {
+    $.get("/getTrain/unselect/" + num, (data, status, xhr) => {
+        if (xhr.status === 264) {
+            notLogin();
+            setTimeout(() => {
+                $("#collapseTwo").collapse('hide');
+            }, 0);
+            return
+        }
+        $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger" style="width: 30%">
+                            <span>30% </span>
+                        </div>
+                    </div>
+                    <div id="blankContent">
+                        
+                    </div>
+                    <div id="backGroup" class="row">
+                        <div class="col-sm-offset-9">
+                            <a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>
+                        </div>
+                        <div class="col-sm-offset-9 hidden">
+                            <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#blankEditor');">确认</a>
+                        </div>
+                    </div>`);
+        let content = $(controls).find("#blankContent");
+
+        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).append(`<div>
+                            <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
+                               id="showEditor">填写你认为正确的答案</a>
+                        </div>
+                        <div>
+                            <textarea name="content" id="blankEditor" class="hidden"></textarea>
+                        </div>`);
+        $("#nextUnQuestion").on("click", (e) => {
+            let parent = $(e.target).parent("div").parent("div").parent("div");
+            if ($(parent).attr("id") === "Blank") {
+                let userAnswer = $(parent).find('#showEditor').attr("data-content");
+                if (userAnswer !== undefined && userAnswer.length > 0) {
+                    $(parent).empty();
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    getUnSelect(controls, QueueNum)
+                } else {
+                    alert("请填写你的答案！");
+                }
+            }
+        });
+    });
 }
 
 //获取选择题
-function getSelect(controls) {
+function getSelectFirst(controls) {
 
     $.get("/admin/getQuestion/1", (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
-            setTimeout(()=>{
+            setTimeout(() => {
                 $("#collapseTwo").collapse('hide');
-            },0);
+            }, 0);
             return
         }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
@@ -543,20 +602,80 @@ function getSelect(controls) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    getSelect(controls);
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    getSelect(controls, QueueNum);
                 } else {
                     alert("请选择你认为正确的答案！");
                 }
             }
         });
     });
+}
 
-
+function getSelect(controls, num) {
+    $.get("/getTrain/select/" + num, (data, status, xhr) => {
+        if (xhr.status === 264) {
+            notLogin();
+            setTimeout(() => {
+                $("#collapseTwo").collapse('hide');
+            }, 0);
+            return
+        }
+        $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
+                            <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger" style="width: 30%">
+                            <span>30% </span>
+                        </div>
+                    </div>
+                    <div id="selectContent">
+                        
+                    </div>
+                    <div id="backGroup" class="row">
+                        <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                        <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
+                    </div>`);
+        let content = $(controls).find("#selectContent");
+        let choices = ``;
+        let letterNumber = 65;
+        for (let i = 0; i < data.Choices.length; i++) {
+            choices += `<div>
+                            <label for="">
+                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            </label>
+                        </div>`
+        }
+        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).append(choices);
+        $(content).find("p").css("display", "inline");
+        $("#nextQuestion").on("click", (e) => {
+            let parent = $(e.target).parent("div").parent("div");
+            if ($(parent).attr("id") === "Select") {
+                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+                if (userAnswer !== undefined) {
+                    $(parent).empty();
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    getSelect(controls, QueueNum);
+                } else {
+                    alert("请选择你认为正确的答案！");
+                }
+            }
+        });
+    });
 }
 
 //专项练习获取题
-function getSpecialPractice(sp, id) {
-    $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
+function getSpecialPracticeFirst(sp, id) {
+    $.get("/admin/getQuestionByCommonId/" + id, (data) => {
+        $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success" style="width: 35%">
                         <span>35% </span>
@@ -573,10 +692,8 @@ function getSpecialPractice(sp, id) {
                         </div>
                         <div id="backGroup" class="row">
                         </div>`);
-    let content = $(sp).find("#SpecialPracticeContent");
-    let backGroup = $(sp).find("#backGroup");
-    let role = -1;
-    $.get("/admin/getQuestionByCommonId/" + id, (data) => {
+        let content = $(sp).find("#SpecialPracticeContent");
+        let backGroup = $(sp).find("#backGroup");
         if (data.Content === undefined) {
             $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
             return
@@ -602,7 +719,9 @@ function getSpecialPractice(sp, id) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    getSpecialPractice(sp, id);
+                    let QueueNum=data.QueueNum;
+                    QueueNum++;
+                    getSpecialPractice(sp, QueueNum);
                 } else {
                     alert("请选择你认为正确的答案！");
                 }
@@ -630,7 +749,9 @@ function getSpecialPractice(sp, id) {
                 let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    getSpecialPractice(sp, id)
+                    let QueueNum=data.QueueNum;
+                    QueueNum++;
+                    getSpecialPractice(sp, QueueNum);
                 } else {
                     alert("请填写你的答案！");
                 }
@@ -638,8 +759,94 @@ function getSpecialPractice(sp, id) {
         }
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
     });
+}
 
+function getSpecialPractice(sp,num) {
+    $.get("/getPractice/" + num, (data) => {
+        $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
+                        <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 35%">
+                        <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
+                        <span>35% </span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger" style="width: 30%">
+                        <span>30% </span>
+                        </div>
+                        </div>
+                        <div id="SpecialPracticeContent">
 
+                        </div>
+                        <div id="backGroup" class="row">
+                        </div>`);
+        let content = $(sp).find("#SpecialPracticeContent");
+        let backGroup = $(sp).find("#backGroup");
+        if (data.Content === undefined) {
+            $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
+            return
+        }
+        if (data.Role === 1) {
+            let choices = ``;
+            let letterNumber = 65;
+            for (let i = 0; i < data.Choices.length; i++) {
+                choices += `<div>
+                            <label for="">
+                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            </label>
+                        </div>`
+            }
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(choices);
+            $(content).find("p").css("display", "inline");
+            $(backGroup).empty().append(`<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                        <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`)
+            $("#nextSPQuestion").on("click", (e) => {
+                let parent = $(e.target).parent("div").parent("div");
+                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+                if (userAnswer !== undefined) {
+                    $(parent).empty();
+                    let QueueNum=data.QueueNum;
+                    QueueNum++;
+                    getSpecialPractice(sp, QueueNum);
+                } else {
+                    alert("请选择你认为正确的答案！");
+                }
+
+            });
+        } else {
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(`<div>
+                            <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
+                               id="showSPEditor">填写你认为正确的答案</a>
+                        </div>
+                        <div>
+                            <textarea name="content" id="SPEditor" class="hidden"></textarea>
+                        </div>`)
+            $(backGroup).empty().append(`<div class="col-sm-offset-9">
+                            <a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>
+                        </div>
+                        <div class="col-sm-offset-9 hidden">
+                            <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
+                        </div>`);
+            $("#nextSPQuestion").on("click", (e) => {
+
+                let parent = $(e.target).parent("div").parent("div").parent("div");
+                let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
+                if (userAnswer !== undefined && userAnswer.length > 0) {
+                    $(parent).empty();
+                    let QueueNum=data.QueueNum;
+                    QueueNum++;
+                    getSpecialPractice(sp, QueueNum);
+                } else {
+                    alert("请填写你的答案！");
+                }
+            });
+        }
+        // MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
+    });
 }
 
 function UNACTION() {

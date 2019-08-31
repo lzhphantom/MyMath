@@ -590,7 +590,7 @@ func (c *AdminController) GetQuestionByCommonId() {
 		start = 0
 		end = len(questions)
 	}
-	practices := make([]interface{}, 0)
+	practices := make([]common.Practice, 0)
 	for i := start; i < end; i++ {
 		question := questions[i]
 		if question.RoleQuestion == 1 {
@@ -609,7 +609,10 @@ func (c *AdminController) GetQuestionByCommonId() {
 				},
 				Answer: question.Answer,
 			}
-			practices = append(practices, practiceSelect)
+			practice := common.Practice{
+				Select: &practiceSelect,
+			}
+			practices = append(practices, practice)
 		} else {
 			practiceUnSelect := common.UnSelect{
 				Train: &common.TrainingUnSelect{
@@ -619,7 +622,10 @@ func (c *AdminController) GetQuestionByCommonId() {
 				},
 				Answer: question.Answer,
 			}
-			practices = append(practices, practiceUnSelect)
+			practice := common.Practice{
+				UnSelect: &practiceUnSelect,
+			}
+			practices = append(practices, practice)
 		}
 	}
 	c.SetSession(common.KeyPractices, practices)
@@ -631,16 +637,17 @@ func (c *AdminController) GetPractice() {
 	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
 	test := c.GetSession(common.KeyPractices)
 	logs.Info("practice", test)
-	practices := test.([]interface{})
-	practice, ok := practices[num].(common.Select)
+	practices, ok := test.([]common.Practice)
+	practice := practices[num]
 	if ok {
-		practice.Train.QueueNum = num
-		c.Data["json"] = practice.Train
-	} else {
-		practice, ok := practices[num].(common.UnSelect)
-		if ok {
-			practice.Train.QueueNum = num
-			c.Data["json"] = practice.Train
+		if practice.Select != nil {
+			data := practice.Select
+			data.Train.QueueNum = num
+			c.Data["json"] = data.Train
+		} else if practice.UnSelect != nil {
+			data := practice.UnSelect
+			data.Train.QueueNum = num
+			c.Data["json"] = data.Train
 		}
 	}
 	c.ServeJSON()

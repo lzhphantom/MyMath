@@ -24,3 +24,8 @@ type TrainingSelect struct {
 	Role     uint8
 	QueueNum int
 }
+
+type Practice struct {
+	Select   *Select
+	UnSelect *UnSelect
+}

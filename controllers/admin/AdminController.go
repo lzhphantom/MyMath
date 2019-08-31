@@ -489,7 +489,7 @@ func (c *AdminController) GetQuestion() {
 		var end int
 		if num > 12 {
 			start = rand.Intn(len(questions) - 12)
-			end = start + 13
+			end = start + 12
 		} else {
 			start = 0
 			end = len(questions)
@@ -500,6 +500,7 @@ func (c *AdminController) GetQuestion() {
 					Id:      questions[i].Id,
 					Content: questions[i].Content,
 					Role:    questions[i].RoleQuestion,
+					Total:   end - start,
 				},
 				Answer: questions[i].Answer,
 			}
@@ -519,7 +520,7 @@ func (c *AdminController) GetQuestion() {
 		var end int
 		if num > 12 {
 			start = rand.Intn(len(questions) - 12)
-			end = start + 13
+			end = start + 12
 		} else {
 			start = 0
 			end = len(questions)
@@ -537,6 +538,7 @@ func (c *AdminController) GetQuestion() {
 					Content: questions[i].Content,
 					Choices: choices,
 					Role:    questions[i].RoleQuestion,
+					Total:   end - start,
 				},
 				Answer: questions[i].Answer,
 			}
@@ -548,22 +550,123 @@ func (c *AdminController) GetQuestion() {
 }
 
 //从缓存冲抽取题目
-// @router /getTrain/:role/:num [get]
+// @router /getTrain/:role/:num [get,post]
 func (c *AdminController) GetTrain() {
 	role := c.Ctx.Input.Param(":role")
+	answer := c.GetString("answer")
 	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
 	if role == "select" {
 		selects := c.GetSession(common.KeySelects).([]common.Select)
+		logs.Info(selects)
+		if num > 0 {
+			selects[num-1].ViewFlag = true
+			selects[num-1].UserAnswer = answer
+			if selects[num-1].Answer == answer {
+				selects[num-1].Correct = true
+			} else {
+				selects[num-1].Correct = false
+			}
+		}
 		data := selects[num].Train
 		data.QueueNum = num
 		c.Data["json"] = data
 	} else if role == "unselect" {
 		unSelects := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
+		if num > 0 {
+			unSelects[num-1].ViewFlag = true
+			unSelects[num-1].UserAnswer = answer
+			if unSelects[num-1].Answer == answer {
+				unSelects[num-1].Correct = true
+			} else {
+				unSelects[num-1].Correct = false
+			}
+		}
 		data := unSelects[num].Train
 		data.QueueNum = num
 		c.Data["json"] = data
 	} else {
 		logs.Warning("不存在这样的选择")
+	}
+	c.ServeJSON()
+}
+
+//提交并检测训练
+// @router /commitTraining/:role [post]
+func (c *AdminController) CommitTraining() {
+	role := c.Ctx.Input.Param(":role")
+	answer := c.GetString("answer")
+	if role == "select" {
+		selects, ok := c.GetSession(common.KeySelects).([]common.Select)
+		if ok {
+			countCorrect := 0
+			countView := 0
+			for i := 0; i < len(selects); i++ {
+				if selects[i].ViewFlag {
+					if selects[i].Correct {
+						countCorrect++
+					}
+					countView++
+				} else {
+					if len(answer) > 0 {
+						selects[i].UserAnswer = answer
+						selects[i].ViewFlag = true
+						if selects[i].Answer == answer {
+							selects[i].Correct = true
+							countCorrect++
+						} else {
+							selects[i].Correct = false
+						}
+						countView++
+					}
+				}
+			}
+			data := struct {
+				View    int
+				Correct int
+			}{
+				countView,
+				countCorrect,
+			}
+			c.DelSession(common.KeySelects)
+			c.Data["json"] = data
+		}
+	} else if role == "unselect" {
+		unSelects, ok := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
+		if ok {
+			countCorrect := 0
+			countView := 0
+			for i := 0; i < len(unSelects); i++ {
+				if unSelects[i].ViewFlag {
+					if unSelects[i].Correct {
+						countCorrect++
+					}
+					countView++
+				} else {
+					if len(answer) > 0 {
+						unSelects[i].UserAnswer = answer
+						unSelects[i].ViewFlag = true
+						if unSelects[i].Answer == answer {
+							unSelects[i].Correct = true
+							countCorrect++
+						} else {
+							unSelects[i].Correct = false
+						}
+						countView++
+					}
+				}
+			}
+			data := struct {
+				View    int
+				Correct int
+			}{
+				countView,
+				countCorrect,
+			}
+			c.DelSession(common.KeyUnSelects)
+			c.Data["json"] = data
+		}
+	} else {
+		logs.Info("role 参数不正常")
 	}
 	c.ServeJSON()
 }
@@ -585,7 +688,7 @@ func (c *AdminController) GetQuestionByCommonId() {
 	var end int
 	if num > 12 {
 		start = rand.Intn(len(questions) - 12)
-		end = start + 13
+		end = start + 12
 	} else {
 		start = 0
 		end = len(questions)
@@ -606,6 +709,7 @@ func (c *AdminController) GetQuestionByCommonId() {
 					Content: question.Content,
 					Choices: choices,
 					Role:    question.RoleQuestion,
+					Total:   end - start,
 				},
 				Answer: question.Answer,
 			}
@@ -619,6 +723,7 @@ func (c *AdminController) GetQuestionByCommonId() {
 					Id:      question.Id,
 					Content: question.Content,
 					Role:    question.RoleQuestion,
+					Total:   end - start,
 				},
 				Answer: question.Answer,
 			}
@@ -632,12 +737,32 @@ func (c *AdminController) GetQuestionByCommonId() {
 	c.Redirect("/getPractice/0", 302)
 }
 
-// @router /getPractice/:num [get]
+//冲缓存中抽取专项训练题目
+// @router /getPractice/:num [post,get]
 func (c *AdminController) GetPractice() {
 	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
-	test := c.GetSession(common.KeyPractices)
-	logs.Info("practice", test)
-	practices, ok := test.([]common.Practice)
+	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
+	if num > 0 {
+		answer := c.GetString("answer")
+		pre := practices[num-1]
+		if pre.Select != nil {
+			pre.Select.ViewFlag = true
+			pre.Select.UserAnswer = answer
+			if pre.Select.Answer == answer {
+				pre.Select.Correct = true
+			} else {
+				pre.Select.Correct = false
+			}
+		} else if pre.UnSelect != nil {
+			pre.UnSelect.ViewFlag = true
+			pre.UnSelect.UserAnswer = answer
+			if pre.UnSelect.Answer == answer {
+				pre.UnSelect.Correct = true
+			} else {
+				pre.UnSelect.Correct = false
+			}
+		}
+	}
 	practice := practices[num]
 	if ok {
 		if practice.Select != nil {
@@ -649,6 +774,69 @@ func (c *AdminController) GetPractice() {
 			data.Train.QueueNum = num
 			c.Data["json"] = data.Train
 		}
+	}
+	c.ServeJSON()
+}
+
+//提交并检测专项训练
+// @router /commitPractice [get,post]
+func (c *AdminController) CommitPractice() {
+	answer := c.GetString("answer")
+	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
+	if ok {
+		countView := 0
+		countCorrect := 0
+		for i := 0; i < len(practices); i++ {
+			if practices[i].Select != nil {
+				if practices[i].Select.ViewFlag {
+					countView++
+					if practices[i].Select.Correct {
+						countCorrect++
+					}
+				} else {
+					if len(answer) > 0 {
+						practices[i].Select.UserAnswer = answer
+						practices[i].Select.ViewFlag = true
+						if practices[i].Select.Answer == answer {
+							countCorrect++
+							practices[i].Select.Correct = true
+						} else {
+							practices[i].Select.Correct = false
+						}
+					}
+
+				}
+			} else if practices[i].UnSelect != nil {
+				if practices[i].UnSelect.ViewFlag {
+					countView++
+					if practices[i].UnSelect.Correct {
+						countCorrect++
+					}
+				} else {
+					if len(answer) > 0 {
+						practices[i].UnSelect.UserAnswer = answer
+						practices[i].UnSelect.ViewFlag = true
+						if practices[i].UnSelect.Answer == answer {
+							countCorrect++
+							practices[i].UnSelect.Correct = true
+						} else {
+							practices[i].UnSelect.Correct = false
+						}
+					}
+
+				}
+			}
+		}
+
+		data := struct {
+			View    int
+			Correct int
+		}{
+			countView,
+			countCorrect,
+		}
+		c.Data["json"] = data
+		c.DelSession(common.KeyPractices)
 	}
 	c.ServeJSON()
 }

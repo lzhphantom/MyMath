@@ -432,7 +432,6 @@ function backToLast(backGroup, editorName) {
 
 //获取非选择题
 function getUnSelectFirst(controls) {
-
     $.get("/admin/getQuestion/-1", (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
@@ -441,16 +440,11 @@ function getUnSelectFirst(controls) {
             }, 0);
             return
         }
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
                     <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                            <span>30% </span>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                            <span>` + percent + `% </span>
                         </div>
                     </div>
                     <div id="blankContent">
@@ -483,7 +477,8 @@ function getUnSelectFirst(controls) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getUnSelect(controls, QueueNum)
+                    let commitData = {answer: userAnswer};
+                    getUnSelect(controls, QueueNum, commitData)
                 } else {
                     alert("请填写你的答案！");
                 }
@@ -492,8 +487,8 @@ function getUnSelectFirst(controls) {
     });
 }
 
-function getUnSelect(controls, num) {
-    $.get("/getTrain/unselect/" + num, (data, status, xhr) => {
+function getUnSelect(controls, num, commitData) {
+    $.post("/getTrain/unselect/" + num, commitData, (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -501,16 +496,18 @@ function getUnSelect(controls, num) {
             }, 0);
             return
         }
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        let button1 = ``;
+        if ((data.QueueNum + 1) === data.Total) {
+            button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
+        } else {
+            button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>`
+        }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
                     <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                            <span>30% </span>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                            <span>` + percent + `% </span>
                         </div>
                     </div>
                     <div id="blankContent">
@@ -518,8 +515,7 @@ function getUnSelect(controls, num) {
                     </div>
                     <div id="backGroup" class="row">
                         <div class="col-sm-offset-9">
-                            <a class="btn btn-danger btn-lg">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>
+                            ` + button1 + `
                         </div>
                         <div class="col-sm-offset-9 hidden">
                             <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#blankEditor');">确认</a>
@@ -543,13 +539,30 @@ function getUnSelect(controls, num) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getUnSelect(controls, QueueNum)
+                    let commitData = {answer: userAnswer};
+                    getUnSelect(controls, QueueNum, commitData)
                 } else {
                     alert("请填写你的答案！");
                 }
             }
         });
     });
+}
+
+function commitUnSelect(controls) {
+    let userAnswer = $(controls).find("#showEditor").attr("data-content");
+    if (userAnswer !== undefined && userAnswer.length > 0) {
+        $(controls).empty();
+    } else {
+        alert("请填写你的答案！");
+        return
+    }
+
+    $.post("/commitTraining/unselect",
+        {answer: userAnswer},
+        (data) => {
+            console.log(data);
+        });
 }
 
 //获取选择题
@@ -563,16 +576,11 @@ function getSelectFirst(controls) {
             }, 0);
             return
         }
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
                     <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                            <span>30% </span>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                            <span>` + percent + `% </span>
                         </div>
                     </div>
                     <div id="selectContent">
@@ -580,7 +588,7 @@ function getSelectFirst(controls) {
                     </div>
                     <div id="backGroup" class="row">
                         <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                        <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
+                            <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
                     </div>`);
         let content = $(controls).find("#selectContent");
         let choices = ``;
@@ -604,7 +612,8 @@ function getSelectFirst(controls) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getSelect(controls, QueueNum);
+                    let commitData = {answer: userAnswer};
+                    getSelect(controls, QueueNum, commitData);
                 } else {
                     alert("请选择你认为正确的答案！");
                 }
@@ -613,8 +622,8 @@ function getSelectFirst(controls) {
     });
 }
 
-function getSelect(controls, num) {
-    $.get("/getTrain/select/" + num, (data, status, xhr) => {
+function getSelect(controls, num, commitData) {
+    $.post("/getTrain/select/" + num, commitData, (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -622,24 +631,25 @@ function getSelect(controls, num) {
             }, 0);
             return
         }
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        let button1 = ``;
+        if ((data.QueueNum + 1) === data.Total) {
+            button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
+        } else {
+            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>`
+        }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
                     <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                            <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                            <span>30% </span>
+                        <div class="progress-bar progress-bar-success  progress-bar-striped active" style="width: ` + percent + `%">
+                            <span>` + percent + `% </span>
                         </div>
                     </div>
                     <div id="selectContent">
                         
                     </div>
                     <div id="backGroup" class="row">
-                        <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                        <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
+                        ` + button1 + `
                     </div>`);
         let content = $(controls).find("#selectContent");
         let choices = ``;
@@ -663,7 +673,8 @@ function getSelect(controls, num) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getSelect(controls, QueueNum);
+                    let commitData = {answer: userAnswer};
+                    getSelect(controls, QueueNum, commitData);
                 } else {
                     alert("请选择你认为正确的答案！");
                 }
@@ -672,19 +683,29 @@ function getSelect(controls, num) {
     });
 }
 
+function commitSelect(controls) {
+    let userAnswer = $(controls).find('input[name="choice"]:checked').val();
+    if (userAnswer !== undefined) {
+        $(controls).empty();
+    } else {
+        alert("请选择你认为正确的答案！");
+        return
+    }
+    $.post("/commitTraining/select",
+        {},
+        (data) => {
+            console.log(data);
+        })
+}
+
 //专项练习获取题
 function getSpecialPracticeFirst(sp, id) {
     $.get("/admin/getQuestionByCommonId/" + id, (data) => {
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                        <span>30% </span>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                        <span>` + percent + `% </span>
                         </div>
                         </div>
                         <div id="SpecialPracticeContent">
@@ -713,13 +734,13 @@ function getSpecialPracticeFirst(sp, id) {
             $(content).append(choices);
             $(content).find("p").css("display", "inline");
             $(backGroup).empty().append(`<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                        <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`)
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`);
             $("#nextSPQuestion").on("click", (e) => {
                 let parent = $(e.target).parent("div").parent("div");
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum=data.QueueNum;
+                    let QueueNum = data.QueueNum;
                     QueueNum++;
                     getSpecialPractice(sp, QueueNum);
                 } else {
@@ -735,10 +756,16 @@ function getSpecialPracticeFirst(sp, id) {
                         </div>
                         <div>
                             <textarea name="content" id="SPEditor" class="hidden"></textarea>
-                        </div>`)
+                        </div>`);
+            let button1 = ``;
+            if (data.QueueNum === data.Total) {
+                button1 = `<a class="btn btn-success btn-lg">提交检测</a>`
+            } else {
+                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
+            }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
-                            <a class="btn btn-danger btn-lg">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>
+                            ` + button1 + `
                         </div>
                         <div class="col-sm-offset-9 hidden">
                             <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
@@ -749,7 +776,7 @@ function getSpecialPracticeFirst(sp, id) {
                 let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum=data.QueueNum;
+                    let QueueNum = data.QueueNum;
                     QueueNum++;
                     getSpecialPractice(sp, QueueNum);
                 } else {
@@ -761,18 +788,13 @@ function getSpecialPracticeFirst(sp, id) {
     });
 }
 
-function getSpecialPractice(sp,num) {
-    $.get("/getPractice/" + num, (data) => {
+function getSpecialPractice(sp, num) {
+    $.post("/getPractice/" + num, (data) => {
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 35%">
-                        <span>35% </span>
-                        </div>
-                        <div class="progress-bar progress-bar-danger" style="width: 30%">
-                        <span>30% </span>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                        <span>` + percent + `% </span>
                         </div>
                         </div>
                         <div id="SpecialPracticeContent">
@@ -800,14 +822,20 @@ function getSpecialPractice(sp,num) {
             $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
             $(content).append(choices);
             $(content).find("p").css("display", "inline");
-            $(backGroup).empty().append(`<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                        <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`)
+            let button1 = ``;
+            if ((data.QueueNum + 1) === data.Total) {
+                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            } else {
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
+            }
+            $(backGroup).empty().append(button1);
             $("#nextSPQuestion").on("click", (e) => {
                 let parent = $(e.target).parent("div").parent("div");
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum=data.QueueNum;
+                    let QueueNum = data.QueueNum;
                     QueueNum++;
                     getSpecialPractice(sp, QueueNum);
                 } else {
@@ -823,10 +851,16 @@ function getSpecialPractice(sp,num) {
                         </div>
                         <div>
                             <textarea name="content" id="SPEditor" class="hidden"></textarea>
-                        </div>`)
+                        </div>`);
+            let button1 = ``;
+            if ((data.QueueNum + 1) === data.Total) {
+                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            } else {
+                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
+            }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
-                            <a class="btn btn-danger btn-lg">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>
+                            ` + button1 + `
                         </div>
                         <div class="col-sm-offset-9 hidden">
                             <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
@@ -837,7 +871,7 @@ function getSpecialPractice(sp,num) {
                 let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum=data.QueueNum;
+                    let QueueNum = data.QueueNum;
                     QueueNum++;
                     getSpecialPractice(sp, QueueNum);
                 } else {
@@ -845,8 +879,32 @@ function getSpecialPractice(sp,num) {
                 }
             });
         }
-        // MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
     });
+}
+
+function commitPractice(sp, role) {
+    let userAnswer;
+    if (role === 1) {
+        userAnswer = $(sp).find('input[name="choice"]:checked').val();
+        if (userAnswer !== undefined) {
+            $(sp).empty();
+        } else {
+            alert("请选择你认为正确的答案！");
+        }
+    } else {
+        userAnswer = $(sp).find('#showSPEditor').attr("data-content");
+        if (userAnswer !== undefined && userAnswer.length > 0) {
+            $(sp).empty();
+        } else {
+            alert("请填写你的答案！");
+        }
+    }
+    $.post("/commitPractice",
+        {answer: userAnswer},
+        (data) => {
+            console.log(data);
+        })
 }
 
 function UNACTION() {

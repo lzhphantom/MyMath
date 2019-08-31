@@ -1,8 +1,11 @@
 package common
 
 type UnSelect struct {
-	Train  *TrainingUnSelect
-	Answer string
+	Train      *TrainingUnSelect
+	Answer     string
+	UserAnswer string //用户答案
+	ViewFlag   bool   //是否已答题
+	Correct    bool   //是否正确
 }
 
 type TrainingUnSelect struct {
@@ -10,11 +13,15 @@ type TrainingUnSelect struct {
 	Content  string
 	Role     uint8
 	QueueNum int
+	Total    int
 }
 
 type Select struct {
-	Train  *TrainingSelect
-	Answer string
+	Train      *TrainingSelect
+	Answer     string
+	UserAnswer string //用户答案
+	ViewFlag   bool   //是否已答题
+	Correct    bool   //是否正确
 }
 
 type TrainingSelect struct {
@@ -23,6 +30,7 @@ type TrainingSelect struct {
 	Choices  []string
 	Role     uint8
 	QueueNum int
+	Total    int
 }
 
 type Practice struct {

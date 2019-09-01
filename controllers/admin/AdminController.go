@@ -478,7 +478,7 @@ func (c *AdminController) GetQuestion() {
 	var questions []*models.Question
 	rand.Seed(time.Now().UnixNano())
 	if role == "-1" {
-		num, err := o.Raw("SELECT id,content FROM question WHERE role_question != ?", 1).QueryRows(&questions)
+		num, err := o.Raw("SELECT id,content,answer,role_question FROM question WHERE role_question != ?", 1).QueryRows(&questions)
 		if err != nil {
 			logs.Debug("获取题失败：", err)
 		} else {
@@ -557,7 +557,6 @@ func (c *AdminController) GetTrain() {
 	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
 	if role == "select" {
 		selects := c.GetSession(common.KeySelects).([]common.Select)
-		logs.Info(selects)
 		if num > 0 {
 			selects[num-1].ViewFlag = true
 			selects[num-1].UserAnswer = answer
@@ -623,9 +622,11 @@ func (c *AdminController) CommitTraining() {
 			data := struct {
 				View    int
 				Correct int
+				Selects *[]common.Select
 			}{
 				countView,
 				countCorrect,
+				&selects,
 			}
 			c.DelSession(common.KeySelects)
 			c.Data["json"] = data
@@ -656,11 +657,13 @@ func (c *AdminController) CommitTraining() {
 				}
 			}
 			data := struct {
-				View    int
-				Correct int
+				View      int
+				Correct   int
+				UnSelects *[]common.UnSelect
 			}{
 				countView,
 				countCorrect,
+				&unSelects,
 			}
 			c.DelSession(common.KeyUnSelects)
 			c.Data["json"] = data
@@ -744,22 +747,21 @@ func (c *AdminController) GetPractice() {
 	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
 	if num > 0 {
 		answer := c.GetString("answer")
-		pre := practices[num-1]
-		if pre.Select != nil {
-			pre.Select.ViewFlag = true
-			pre.Select.UserAnswer = answer
-			if pre.Select.Answer == answer {
-				pre.Select.Correct = true
+		if practices[num-1].Select != nil {
+			practices[num-1].Select.ViewFlag = true
+			practices[num-1].Select.UserAnswer = answer
+			if practices[num-1].Select.Answer == answer {
+				practices[num-1].Select.Correct = true
 			} else {
-				pre.Select.Correct = false
+				practices[num-1].Select.Correct = false
 			}
-		} else if pre.UnSelect != nil {
-			pre.UnSelect.ViewFlag = true
-			pre.UnSelect.UserAnswer = answer
-			if pre.UnSelect.Answer == answer {
-				pre.UnSelect.Correct = true
+		} else if practices[num-1].UnSelect != nil {
+			practices[num-1].UnSelect.ViewFlag = true
+			practices[num-1].UnSelect.UserAnswer = answer
+			if practices[num-1].UnSelect.Answer == answer {
+				practices[num-1].UnSelect.Correct = true
 			} else {
-				pre.UnSelect.Correct = false
+				practices[num-1].UnSelect.Correct = false
 			}
 		}
 	}
@@ -803,6 +805,7 @@ func (c *AdminController) CommitPractice() {
 						} else {
 							practices[i].Select.Correct = false
 						}
+						countView++
 					}
 
 				}
@@ -822,6 +825,7 @@ func (c *AdminController) CommitPractice() {
 						} else {
 							practices[i].UnSelect.Correct = false
 						}
+						countView++
 					}
 
 				}
@@ -829,11 +833,13 @@ func (c *AdminController) CommitPractice() {
 		}
 
 		data := struct {
-			View    int
-			Correct int
+			View      int
+			Correct   int
+			Practices *[]common.Practice
 		}{
 			countView,
 			countCorrect,
+			&practices,
 		}
 		c.Data["json"] = data
 		c.DelSession(common.KeyPractices)

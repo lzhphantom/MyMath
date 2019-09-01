@@ -313,7 +313,7 @@ async function showEditor(obj, editorName, backGroup) {
         let content = $(obj).attr("data-content");
         editor.setData(unregularEditorContent(content));
     } else {
-        editor.setData($(obj).html());
+        editor.setData("");
     }
     showContentName = "#" + $(obj).attr("id");
 
@@ -441,6 +441,13 @@ function getUnSelectFirst(controls) {
             return
         }
         let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        let button1 = ``;
+        if ((data.QueueNum + 1) === data.Total) {
+            button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
+        } else {
+            button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>`
+        }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
@@ -452,8 +459,7 @@ function getUnSelectFirst(controls) {
                     </div>
                     <div id="backGroup" class="row">
                         <div class="col-sm-offset-9">
-                            <a class="btn btn-danger btn-lg">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>
+                            ` + button1 + `
                         </div>
                         <div class="col-sm-offset-9 hidden">
                             <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#blankEditor');">确认</a>
@@ -464,7 +470,7 @@ function getUnSelectFirst(controls) {
         $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
         $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
-                               id="showEditor">填写你认为正确的答案</a>
+                               id="showEditor">填写你最简正确的答案</a>
                         </div>
                         <div>
                             <textarea name="content" id="blankEditor" class="hidden"></textarea>
@@ -526,7 +532,7 @@ function getUnSelect(controls, num, commitData) {
         $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
         $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
-                               id="showEditor">填写你认为正确的答案</a>
+                               id="showEditor">填写你最简正确的答案</a>
                         </div>
                         <div>
                             <textarea name="content" id="blankEditor" class="hidden"></textarea>
@@ -561,7 +567,49 @@ function commitUnSelect(controls) {
     $.post("/commitTraining/unselect",
         {answer: userAnswer},
         (data) => {
-            console.log(data);
+            let tbody = ``;
+            for (let i = 0; i < data.UnSelects.length; i++) {
+                let textClass = ``;
+                if (data.UnSelects[i].Correct) {
+                    textClass = `class="text-success"`;
+                } else {
+                    textClass = `class="text-danger"`;
+                }
+                tbody += `<tr>
+                                <td>` + (i + 1) + `</td>
+                                <td>` + data.UnSelects[i].Train.Content + `</td>
+                                <td ` + textClass + `>` + data.UnSelects[i].UserAnswer + `</td>
+                                <td>` + data.UnSelects[i].Answer + `</td>
+                            </tr>`;
+            }
+            $(controls).append(`<div>
+                        <h1 class="text-center text-muted">训练成果</h1>
+                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
+                        </div>
+                        <div>
+                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
+                          详情查看 <span class="caret"></span>
+                        </a>
+                        <div class="collapse" id="TrainingDetail">
+                          <div class="well">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <td>No.</td>
+                                    <td>题目</td>
+                                    <td>你的答案</td>
+                                    <td>参考答案</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                ` + tbody + `
+                                </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        </div>`);
         });
 }
 
@@ -577,6 +625,13 @@ function getSelectFirst(controls) {
             return
         }
         let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        let button1 = ``;
+        if ((data.QueueNum + 1) === data.Total) {
+            button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
+        } else {
+            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>`
+        }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
                     <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
@@ -587,8 +642,7 @@ function getSelectFirst(controls) {
                         
                     </div>
                     <div id="backGroup" class="row">
-                        <a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>
+                        ` + button1 + `
                     </div>`);
         let content = $(controls).find("#selectContent");
         let choices = ``;
@@ -692,104 +746,57 @@ function commitSelect(controls) {
         return
     }
     $.post("/commitTraining/select",
-        {},
+        {answer: userAnswer},
         (data) => {
-            console.log(data);
+            let tbody = ``;
+            for (let i = 0; i < data.Selects.length; i++) {
+                let textClass = ``;
+                if (data.Selects[i].Correct) {
+                    textClass = `class="text-success"`;
+                } else {
+                    textClass = `class="text-danger"`;
+                }
+                tbody += `<tr>
+                                <td>` + (i + 1) + `</td>
+                                <td>` + data.Selects[i].Train.Content + `</td>
+                                <td ` + textClass + `>` + data.Selects[i].UserAnswer + `</td>
+                                <td>` + data.Selects[i].Answer + `</td>
+                            </tr>`;
+            }
+            $(controls).append(`<div>
+                        <h1 class="text-center text-muted">训练成果</h1>
+                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>
+                        <div>
+                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
+                          详情查看 <span class="caret"></span>
+                        </a>
+                        <div class="collapse" id="TrainingDetail">
+                          <div class="well">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <td>No.</td>
+                                    <td>题目</td>
+                                    <td>你的答案</td>
+                                    <td>参考答案</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                ` + tbody + `
+                                </tbody>
+                            </table>
+                          </div>
+                        </div>
+</div>          
+                        </div>`);
         })
 }
 
 //专项练习获取题
 function getSpecialPracticeFirst(sp, id) {
     $.get("/admin/getQuestionByCommonId/" + id, (data) => {
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
-        $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
-                        <div id="progress" class="progress">
-                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
-                        <span>` + percent + `% </span>
-                        </div>
-                        </div>
-                        <div id="SpecialPracticeContent">
-
-                        </div>
-                        <div id="backGroup" class="row">
-                        </div>`);
-        let content = $(sp).find("#SpecialPracticeContent");
-        let backGroup = $(sp).find("#backGroup");
-        if (data.Content === undefined) {
-            $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
-            return
-        }
-        if (data.Role === 1) {
-            let choices = ``;
-            let letterNumber = 65;
-            for (let i = 0; i < data.Choices.length; i++) {
-                choices += `<div>
-                            <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
-                            </label>
-                        </div>`
-            }
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
-            $(content).append(choices);
-            $(content).find("p").css("display", "inline");
-            $(backGroup).empty().append(`<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`);
-            $("#nextSPQuestion").on("click", (e) => {
-                let parent = $(e.target).parent("div").parent("div");
-                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
-                if (userAnswer !== undefined) {
-                    $(parent).empty();
-                    let QueueNum = data.QueueNum;
-                    QueueNum++;
-                    getSpecialPractice(sp, QueueNum);
-                } else {
-                    alert("请选择你认为正确的答案！");
-                }
-
-            });
-        } else {
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
-            $(content).append(`<div>
-                            <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
-                               id="showSPEditor">填写你认为正确的答案</a>
-                        </div>
-                        <div>
-                            <textarea name="content" id="SPEditor" class="hidden"></textarea>
-                        </div>`);
-            let button1 = ``;
-            if (data.QueueNum === data.Total) {
-                button1 = `<a class="btn btn-success btn-lg">提交检测</a>`
-            } else {
-                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
-                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
-            }
-            $(backGroup).empty().append(`<div class="col-sm-offset-9">
-                            ` + button1 + `
-                        </div>
-                        <div class="col-sm-offset-9 hidden">
-                            <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
-                        </div>`);
-            $("#nextSPQuestion").on("click", (e) => {
-
-                let parent = $(e.target).parent("div").parent("div").parent("div");
-                let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
-                if (userAnswer !== undefined && userAnswer.length > 0) {
-                    $(parent).empty();
-                    let QueueNum = data.QueueNum;
-                    QueueNum++;
-                    getSpecialPractice(sp, QueueNum);
-                } else {
-                    alert("请填写你的答案！");
-                }
-            });
-        }
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
-    });
-}
-
-function getSpecialPractice(sp, num) {
-    $.post("/getPractice/" + num, (data) => {
         let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
@@ -837,7 +844,8 @@ function getSpecialPractice(sp, num) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getSpecialPractice(sp, QueueNum);
+                    let commitData = {answer: userAnswer};
+                    getSpecialPractice(sp, QueueNum, commitData);
                 } else {
                     alert("请选择你认为正确的答案！");
                 }
@@ -847,7 +855,7 @@ function getSpecialPractice(sp, num) {
             $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
             $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
-                               id="showSPEditor">填写你认为正确的答案</a>
+                               id="showSPEditor">填写你最简正确的答案</a>
                         </div>
                         <div>
                             <textarea name="content" id="SPEditor" class="hidden"></textarea>
@@ -873,7 +881,105 @@ function getSpecialPractice(sp, num) {
                     $(parent).empty();
                     let QueueNum = data.QueueNum;
                     QueueNum++;
-                    getSpecialPractice(sp, QueueNum);
+                    let commitData = {answer: userAnswer}
+                    getSpecialPractice(sp, QueueNum, commitData);
+                } else {
+                    alert("请填写你的答案！");
+                }
+            });
+        }
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "SpecialPracticeContent"]);
+    });
+}
+
+function getSpecialPractice(sp, num, commitData) {
+    $.post("/getPractice/" + num, commitData, (data) => {
+        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
+                        <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
+                        <span>` + percent + `% </span>
+                        </div>
+                        </div>
+                        <div id="SpecialPracticeContent">
+
+                        </div>
+                        <div id="backGroup" class="row">
+                        </div>`);
+        let content = $(sp).find("#SpecialPracticeContent");
+        let backGroup = $(sp).find("#backGroup");
+        if (data.Content === undefined) {
+            $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
+            return
+        }
+        if (data.Role === 1) {
+            let choices = ``;
+            let letterNumber = 65;
+            for (let i = 0; i < data.Choices.length; i++) {
+                choices += `<div>
+                            <label for="">
+                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            </label>
+                        </div>`
+            }
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(choices);
+            $(content).find("p").css("display", "inline");
+            let button1 = ``;
+            if ((data.QueueNum + 1) === data.Total) {
+                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            } else {
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
+            }
+            $(backGroup).empty().append(button1);
+            $("#nextSPQuestion").on("click", (e) => {
+                let parent = $(e.target).parent("div").parent("div");
+                let userAnswer = $(parent).find('input[name="choice"]:checked').val();
+                if (userAnswer !== undefined) {
+                    $(parent).empty();
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    let commitData = {answer: userAnswer};
+                    getSpecialPractice(sp, QueueNum, commitData);
+                } else {
+                    alert("请选择你认为正确的答案！");
+                }
+
+            });
+        } else {
+            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).append(`<div>
+                            <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
+                               id="showSPEditor">填写你最简正确的答案</a>
+                        </div>
+                        <div>
+                            <textarea name="content" id="SPEditor" class="hidden"></textarea>
+                        </div>`);
+            let button1 = ``;
+            if ((data.QueueNum + 1) === data.Total) {
+                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            } else {
+                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                            <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
+            }
+            $(backGroup).empty().append(`<div class="col-sm-offset-9">
+                            ` + button1 + `
+                        </div>
+                        <div class="col-sm-offset-9 hidden">
+                            <a class="btn btn-primary btn-lg" onclick="backToLast('#backGroup','#SPEditor');">确认</a>
+                        </div>`);
+            $("#nextSPQuestion").on("click", (e) => {
+
+                let parent = $(e.target).parent("div").parent("div").parent("div");
+                let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
+                if (userAnswer !== undefined && userAnswer.length > 0) {
+                    $(parent).empty();
+                    let QueueNum = data.QueueNum;
+                    QueueNum++;
+                    let commitData = {answer: userAnswer};
+                    getSpecialPractice(sp, QueueNum, commitData);
                 } else {
                     alert("请填写你的答案！");
                 }
@@ -903,8 +1009,64 @@ function commitPractice(sp, role) {
     $.post("/commitPractice",
         {answer: userAnswer},
         (data) => {
-            console.log(data);
-        })
+            let tbody = ``;
+            for (let i = 0; i < data.Practices.length; i++) {
+                let textClass = ``;
+                if (data.Practices[i].Select !== null) {
+                    if (data.Practices[i].Select.Correct) {
+                        textClass = `class="text-success"`;
+                    } else {
+                        textClass = `class="text-danger"`;
+                    }
+                    tbody += `<tr>
+                                    <td>` + (i + 1) + `</td>
+                                    <td>` + data.Practices[i].Select.Train.Content + `</td>
+                                    <td ` + textClass + `>` + data.Practices[i].Select.UserAnswer + `</td>
+                                    <td>` + data.Practices[i].Select.Answer + `</td>
+                                </tr>`;
+                } else {
+                    if (data.Practices[i].UnSelect.Correct) {
+                        textClass = `class="text-success"`;
+                    } else {
+                        textClass = `class="text-danger"`;
+                    }
+                    tbody += `<tr>
+                                    <td>` + (i + 1) + `</td>
+                                    <td>` + data.Practices[i].UnSelect.Train.Content + `</td>
+                                    <td ` + textClass + `>` + data.Practices[i].UnSelect.UserAnswer + `</td>
+                                    <td>` + data.Practices[i].UnSelect.Answer + `</td>
+                                </tr>`;
+                }
+            }
+            $(sp).append(`<div>
+                        <h1 class="text-center text-muted">训练成果</h1>
+                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
+                        </div>
+                        <div>
+                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#PracticeDetail" aria-expanded="false" aria-controls="PracticeDetail">
+                          详情查看 <span class="caret"></span>
+                        </a>
+                        <div class="collapse" id="PracticeDetail">
+                          <div class="well">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <td>No.</td>
+                                    <td>题目</td>
+                                    <td>你的答案</td>
+                                    <td>参考答案</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                ` + tbody + `
+                                </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        </div>`);
+        });
 }
 
 function UNACTION() {

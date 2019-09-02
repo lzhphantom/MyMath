@@ -135,6 +135,7 @@ $(function () {
     });
     $("#collapseTwo").on("hide.bs.collapse", () => {
         $('a[role-tab="training"]').off("hide.bs.tab shown.bs.tab");
+        $('a[role-tab="training"]').parent("li").removeClass("active");
         $("#Select").empty();
         $("#Blank").empty();
     });
@@ -269,6 +270,7 @@ $(function () {
 
     $("#collapse4").on("hide.bs.collapse", () => {
         $("#Upload").addClass("hidden");
+        // $('a[role-tab="upload"]').parent("li").removeClass("active");
         $("#mulChoiceUpBtn").off("click");
         $("#solveUpBtn").off("click");
     })
@@ -590,7 +592,7 @@ function commitUnSelect(controls) {
                         <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
                         </div>
                         <div>
-                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
+                        <a class="btn btn-primary" role="button" data-for="detail" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
                           详情查看 <span class="caret"></span>
                         </a>
                         <div class="collapse" id="TrainingDetail">
@@ -612,6 +614,12 @@ function commitUnSelect(controls) {
                         </div>
                         </div>`);
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
+            $('#TrainingDetail').on('show.bs.collapse',()=>{
+                $('a[data-for="detail"]').addClass("dropup");
+            });
+            $('#TrainingDetail').on('hide.bs.collapse',()=>{
+                $('a[data-for="detail"]').removeClass("dropup");
+            });
         });
 }
 
@@ -773,7 +781,7 @@ function commitSelect(controls) {
                         <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
                         <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>
                         <div>
-                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
+                        <a class="btn btn-primary" role="button" data-for="detail" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
                           详情查看 <span class="caret"></span>
                         </a>
                         <div class="collapse" id="TrainingDetail">
@@ -795,6 +803,12 @@ function commitSelect(controls) {
                         </div>
 </div>          
                         </div>`);
+            $("#TrainingDetail").on('show.bs.collapse',()=>{
+                $('a[data-for="detail"]').addClass("dropup");
+            });
+            $("#TrainingDetail").on('hide.bs.collapse',()=>{
+                $('a[data-for="detail"]').removeClass("dropup");
+            });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
         })
 }
@@ -1052,7 +1066,7 @@ function commitPractice(sp, role) {
                         <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
                         </div>
                         <div>
-                        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#PracticeDetail" aria-expanded="false" aria-controls="PracticeDetail">
+                        <a class="btn btn-primary" role="button" data-toggle="collapse" data-for="detail" href="#PracticeDetail" aria-expanded="false" aria-controls="PracticeDetail">
                           详情查看 <span class="caret"></span>
                         </a>
                         <div class="collapse" id="PracticeDetail">
@@ -1073,6 +1087,12 @@ function commitPractice(sp, role) {
                           </div>
                         </div>
                         </div>`);
+            $("#PracticeDetail").on('show.bs.collapse', () => {
+                $('a[data-for="detail"]').addClass("dropup");
+            });
+            $("#PracticeDetail").on('hide.bs.collapse', () => {
+                $('a[data-for="detail"]').removeClass("dropup");
+            });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, "PracticeDetail"]);
         });
 }

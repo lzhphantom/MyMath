@@ -82,6 +82,25 @@
                             </div>
                         </div>
                     </div>
+                    {{if eq .user.Role 2}}
+                        <div class="panel panel-success">
+                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2"
+                                 href="#collapse5"><a
+                                        href="#">审核</a></div>
+                            <div id="collapse5" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li role="presentation"><a href="#UploadSelect" aria-controls="SpecialPractice"
+                                                                   role="tab"
+                                                                   data-toggle="tab" role-tab="upload">试题审核</a></li>
+                                        <li role="presentation"><a href="#UploadBlank" aria-controls="SpecialPractice"
+                                                                   role="tab"
+                                                                   data-toggle="tab" role-tab="upload">基础知识审核</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
                 {{end}}
             </div>
         </div>

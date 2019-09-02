@@ -38,11 +38,10 @@ func (c *LoginController) Login() {
 
 	var userInfo models.UserInfo
 	o.QueryTable("user_info").Filter("user_id", user.Id).One(&userInfo)
-
 	loginUser := common.LoginUser{
 		user.Id,
 		userInfo.Name,
-		user.Role,
+		int(user.Role),
 	}
 	c.SetSession(common.KeyLoginUser, loginUser)
 	c.Redirect("/", 302)

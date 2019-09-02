@@ -490,6 +490,7 @@ function getUnSelectFirst(controls) {
                 }
             }
         });
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "blankContent"]);
     });
 }
 
@@ -552,6 +553,7 @@ function getUnSelect(controls, num, commitData) {
                 }
             }
         });
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "blankContent"]);
     });
 }
 
@@ -610,6 +612,7 @@ function commitUnSelect(controls) {
                           </div>
                         </div>
                         </div>`);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
         });
 }
 
@@ -673,6 +676,7 @@ function getSelectFirst(controls) {
                 }
             }
         });
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "selectContent"]);
     });
 }
 
@@ -734,6 +738,7 @@ function getSelect(controls, num, commitData) {
                 }
             }
         });
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "selectContent"]);
     });
 }
 
@@ -791,6 +796,7 @@ function commitSelect(controls) {
                         </div>
 </div>          
                         </div>`);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
         })
 }
 
@@ -1066,6 +1072,7 @@ function commitPractice(sp, role) {
                           </div>
                         </div>
                         </div>`);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, "PracticeDetail"]);
         });
 }
 

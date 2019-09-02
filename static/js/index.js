@@ -445,7 +445,7 @@ function getUnSelectFirst(controls) {
         if ((data.QueueNum + 1) === data.Total) {
             button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
         } else {
-            button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+            button1 = `<a class="btn btn-danger btn-lg" onclick="commitUnSelect('` + controls + `');">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>`
         }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
@@ -508,7 +508,7 @@ function getUnSelect(controls, num, commitData) {
         if ((data.QueueNum + 1) === data.Total) {
             button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
         } else {
-            button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+            button1 = `<a class="btn btn-danger btn-lg" onclick="commitUnSelect('` + controls + `');">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextUnQuestion">下一题</a>`
         }
         $(controls).append(`<h1 class="text-muted text-center">非选择题练习</h1>
@@ -565,7 +565,6 @@ function commitUnSelect(controls) {
         alert("请填写你的答案！");
         return
     }
-
     $.post("/commitTraining/unselect",
         {answer: userAnswer},
         (data) => {
@@ -632,7 +631,7 @@ function getSelectFirst(controls) {
         if ((data.QueueNum + 1) === data.Total) {
             button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
         } else {
-            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>`
         }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
@@ -694,7 +693,7 @@ function getSelect(controls, num, commitData) {
         if ((data.QueueNum + 1) === data.Total) {
             button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
         } else {
-            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+            button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextQuestion">下一题</a>`
         }
         $(controls).append(`<h1 class="text-muted text-center">选择题练习</h1>
@@ -839,7 +838,7 @@ function getSpecialPracticeFirst(sp, id) {
             if ((data.QueueNum + 1) === data.Total) {
                 button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(button1);
@@ -870,7 +869,7 @@ function getSpecialPracticeFirst(sp, id) {
             if ((data.QueueNum + 1) === data.Total) {
                 button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
@@ -936,7 +935,7 @@ function getSpecialPractice(sp, num, commitData) {
             if ((data.QueueNum + 1) === data.Total) {
                 button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(button1);
@@ -967,7 +966,7 @@ function getSpecialPractice(sp, num, commitData) {
             if ((data.QueueNum + 1) === data.Total) {
                 button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
@@ -1003,6 +1002,7 @@ function commitPractice(sp, role) {
             $(sp).empty();
         } else {
             alert("请选择你认为正确的答案！");
+            return
         }
     } else {
         userAnswer = $(sp).find('#showSPEditor').attr("data-content");
@@ -1010,6 +1010,7 @@ function commitPractice(sp, role) {
             $(sp).empty();
         } else {
             alert("请填写你的答案！");
+            return
         }
     }
     $.post("/commitPractice",

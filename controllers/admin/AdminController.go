@@ -596,6 +596,7 @@ func (c *AdminController) CommitTraining() {
 	answer := c.GetString("answer")
 	if role == "select" {
 		selects, ok := c.GetSession(common.KeySelects).([]common.Select)
+		showSelects := make([]common.Select, 0)
 		if ok {
 			countCorrect := 0
 			countView := 0
@@ -605,6 +606,7 @@ func (c *AdminController) CommitTraining() {
 						countCorrect++
 					}
 					countView++
+					showSelects = append(showSelects, selects[i])
 				} else {
 					if len(answer) > 0 {
 						selects[i].UserAnswer = answer
@@ -617,6 +619,8 @@ func (c *AdminController) CommitTraining() {
 						}
 						countView++
 					}
+					showSelects = append(showSelects, selects[i])
+					break
 				}
 			}
 			data := struct {
@@ -626,13 +630,14 @@ func (c *AdminController) CommitTraining() {
 			}{
 				countView,
 				countCorrect,
-				&selects,
+				&showSelects,
 			}
 			c.DelSession(common.KeySelects)
 			c.Data["json"] = data
 		}
 	} else if role == "unselect" {
 		unSelects, ok := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
+		showUnSelect := make([]common.UnSelect, 0)
 		if ok {
 			countCorrect := 0
 			countView := 0
@@ -642,6 +647,7 @@ func (c *AdminController) CommitTraining() {
 						countCorrect++
 					}
 					countView++
+					showUnSelect = append(showUnSelect, unSelects[i])
 				} else {
 					if len(answer) > 0 {
 						unSelects[i].UserAnswer = answer
@@ -654,6 +660,8 @@ func (c *AdminController) CommitTraining() {
 						}
 						countView++
 					}
+					showUnSelect = append(showUnSelect, unSelects[i])
+					break
 				}
 			}
 			data := struct {
@@ -663,7 +671,7 @@ func (c *AdminController) CommitTraining() {
 			}{
 				countView,
 				countCorrect,
-				&unSelects,
+				&showUnSelect,
 			}
 			c.DelSession(common.KeyUnSelects)
 			c.Data["json"] = data
@@ -785,6 +793,7 @@ func (c *AdminController) GetPractice() {
 func (c *AdminController) CommitPractice() {
 	answer := c.GetString("answer")
 	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
+	showPractices := make([]common.Practice, 0)
 	if ok {
 		countView := 0
 		countCorrect := 0
@@ -795,6 +804,7 @@ func (c *AdminController) CommitPractice() {
 					if practices[i].Select.Correct {
 						countCorrect++
 					}
+					showPractices = append(showPractices, practices[i])
 				} else {
 					if len(answer) > 0 {
 						practices[i].Select.UserAnswer = answer
@@ -807,7 +817,8 @@ func (c *AdminController) CommitPractice() {
 						}
 						countView++
 					}
-
+					showPractices = append(showPractices, practices[i])
+					break
 				}
 			} else if practices[i].UnSelect != nil {
 				if practices[i].UnSelect.ViewFlag {
@@ -815,6 +826,7 @@ func (c *AdminController) CommitPractice() {
 					if practices[i].UnSelect.Correct {
 						countCorrect++
 					}
+					showPractices = append(showPractices, practices[i])
 				} else {
 					if len(answer) > 0 {
 						practices[i].UnSelect.UserAnswer = answer
@@ -827,7 +839,8 @@ func (c *AdminController) CommitPractice() {
 						}
 						countView++
 					}
-
+					showPractices = append(showPractices, practices[i])
+					break
 				}
 			}
 		}
@@ -839,7 +852,7 @@ func (c *AdminController) CommitPractice() {
 		}{
 			countView,
 			countCorrect,
-			&practices,
+			&showPractices,
 		}
 		c.Data["json"] = data
 		c.DelSession(common.KeyPractices)

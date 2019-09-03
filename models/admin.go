@@ -37,7 +37,7 @@ func init() {
 		beego.Debug("注册数据库失败")
 	}
 	//映射model数据
-	orm.RegisterModel(new(Admin), new(BasicCommon), new(BasicContent), new(KnowledgeImportant), new(Formula), new(ExaminationCenter), new(HDifficulty), new(User), new(UserInfo), new(Question))
+	orm.RegisterModel(new(Admin), new(BasicCommon), new(BasicContent), new(KnowledgeImportant), new(Formula), new(ExaminationCenter), new(HDifficulty), new(User), new(UserInfo), new(Question), new(QuestionReviewRecord), new(BasicReviewRecord))
 	//生成表
 	orm.RunSyncdb("default", false, true)
 

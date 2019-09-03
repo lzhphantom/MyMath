@@ -7,12 +7,15 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/common"
 	"github.com/lzhphantom/MyMath/models"
+	"strconv"
+	"strings"
 )
 
 type LoginController struct {
 	beego.Controller
 }
 
+//用户登录
 // @router /login [post]
 func (c *LoginController) Login() {
 
@@ -47,12 +50,14 @@ func (c *LoginController) Login() {
 	c.Redirect("/", 302)
 }
 
+//用户退出
 // @router /logout [get]
 func (c *LoginController) LoginOut() {
 	c.DelSession(common.KeyLoginUser)
 	c.Redirect("/", 302)
 }
 
+//修改密码
 // @router /changePwd [post]
 func (c *LoginController) ChangePassword() {
 	user := c.GetSession(common.KeyLoginUser).(common.LoginUser)
@@ -77,6 +82,7 @@ func (c *LoginController) ChangePassword() {
 	c.Redirect("/", 302)
 }
 
+//注册用户
 // @router /register [post]
 func (c *LoginController) Register() {
 	loginName := c.GetString("registerName")
@@ -94,4 +100,83 @@ func (c *LoginController) Register() {
 		logs.Info("成功插入", num, "条")
 	}
 	c.Redirect("/", 302)
+}
+
+//获取需要审核的题目
+// @router /getQuestionReview [get]
+func (c *LoginController) GetQuestionReview() {
+	o := orm.NewOrm()
+	questions := make([]models.Question, 0)
+	reviewQuestions := make([]common.ReviewQuestion, 0)
+	o.QueryTable("question").Filter("review__lt", 3).All(&questions)
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+Loop:
+	for i := 0; i < len(questions); i++ {
+		var records []models.QuestionReviewRecord
+		o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).RelatedSel().All(&records)
+		var reviewers []string
+		if len(records) > 0 {
+			for j := 0; j < len(records); j++ {
+				if records[j].User.Id == loginUser.Id {
+					continue Loop
+				}
+				var userInfo models.UserInfo
+				o.QueryTable("user_info").Filter("user_id", records[j].User.Id).One(&userInfo)
+				reviewers = append(reviewers, userInfo.Name)
+			}
+		}
+
+		var questionType string
+		var choices []string
+		if questions[i].RoleQuestion == 1 {
+			choices = strings.Split(questions[i].Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
+			}
+			questionType = "选择题"
+		} else {
+			questionType = "非选择题"
+		}
+
+		reviewQuestion := common.ReviewQuestion{
+			Id:           questions[i].Id,
+			Content:      questions[i].Content,
+			QuestionType: questionType,
+			Addition:     choices,
+			Answer:       questions[i].Answer,
+			ViewNum:      questions[i].Review,
+			Reviewers:    reviewers,
+		}
+		reviewQuestions = append(reviewQuestions, reviewQuestion)
+	}
+	c.Data["json"] = reviewQuestions
+	c.ServeJSON()
+}
+
+//题目审核通过
+// @router /passQuestionReview/:id [get]
+func (c *LoginController) PassQuestionReview() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		logs.Warning("id 不正确", err)
+	}
+	user := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	newRecord := models.QuestionReviewRecord{
+		User: &models.User{
+			Id: user.Id,
+		},
+		Question: &models.Question{
+			Id: id,
+		},
+	}
+	o := orm.NewOrm()
+	num, err := o.Insert(&newRecord)
+	if err != nil {
+		logs.Info("插入失败", err)
+	} else {
+		logs.Info("成功插入", num, "条")
+	}
+	c.ServeJSON()
 }

@@ -4,6 +4,7 @@ $(function () {
         $("#collapseTwo").collapse('hide');
         $("#collapseThree").collapse('hide');
         $("#collapse4").collapse('hide');
+        $("#collapse5").collapse('hide');
         $.get("/admin/basicCommon",
             function (data, status, xhr) {
                 if (xhr.status === 264) {
@@ -120,6 +121,7 @@ $(function () {
         $("#collapseOne").collapse('hide');
         $("#collapseThree").collapse('hide');
         $("#collapse4").collapse('hide');
+        $("#collapse5").collapse('hide');
         $('a[role-tab="training"]').on('hide.bs.tab', (e) => {
             let controls = $(e.target).attr("href");
             $(controls).empty();
@@ -144,6 +146,7 @@ $(function () {
         $("#collapseOne").collapse('hide');
         $("#collapseTwo").collapse('hide');
         $("#collapse4").collapse('hide');
+        $("#collapse5").collapse('hide');
         $.get("/admin/basicCommon", (data, status, xhr) => {
             if (xhr.status === 264) {
                 notLogin();
@@ -181,7 +184,8 @@ $(function () {
         $("#collapseOne").collapse('hide');
         $("#collapseThree").collapse('hide');
         $("#collapseTwo").collapse('hide');
-        $('a[role-tab="upload"]').on("shown.bs.tab", (e) => {
+        $("#collapse5").collapse('hide');
+        $('a[role-tab="upload"]').on("show.bs.tab", (e) => {
             let target = $(e.target).attr("href");
             $(target).removeClass("hidden");
         });
@@ -273,7 +277,33 @@ $(function () {
         // $('a[role-tab="upload"]').parent("li").removeClass("active");
         $("#mulChoiceUpBtn").off("click");
         $("#solveUpBtn").off("click");
-    })
+    });
+    $("#collapse5").on('show.bs.collapse', () => {
+        $("#Review").removeClass("hidden");
+        $("#collapseOne").collapse('hide');
+        $("#collapseThree").collapse('hide');
+        $("#collapseTwo").collapse('hide');
+        $("#collapse4").collapse('hide');
+        $('a[role-tab="review"]').on("show.bs.tab", (e) => {
+            let target = $(e.target).attr("href");
+            $(target).removeClass("hidden");
+            if (target === "#QuestionReview") {
+                getQuestionReview(target)
+            } else if (target === "#KnowledgeReview") {
+
+            }
+        });
+        $('a[role-tab="review"]').on("hide.bs.tab", (e) => {
+            let target = $(e.target).attr("href");
+            $(target).empty();
+        });
+    });
+    $("#collapse5").on('hide.bs.collapse', () => {
+        $('a[role-tab="review"]').off("hide.bs.tab shown.bs.tab");
+        $('a[role-tab="review"]').parent("li").removeClass("active");
+        $("#QuestionReview").empty();
+        $("#KnowledgeReview").empty();
+    });
 
 });
 
@@ -614,10 +644,10 @@ function commitUnSelect(controls) {
                         </div>
                         </div>`);
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
-            $('#TrainingDetail').on('show.bs.collapse',()=>{
+            $('#TrainingDetail').on('show.bs.collapse', () => {
                 $('a[data-for="detail"]').addClass("dropup");
             });
-            $('#TrainingDetail').on('hide.bs.collapse',()=>{
+            $('#TrainingDetail').on('hide.bs.collapse', () => {
                 $('a[data-for="detail"]').removeClass("dropup");
             });
         });
@@ -803,10 +833,10 @@ function commitSelect(controls) {
                         </div>
 </div>          
                         </div>`);
-            $("#TrainingDetail").on('show.bs.collapse',()=>{
+            $("#TrainingDetail").on('show.bs.collapse', () => {
                 $('a[data-for="detail"]').addClass("dropup");
             });
-            $("#TrainingDetail").on('hide.bs.collapse',()=>{
+            $("#TrainingDetail").on('hide.bs.collapse', () => {
                 $('a[data-for="detail"]').removeClass("dropup");
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, "TrainingDetail"]);
@@ -1099,4 +1129,64 @@ function commitPractice(sp, role) {
 
 function UNACTION() {
     alert("该功能正在修建中...");
+}
+
+function getQuestionReview(controls) {
+    $.get("/getQuestionReview", (data) => {
+        console.log(data);
+        let tbody = ``;
+        for (let i = 0; i < data.length; i++) {
+            let addition = ``;
+            if (data[i].Addition != null && data[i].Addition.length > 0) {
+                for (let j = 0; j < data[i].Addition.length; j++) {
+                    addition += `` + data[i].Addition[j];
+                }
+            } else {
+                addition = `无`;
+            }
+            let reviewer = ``;
+            if (data[i].Reviewers != null && data[i].Reviewers.length > 0) {
+                for (let j = 0; j < data[i].Reviewers.length; j++) {
+                    reviewer += `<p>` + data[i].Reviewers[j]+`</p>`;
+                }
+            } else {
+                reviewer = `无`;
+            }
+            tbody += `<tr>
+                        <td>` + (i + 1) + `</td>
+                        <td>` + data[i].Content + `</td>
+                        <td>` + data[i].QuestionType + `</td>
+                        <td>` + addition + `</td>
+                        <td>` + data[i].Answer + `</td>
+                        <td>` + data[i].ViewNum + `</td>
+                        <td>`+reviewer+`</td>
+                        <td><a class="btn btn-warning" href="javascript:void(0);" >修改</a></td>
+                        <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + data[i].Id + `)">通过</a></td>
+                    </tr>`
+        }
+        $(controls).empty().append(`<table class="table table-hover">
+                        <caption><h1 class="text-center text-muted">新增试题审核</h1></caption>
+                        <thead>
+                        <tr>
+                            <td>No.</td>
+                            <td>题目</td>
+                            <td>题目类型</td>
+                            <td>附加</td>
+                            <td>答案</td>
+                            <td>审核次数</td>
+                            <td>审核人</td>
+                            <td colspan="2" class="text-center">操作</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ` + tbody + `
+                        </tbody>
+                    </table>`);
+    })
+}
+
+function QuestionReviewPass(id) {
+    $.get("/passQuestionReview/" + id, (data) => {
+        console.log(data);
+    })
 }

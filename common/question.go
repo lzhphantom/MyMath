@@ -37,3 +37,13 @@ type Practice struct {
 	Select   *Select
 	UnSelect *UnSelect
 }
+
+type ReviewQuestion struct {
+	Id           int
+	Content      string
+	QuestionType string
+	Addition     []string
+	Answer       string
+	ViewNum      int
+	Reviewers    []string
+}

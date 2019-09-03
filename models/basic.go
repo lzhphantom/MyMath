@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // 基础知识分类
 type BasicCommon struct {
 	Id           int
@@ -18,6 +20,16 @@ type BasicContent struct {
 	Formula            []*Formula            `orm:"reverse(many)"`
 	ExaminationCenter  []*ExaminationCenter  `orm:"reverse(many)"`
 	HDifficulty        []*HDifficulty        `orm:"reverse(many)"`
+	BasicReviewRecord  []*BasicReviewRecord  `orm:"reverse(many)"`
+	Review             int                   `description:"大于等于3，审核完毕"`
+}
+
+type BasicReviewRecord struct {
+	Id           int
+	Created      time.Time     `orm:"auto_now_add;type(datetime)"`
+	Updated      time.Time     `orm:"auto_now;type(datetime)"`
+	User         *User         `orm:"rel(one)"`
+	BasicContent *BasicContent `orm:"rel(fk)"`
 }
 
 //知识点精讲

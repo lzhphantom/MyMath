@@ -4,14 +4,14 @@ import "time"
 
 type User struct {
 	Id                   int
-	UserName             string                `orm:"unique"` //登录用户名
-	Password             string                //密码
-	Role                 byte                  `orm:"default(1)" description:"1学生,2教师,0管理员"` //角色
-	Created              time.Time             `orm:"auto_now_add;type(datetime)"`
-	Updated              time.Time             `orm:"auto_now;type(datetime)"`
-	UserInfo             *UserInfo             `orm:"reverse(one)"`
-	QuestionReviewRecord *QuestionReviewRecord `orm:"reverse(one)"`
-	BasicReviewRecord    *BasicReviewRecord    `orm:"reverse(one)"`
+	UserName             string                  `orm:"unique"` //登录用户名
+	Password             string                  //密码
+	Role                 byte                    `orm:"default(1)" description:"1学生,2教师,0管理员"` //角色
+	Created              time.Time               `orm:"auto_now_add;type(datetime)"`
+	Updated              time.Time               `orm:"auto_now;type(datetime)"`
+	UserInfo             *UserInfo               `orm:"reverse(one)"`
+	QuestionReviewRecord []*QuestionReviewRecord `orm:"reverse(many)"`
+	BasicReviewRecord    []*BasicReviewRecord    `orm:"reverse(many)"`
 }
 
 type UserInfo struct {

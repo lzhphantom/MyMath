@@ -84,16 +84,35 @@ $(function () {
     //基础知识内容添加
     $("#contentAdd").on("click", function () {
         let typeSelect = $("#typeSelect").val();
+        if (typeSelect==="0"){
+            alert("请选择类型")
+            return
+        }
         let contentSelect = $("#contentSelect").val();
-        let basicPublishContent = $("#basicPublishContent").val();
+        if (contentSelect==="0"){
+            alert("请选择版块")
+            return
+        }
+        if($("#showBasicPublishContent").attr("data-content")===undefined){
+            alert("请填充内容")
+            return
+        }
+        let basicPublishContent = $("#showBasicPublishContent").attr("data-content");
+        if(basicPublishContent.length===0){
+            alert("请填充内容")
+            return
+        }
+
         $.post(
             "/admin/publishContent/" + contentSelect,
             {
                 typeId: typeSelect,
                 content: basicPublishContent,
             },
-            function (data, status) {
-                chooseContentShow(document.getElementById("basic-content"), data);
+            function (data, status,xhr) {
+                if(xhr.status===200){
+                    chooseContentShow(document.getElementById("basic-content"), data);
+                }
             });
     });
 
@@ -327,16 +346,16 @@ function chooseContentShow(basicContent, data) {
             let hdContent = ``;
             //知识点精讲部分
             for (let know = 0; know < content[j].KnowledgeImportant.length; know++) {
-                knowledgeContent += `<span>` + content[j].KnowledgeImportant[know].Content + `</span><br>`;
+                knowledgeContent += `` + content[j].KnowledgeImportant[know].Content  ;
             }
             for (let know = 0; know < content[j].Formula.length; know++) {
-                formulaContent += `<span>` + content[j].Formula[know].Content + `</span><br>`;
+                formulaContent += `` + content[j].Formula[know].Content ;
             }
             for (let know = 0; know < content[j].ExaminationCenter.length; know++) {
-                testContent += `<span>` + content[j].ExaminationCenter[know].Content + `</span><br>`;
+                testContent += `` + content[j].ExaminationCenter[know].Content ;
             }
             for (let know = 0; know < content[j].HDifficulty.length; know++) {
-                hdContent += `<span>` + content[j].HDifficulty[know].Content + `</span><br>`;
+                hdContent += `` + content[j].HDifficulty[know].Content ;
             }
 
 
@@ -351,7 +370,10 @@ function chooseContentShow(basicContent, data) {
                             <td>` + hdContent + `</td>
                             <td>
                                 <a href="#" class="btn btn-danger" onclick="` + delContent + `">删除</a>
-                                <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>
+                                
+                            </td>
+                            <td>
+                                <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="\` + content[j].Id + \`" id="basicCC-btn">修改</a>
                             </td>
                         </tr>`);
             $('a[data-toggle="modal"]').on('click', function (e) {
@@ -359,6 +381,7 @@ function chooseContentShow(basicContent, data) {
                 let changeModal = $("#basicContentChange");
                 showChangeBasicContent(id, changeModal);
             });
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, "basic-content"]);
         }
     }
 }

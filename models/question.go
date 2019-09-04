@@ -21,6 +21,6 @@ type QuestionReviewRecord struct {
 	Id       int
 	Created  time.Time `orm:"auto_now_add;type(datetime)"`
 	Updated  time.Time `orm:"auto_now;type(datetime)"`
-	User     *User     `orm:"rel(one)"`
+	User     *User     `orm:"rel(fk)"`
 	Question *Question `orm:"rel(fk)"`
 }

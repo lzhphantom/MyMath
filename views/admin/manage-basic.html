@@ -50,7 +50,7 @@
                             class="glyphicon glyphicon-share-alt"></i></a>
             </div>
         </div>
-        <table class="table table-bordered text-center">
+        <table class="table table-bordered">
             <thead>
             <tr>
                 <th class="text-center">编号</th>
@@ -61,7 +61,7 @@
                 <th class="text-center">相关公式</th>
                 <th class="text-center">考点</th>
                 <th class="text-center">重难点</th>
-                <th class="text-center">操作</th>
+                <th class="text-center" colspan="2">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -136,9 +136,20 @@
                             <div class="col-sm-2">
                                 <label for="basicPublishContent" class="control-label">内容</label>
                             </div>
-                            <div class="col-sm-6">
-                                            <textarea name="" id="basicPublishContent" cols="30" rows="10"
-                                                      class="form-control"></textarea>
+                            <div class="col-sm-9">
+                                <a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContent','#backBlankGroup');"
+                                   id="showBasicPublishContent">暂无内容</a>
+                                <div class="form-group">
+                                    <textarea name="content" id="basicPublishContent" class="hidden"></textarea>
+                                </div>
+                                <div class="row" id="backBlankGroup">
+                                    <div class="col-md-3 col-md-offset-9">
+
+                                    </div>
+                                    <div class="col-md-3 col-md-offset-9 hidden">
+                                        <a class="btn btn-primary btn-lg" onclick="backToLast('#backBlankGroup','#basicPublishContent');">确认</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

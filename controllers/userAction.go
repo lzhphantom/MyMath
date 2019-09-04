@@ -172,11 +172,20 @@ func (c *LoginController) PassQuestionReview() {
 		},
 	}
 	o := orm.NewOrm()
-	num, err := o.Insert(&newRecord)
+	var question models.Question
+	o.QueryTable("question").Filter("id", id).One(&question)
+	question.Review = question.Review + 1
+	num, err := o.Update(&question, "review")
+	if err != nil {
+		logs.Warning("更新失败", err)
+	} else {
+		logs.Info("更了", num, "条")
+	}
+	num, err = o.Insert(&newRecord)
 	if err != nil {
 		logs.Info("插入失败", err)
 	} else {
-		logs.Info("成功插入", num, "条")
+		logs.Info("成功插入", num)
 	}
 	c.ServeJSON()
 }

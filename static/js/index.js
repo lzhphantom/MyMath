@@ -49,7 +49,7 @@ $(function () {
                         if (data.BasicContent[0] !== undefined) {
                             $($modal).append(`<div>
                     <h3>1.` + data.BasicContent[0].Title + `的概念</h3>
-                    <p class="text-muted well">` + data.BasicContent[0].Concept + `</p>
+                    ` + data.BasicContent[0].Concept + `
                 </div>`);
                             //知识点精讲部分
                             if (data.BasicContent[0].KnowledgeImportant !== undefined) {
@@ -59,7 +59,7 @@ $(function () {
                                 for (let i = 0; i < data.BasicContent[0].KnowledgeImportant.length; i++) {
                                     content += `<div>
                         <h4>` + String.fromCharCode(letterNumber++) + `.</h4>
-                        <p class="text-muted well">` + data.BasicContent[0].KnowledgeImportant[i].Content + `</p>
+                        ` + data.BasicContent[0].KnowledgeImportant[i].Content + `
                     </div>`;
                                 }
                                 $($modal).append(`<div>
@@ -71,7 +71,7 @@ $(function () {
                             if (data.BasicContent[0].Formula !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].Formula.length; i++) {
-                                    content += `<p class="text-muted well">` + data.BasicContent[0].Formula[i].Content + `</p>`;
+                                    content += `` + data.BasicContent[0].Formula[i].Content ;
                                 }
                                 $($modal).append(`<div>
                     <h3>3.相关公式</h3>
@@ -82,7 +82,7 @@ $(function () {
                             if (data.BasicContent[0].ExaminationCenter !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].ExaminationCenter.length; i++) {
-                                    content += `<p class="text-muted well">` + data.BasicContent[0].ExaminationCenter[i].Content + `</p>`;
+                                    content += `` + data.BasicContent[0].ExaminationCenter[i].Content ;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-danger">4.考点</h3>
@@ -93,7 +93,7 @@ $(function () {
                             if (data.BasicContent[0].HDifficulty !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].HDifficulty.length; i++) {
-                                    content += `<p class="text-muted well">` + data.BasicContent[0].HDifficulty[i].Content + `</p>`;
+                                    content += `` + data.BasicContent[0].HDifficulty[i].Content ;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-success">5.重难点</h3>
@@ -105,10 +105,11 @@ $(function () {
                         <h3 class="text-center text-danger">抱歉！暂无内容！</h3>
                     </div>`);
                         }
-                    })
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
+                        $(controls).find("p").addClass("text-muted well");
+                    });
                 });
-            }
-        );
+            });
     });
     $("#collapseOne").on("hide.bs.collapse", () => {
         $(this).closest("ul").empty();
@@ -1133,7 +1134,6 @@ function UNACTION() {
 
 function getQuestionReview(controls) {
     $.get("/getQuestionReview", (data) => {
-        console.log(data);
         let tbody = ``;
         for (let i = 0; i < data.length; i++) {
             let addition = ``;
@@ -1147,7 +1147,7 @@ function getQuestionReview(controls) {
             let reviewer = ``;
             if (data[i].Reviewers != null && data[i].Reviewers.length > 0) {
                 for (let j = 0; j < data[i].Reviewers.length; j++) {
-                    reviewer += `<p>` + data[i].Reviewers[j]+`</p>`;
+                    reviewer += `<p>` + data[i].Reviewers[j] + `</p>`;
                 }
             } else {
                 reviewer = `无`;
@@ -1159,9 +1159,9 @@ function getQuestionReview(controls) {
                         <td>` + addition + `</td>
                         <td>` + data[i].Answer + `</td>
                         <td>` + data[i].ViewNum + `</td>
-                        <td>`+reviewer+`</td>
+                        <td>` + reviewer + `</td>
                         <td><a class="btn btn-warning" href="javascript:void(0);" >修改</a></td>
-                        <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + data[i].Id + `)">通过</a></td>
+                        <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + data[i].Id + `,'` + controls + `')">通过</a></td>
                     </tr>`
         }
         $(controls).empty().append(`<table class="table table-hover">
@@ -1185,8 +1185,10 @@ function getQuestionReview(controls) {
     })
 }
 
-function QuestionReviewPass(id) {
-    $.get("/passQuestionReview/" + id, (data) => {
-        console.log(data);
+function QuestionReviewPass(id, controls) {
+    $.get("/passQuestionReview/" + id, (data, status, xhr) => {
+        if (xhr.status === 200) {
+            getQuestionReview(controls)
+        }
     })
 }

@@ -478,7 +478,7 @@ func (c *AdminController) GetQuestion() {
 	var questions []*models.Question
 	rand.Seed(time.Now().UnixNano())
 	if role == "-1" {
-		num, err := o.Raw("SELECT id,content,answer,role_question FROM question WHERE role_question != ?", 1).QueryRows(&questions)
+		num, err := o.Raw("SELECT id,content,answer,role_question FROM question WHERE role_question != ? and review >= 3", 1).QueryRows(&questions)
 		if err != nil {
 			logs.Debug("获取题失败：", err)
 		} else {
@@ -509,7 +509,7 @@ func (c *AdminController) GetQuestion() {
 		c.SetSession(common.KeyUnSelects, unSelects)
 		c.Redirect("/getTrain/unselect/0", 302)
 	} else {
-		num, err := o.QueryTable("question").Filter("role_question", role).All(&questions)
+		num, err := o.QueryTable("question").Filter("role_question", role).Filter("review__gte", 3).All(&questions)
 		if err != nil {
 			logs.Debug("获取题失败：", err)
 		} else {

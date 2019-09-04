@@ -342,6 +342,7 @@ func (c *AdminController) ChangeContent() {
 	content.Concept = content5Map["5"].(string)
 	o.Update(&content)
 	for key, value := range content.KnowledgeImportant {
+		logs.Info(key, content1Map[strconv.Itoa(key)], content.KnowledgeImportant)
 		(*value).Content = content1Map[strconv.Itoa(key)].(string)
 		o.Update(value)
 	}

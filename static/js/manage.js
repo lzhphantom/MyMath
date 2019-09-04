@@ -62,7 +62,7 @@ $(function () {
         $('#basicAdd').modal('hide');
     });
     //修改添加模板
-    $('#basicAdd').on('hidden.bs.modal', function (e) {
+    $('#basicAdd').on('hide.bs.modal', function (e) {
         $("#myModalLabel").text('添加基础知识大纲');
         $("#basicTypeAdd").text('添加');
         $('input[name="cop"]').val('1');
@@ -80,6 +80,20 @@ $(function () {
             }
             $($typeSelect).append(content);
         })
+    });
+    $("#basicContentAdd").on("hide.bs.modal", function (e) {
+        if (typeof (editor) !== "undefined" && editor != null) {
+            alert("正在编辑中...");
+            e.preventDefault();
+            return;
+        }
+    });
+    $("#basicContentChange").on('hide.bs.modal',(e)=>{
+        if (typeof (editor) !== "undefined" && editor != null) {
+            alert("正在编辑中...");
+            e.preventDefault();
+            return;
+        }
     });
     //基础知识内容添加
     $("#contentAdd").on("click", function () {
@@ -117,30 +131,34 @@ $(function () {
     });
 
     //修改基础知识内容
-    $("#contentChange").on("click", function () {
+    $("#contentChange").on("click", function (e) {
+        if (typeof (editor) !== "undefined" && editor != null) {
+            alert("正在编辑中...");
+            e.preventDefault();
+            return;
+        }
         let modalBody = $("#basicContentChange").find(".modal-body");
-        let id = $(modalBody).find("#typeSelect").data("id");
+        let id = $(modalBody).find("#typeSelectChange").data("id");
         let content1 = {};
         let content2 = {};
         let content3 = {};
         let content4 = {};
         let content5 = {};
-        let textAreas = $(modalBody).find("textarea[id^=basicPublishContent]");
+        let textAreas = $(modalBody).find("a[id^=basicPublishContent]");
         for (let i = 0; i < textAreas.length; i++) {
             let key = $(textAreas[i]).attr("id").substr($(textAreas[i]).attr("id").length - 1, 1)
             if (/^basicPublishContent1.*$/.test($(textAreas[i]).attr("id"))) {
-                content1[key] = $(textAreas[i]).val();
+                content1[key] = $(textAreas[i]).attr("data-content");
             } else if (/^basicPublishContent2.*$/.test($(textAreas[i]).attr("id"))) {
-                content2[key] = $(textAreas[i]).val();
+                content2[key] = $(textAreas[i]).attr("data-content");
             } else if (/^basicPublishContent3.*$/.test($(textAreas[i]).attr("id"))) {
-                content3[key] = $(textAreas[i]).val();
+                content3[key] = $(textAreas[i]).attr("data-content");
             } else if (/^basicPublishContent4.*$/.test($(textAreas[i]).attr("id"))) {
-                content4[key] = $(textAreas[i]).val();
+                content4[key] = $(textAreas[i]).attr("data-content");
             } else if (/^basicPublishContent5.*$/.test($(textAreas[i]).attr("id"))) {
-                content5[key] = $(textAreas[i]).val();
+                content5[key] = $(textAreas[i]).attr("data-content");
             }
         }
-
         $.post(
             "/admin/changeContent",
             {
@@ -357,8 +375,6 @@ function chooseContentShow(basicContent, data) {
             for (let know = 0; know < content[j].HDifficulty.length; know++) {
                 hdContent += `` + content[j].HDifficulty[know].Content;
             }
-
-
             $(tbody).append(` <tr>
                             <td>` + content[j].Id + `</td>
                             <td>` + data[i].Name + `</td>
@@ -376,14 +392,15 @@ function chooseContentShow(basicContent, data) {
                                 <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>
                             </td>
                         </tr>`);
-            $('a[data-toggle="modal"]').on('click', function (e) {
-                let id = $(e.target).attr("data-value");
-                let changeModal = $("#basicContentChange");
-                showChangeBasicContent(id, changeModal);
-            });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, "basic-content"]);
+
         }
     }
+    $('a[data-toggle="modal"]').on('click', function (e) {
+        let id = $(e.target).attr("data-value");
+        let changeModal = $("#basicContentChange");
+        showChangeBasicContent(id, changeModal);
+    });
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, "basic-content"]);
 }
 
 //提交富文本编辑器内容
@@ -529,10 +546,10 @@ function showChangeBasicContent(id, changeModal) {
         "/admin/showChangeContent",
         {id: id},
         function (data, status) {
-            $(changeModal).find("#typeSelect").val(data.Title).attr("disabled", true).attr("data-id", id);
+            $(changeModal).find("#typeSelectChange").val(data.Title).attr("disabled", true).attr("data-id", id);
             $(changeModal).find("option[value='5']").attr("selected", true);
             $(changeModal).find("#publishArea").empty();
-            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent5"><a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent5_0" data-content="` + data.Concept + `">展开...</a></div>`);
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent5"><a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent5_5" data-content="` + data.Concept + `">展开...</a></div>`);
             $(changeModal).find("#publishArea").append(`<div id="basicPublishContent1" class="hidden"></div>`);
             for (let i = 0; i < data.KnowledgeImportant.length; i++) {
                 $(changeModal).find("#basicPublishContent1").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent1_` + i + `" data-content="` + data.KnowledgeImportant[i].Content + `">展开...</a>`);
@@ -560,6 +577,10 @@ function showChangeBasicContent(id, changeModal) {
                                                                             </div>
                                                                         </div>`);
             $(changeModal).find("#contentSelect").on("change", function () {
+                if (typeof (editor) !== "undefined" && editor != null) {
+                    alert("正在编辑中...");
+                    return
+                }
                 let showId = $(this).children('option:selected').val();
                 if(showId==="1"){
                     $("#basicPublishContent1").removeClass("hidden");

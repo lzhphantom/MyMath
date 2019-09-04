@@ -84,21 +84,21 @@ $(function () {
     //基础知识内容添加
     $("#contentAdd").on("click", function () {
         let typeSelect = $("#typeSelect").val();
-        if (typeSelect==="0"){
+        if (typeSelect === "0") {
             alert("请选择类型")
             return
         }
         let contentSelect = $("#contentSelect").val();
-        if (contentSelect==="0"){
+        if (contentSelect === "0") {
             alert("请选择版块")
             return
         }
-        if($("#showBasicPublishContent").attr("data-content")===undefined){
+        if ($("#showBasicPublishContent").attr("data-content") === undefined) {
             alert("请填充内容")
             return
         }
         let basicPublishContent = $("#showBasicPublishContent").attr("data-content");
-        if(basicPublishContent.length===0){
+        if (basicPublishContent.length === 0) {
             alert("请填充内容")
             return
         }
@@ -109,8 +109,8 @@ $(function () {
                 typeId: typeSelect,
                 content: basicPublishContent,
             },
-            function (data, status,xhr) {
-                if(xhr.status===200){
+            function (data, status, xhr) {
+                if (xhr.status === 200) {
                     chooseContentShow(document.getElementById("basic-content"), data);
                 }
             });
@@ -346,16 +346,16 @@ function chooseContentShow(basicContent, data) {
             let hdContent = ``;
             //知识点精讲部分
             for (let know = 0; know < content[j].KnowledgeImportant.length; know++) {
-                knowledgeContent += `` + content[j].KnowledgeImportant[know].Content  ;
+                knowledgeContent += `` + content[j].KnowledgeImportant[know].Content;
             }
             for (let know = 0; know < content[j].Formula.length; know++) {
-                formulaContent += `` + content[j].Formula[know].Content ;
+                formulaContent += `` + content[j].Formula[know].Content;
             }
             for (let know = 0; know < content[j].ExaminationCenter.length; know++) {
-                testContent += `` + content[j].ExaminationCenter[know].Content ;
+                testContent += `` + content[j].ExaminationCenter[know].Content;
             }
             for (let know = 0; know < content[j].HDifficulty.length; know++) {
-                hdContent += `` + content[j].HDifficulty[know].Content ;
+                hdContent += `` + content[j].HDifficulty[know].Content;
             }
 
 
@@ -373,7 +373,7 @@ function chooseContentShow(basicContent, data) {
                                 
                             </td>
                             <td>
-                                <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="\` + content[j].Id + \`" id="basicCC-btn">修改</a>
+                                <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>
                             </td>
                         </tr>`);
             $('a[data-toggle="modal"]').on('click', function (e) {
@@ -395,9 +395,9 @@ function backToLast(backGroup, editorName) {
     });
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
-    if(data.length<=0){
+    if (data.length <= 0) {
         $(showContentName).html("暂无内容")
-    }else {
+    } else {
         $(showContentName).attr("data-content", data);
     }
     //选择题答案添加
@@ -532,42 +532,65 @@ function showChangeBasicContent(id, changeModal) {
             $(changeModal).find("#typeSelect").val(data.Title).attr("disabled", true).attr("data-id", id);
             $(changeModal).find("option[value='5']").attr("selected", true);
             $(changeModal).find("#publishArea").empty();
-            $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent5" cols="30" rows="10" class="form-control">` + data.Concept + `</textarea>`);
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent5"><a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent5_0" data-content="` + data.Concept + `">展开...</a></div>`);
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent1" class="hidden"></div>`);
             for (let i = 0; i < data.KnowledgeImportant.length; i++) {
-                $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent1_` + i + `" cols="30" rows="10" class="form-control hidden">` + data.KnowledgeImportant[i].Content + `</textarea>`);
+                $(changeModal).find("#basicPublishContent1").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent1_` + i + `" data-content="` + data.KnowledgeImportant[i].Content + `">展开...</a>`);
             }
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent2" class="hidden"></div>`);
             for (let i = 0; i < data.Formula.length; i++) {
-                $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent2_` + i + `" cols="30" rows="10" class="form-control hidden">` + data.Formula[i].Content + `</textarea>`);
+                $(changeModal).find("#basicPublishContent2").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent2_` + i + `" data-content="`+data.Formula[i].Content+`">展开...</a>`);
             }
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent3" class="hidden"></div>`);
             for (let i = 0; i < data.ExaminationCenter.length; i++) {
-                $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent3_` + i + `" cols="30" rows="10" class="form-control hidden">` + data.ExaminationCenter[i].Content + `</textarea>`);
+                $(changeModal).find("#basicPublishContent3").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent3_` + i + `" data-content="` + data.ExaminationCenter[i].Content + `">展开...</a>`);
             }
+            $(changeModal).find("#publishArea").append(`<div id="basicPublishContent4" class="hidden"></div>`);
             for (let i = 0; i < data.HDifficulty.length; i++) {
-                $(changeModal).find("#publishArea").append(`<textarea name="" id="basicPublishContent4_` + i + `" cols="30" rows="10" class="form-control hidden">` + data.HDifficulty[i].Content + `</textarea>`);
+                $(changeModal).find("#basicPublishContent4").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent4_` + i + `" data-content="` + data.HDifficulty[i].Content + `">展开...</a>`);
             }
+            $(changeModal).find("#publishArea").append(`<div>
+                                                                            <textarea name="content" id="basicPublishContentEditor" class="hidden"></textarea>
+                                                                        </div>
+                                                                        <div class="row" id="backBasicPublishGroup">
+                                                                            <div class="col-md-3 col-md-offset-9">
+                                                                            </div>
+                                                                            <div class="col-md-3 col-md-offset-9 hidden">
+                                                                                <a class="btn btn-primary btn-lg" onclick="backToLast('#backBasicPublishGroup','#basicPublishContentEditor');">确认</a>
+                                                                            </div>
+                                                                        </div>`);
             $(changeModal).find("#contentSelect").on("change", function () {
                 let showId = $(this).children('option:selected').val();
-                let areaChildren = $(changeModal).find("#publishArea").children();
-                let checkFist = /^$/;
-                if (showId === "1") {
-                    checkFist = /^basicPublishContent1.*$/;
-                } else if (showId === "2") {
-                    checkFist = /^basicPublishContent2.*$/;
-                } else if (showId === "3") {
-                    checkFist = /^basicPublishContent3.*$/;
-                } else if (showId === "4") {
-                    checkFist = /^basicPublishContent4.*$/;
-                } else if (showId === "5") {
-                    checkFist = /^basicPublishContent5.*$/;
-                }
-
-                for (let i = 0; i < areaChildren.length; i++) {
-                    if (checkFist.test($(areaChildren[i]).attr('id'))) {
-                        $(areaChildren[i]).removeAttr("class", "hidden");
-                    } else {
-                        $(areaChildren[i]).addClass("hidden");
-                    }
-
+                if(showId==="1"){
+                    $("#basicPublishContent1").removeClass("hidden");
+                    $("#basicPublishContent2").addClass("hidden");
+                    $("#basicPublishContent3").addClass("hidden");
+                    $("#basicPublishContent4").addClass("hidden");
+                    $("#basicPublishContent5").addClass("hidden");
+                }else if(showId==="2"){
+                    $("#basicPublishContent1").addClass("hidden");
+                    $("#basicPublishContent2").removeClass("hidden");
+                    $("#basicPublishContent3").addClass("hidden");
+                    $("#basicPublishContent4").addClass("hidden");
+                    $("#basicPublishContent5").addClass("hidden");
+                }else if(showId==="3"){
+                    $("#basicPublishContent1").addClass("hidden");
+                    $("#basicPublishContent2").addClass("hidden");
+                    $("#basicPublishContent3").removeClass("hidden");
+                    $("#basicPublishContent4").addClass("hidden");
+                    $("#basicPublishContent5").addClass("hidden");
+                }else if(showId==="4"){
+                    $("#basicPublishContent1").addClass("hidden");
+                    $("#basicPublishContent2").addClass("hidden");
+                    $("#basicPublishContent3").addClass("hidden");
+                    $("#basicPublishContent4").removeClass("hidden");
+                    $("#basicPublishContent5").addClass("hidden");
+                }else if(showId==="5"){
+                    $("#basicPublishContent1").addClass("hidden");
+                    $("#basicPublishContent2").addClass("hidden");
+                    $("#basicPublishContent3").addClass("hidden");
+                    $("#basicPublishContent4").addClass("hidden");
+                    $("#basicPublishContent5").removeClass("hidden");
                 }
             })
         },

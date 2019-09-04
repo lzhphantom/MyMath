@@ -12,6 +12,7 @@ type User struct {
 	UserInfo             *UserInfo               `orm:"reverse(one)"`
 	QuestionReviewRecord []*QuestionReviewRecord `orm:"reverse(many)"`
 	BasicReviewRecord    []*BasicReviewRecord    `orm:"reverse(many)"`
+	QuestionAnswerRecord []*QuestionAnswerRecord `orm:"reverse(many)"`
 }
 
 type UserInfo struct {

@@ -397,7 +397,6 @@ func (c *AdminController) UploadQuestion() {
 		logs.Debug("插入失败：", err)
 	}
 	c.ServeJSON()
-
 }
 
 //添加用户

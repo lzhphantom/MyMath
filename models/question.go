@@ -14,6 +14,7 @@ type Question struct {
 	Review       int                     `description:"大于等于3，审核完毕"`
 	BasicCommon  *BasicCommon            `orm:"rel(fk)"`
 	ReviewRecord []*QuestionReviewRecord `orm:"reverse(many)"`
+	AnswerRecord []*QuestionAnswerRecord `orm:"reverse(many)"`
 }
 
 //审核记录
@@ -23,4 +24,13 @@ type QuestionReviewRecord struct {
 	Updated  time.Time `orm:"auto_now;type(datetime)"`
 	User     *User     `orm:"rel(fk)"`
 	Question *Question `orm:"rel(fk)"`
+}
+
+type QuestionAnswerRecord struct {
+	Id         int
+	Correction bool
+	Created    time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated    time.Time `orm:"auto_now;type(datetime)"`
+	User       *User     `orm:"rel(fk)"`
+	Question   *Question `orm:"rel(fk)"`
 }

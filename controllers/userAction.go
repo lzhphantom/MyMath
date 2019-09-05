@@ -189,3 +189,13 @@ func (c *LoginController) PassQuestionReview() {
 	}
 	c.ServeJSON()
 }
+
+//个人中心
+
+// @router /center [get]
+func (c *LoginController) Center() {
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	c.Data["user"] = loginUser
+	c.Data["isExist"] = true
+	c.TplName = "user/center.html"
+}

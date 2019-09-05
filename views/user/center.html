@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <link rel="shortcut icon" href="static/img/logo.png" type="image/x-icon">
+    <link href="static/lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/simple-footer.css">
+    <link rel="stylesheet" href="static/css/basic.css">
+    <link rel="stylesheet" href="static/css/center.css">
+    <link rel="stylesheet" href="static/css/index-header.css">
+</head>
+<body>
+{{template "index-header.html" .}}
+<div class="container" id="Content-Body">
+    <div class="row">
+        <div class="col-xs-10 col-md-9">
+            <div id="welcome">
+                <h1 class="text-muted text-center">欢迎你的到来 <span class="label label-info">{{ .user.Name }}</span></h1>
+                <h1 class="text-muted text-right"><span class="small">--lzhphantom-Math</span></h1>
+            </div>
+            <div id="personal" class="hidden">
+
+            </div>
+            <div id="trainingHistory" class="hidden">
+                <table class="table table-hover">
+                    <caption><h1 class="text-muted text-center">题海历史</h1></caption>
+                    <thead>
+                    <tr>
+                        <td>NO.</td>
+                        <td>题目</td>
+                        <td>类型</td>
+                        <td>附加</td>
+                        <td>答案</td>
+                        <td>参考答案</td>
+                        <td>对错</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <div id="uploadRecord" class="hidden">
+
+            </div>
+            <div id="noPassQuestion" class="hidden">
+
+            </div>
+        </div>
+        <div class="col-xs-2 col-md-3">
+            <dl>
+                <dt class="text-muted text-center">菜单</dt>
+                <dd class="text-center"><a href="#personal" aria-controls="personal" role="tab" data-toggle="tab"
+                                           role-tab="center">个人信息</a></dd>
+                <dd class="text-center"><a href="#trainingHistory" aria-controls="trainingHistory" role="tab" data-toggle="tab"
+                                           role-tab="center">题海历史</a></dd>
+                <dd class="text-center"><a href="#uploadRecord" aria-controls="uploadRecord" role="tab" data-toggle="tab"
+                                           role-tab="center">上传记录</a></dd>
+                <dd class="text-center"><a href="#noPassQuestion" aria-controls="noPassQuestion" role="tab" data-toggle="tab"
+                                           role-tab="center">未通过题目</a></dd>
+            </dl>
+        </div>
+
+    </div>
+</div>
+{{template "user/center-footer.html"}}
+</body>
+</html>

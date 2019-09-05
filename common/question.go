@@ -47,3 +47,10 @@ type ReviewQuestion struct {
 	ViewNum      int
 	Reviewers    []string
 }
+
+type AnswerRanking struct {
+	Total    int
+	Correct  int
+	Accuracy float64
+	Name     string
+}

@@ -39,6 +39,41 @@ $(function () {
         $("#solveUp").removeClass("hidden");
     });
 
+    $("a[role-tab='rank']").on('show.bs.tab', () => {
+        $.get("/ranking", (data, status, xhr) => {
+            console.log(data);
+            if (xhr.status === 200) {
+                let tbody = ``
+                for (let i = 0; i < data.length; i++) {
+                    tbody += `<tr>
+                                <td>` + (i + 1) + `</td>
+                                <td>` + data[i].Name + `</td>
+                                <td>` + data[i].Total + `</td>
+                                <td>` + data[i].Correct + `</td>
+                                <td>` + number_format(data[i].Accuracy * 100, 2, ".", ",") + `%</td>
+                            </tr>`;
+                }
+                $("#messages").empty().append(`<div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>排名</th>
+                <th>学生姓名</th>
+                <th>答题数量</th>
+                <th>正确数量</th>
+                <th>准确率</th>
+            </tr>
+            </thead>
+            <tbody>
+            ` + tbody + `
+            </tbody>
+        </table>
+    </div>`)
+            }
+        });
+
+    });
+
 
     //基础知识大纲添加
     let basicTypeAdd = document.getElementById("basicTypeAdd");
@@ -88,7 +123,7 @@ $(function () {
             return;
         }
     });
-    $("#basicContentChange").on('hide.bs.modal',(e)=>{
+    $("#basicContentChange").on('hide.bs.modal', (e) => {
         if (typeof (editor) !== "undefined" && editor != null) {
             alert("正在编辑中...");
             e.preventDefault();
@@ -556,7 +591,7 @@ function showChangeBasicContent(id, changeModal) {
             }
             $(changeModal).find("#publishArea").append(`<div id="basicPublishContent2" class="hidden"></div>`);
             for (let i = 0; i < data.Formula.length; i++) {
-                $(changeModal).find("#basicPublishContent2").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent2_` + i + `" data-content="`+data.Formula[i].Content+`">展开...</a>`);
+                $(changeModal).find("#basicPublishContent2").append(`<a href="javascript:void(0);" onclick="showEditor(this,'#basicPublishContentEditor','#backBasicPublishGroup');" id="basicPublishContent2_` + i + `" data-content="` + data.Formula[i].Content + `">展开...</a>`);
             }
             $(changeModal).find("#publishArea").append(`<div id="basicPublishContent3" class="hidden"></div>`);
             for (let i = 0; i < data.ExaminationCenter.length; i++) {
@@ -582,31 +617,31 @@ function showChangeBasicContent(id, changeModal) {
                     return
                 }
                 let showId = $(this).children('option:selected').val();
-                if(showId==="1"){
+                if (showId === "1") {
                     $("#basicPublishContent1").removeClass("hidden");
                     $("#basicPublishContent2").addClass("hidden");
                     $("#basicPublishContent3").addClass("hidden");
                     $("#basicPublishContent4").addClass("hidden");
                     $("#basicPublishContent5").addClass("hidden");
-                }else if(showId==="2"){
+                } else if (showId === "2") {
                     $("#basicPublishContent1").addClass("hidden");
                     $("#basicPublishContent2").removeClass("hidden");
                     $("#basicPublishContent3").addClass("hidden");
                     $("#basicPublishContent4").addClass("hidden");
                     $("#basicPublishContent5").addClass("hidden");
-                }else if(showId==="3"){
+                } else if (showId === "3") {
                     $("#basicPublishContent1").addClass("hidden");
                     $("#basicPublishContent2").addClass("hidden");
                     $("#basicPublishContent3").removeClass("hidden");
                     $("#basicPublishContent4").addClass("hidden");
                     $("#basicPublishContent5").addClass("hidden");
-                }else if(showId==="4"){
+                } else if (showId === "4") {
                     $("#basicPublishContent1").addClass("hidden");
                     $("#basicPublishContent2").addClass("hidden");
                     $("#basicPublishContent3").addClass("hidden");
                     $("#basicPublishContent4").removeClass("hidden");
                     $("#basicPublishContent5").addClass("hidden");
-                }else if(showId==="5"){
+                } else if (showId === "5") {
                     $("#basicPublishContent1").addClass("hidden");
                     $("#basicPublishContent2").addClass("hidden");
                     $("#basicPublishContent3").addClass("hidden");

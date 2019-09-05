@@ -593,6 +593,9 @@ func (c *AdminController) GetTrain() {
 func (c *AdminController) CommitTraining() {
 	role := c.Ctx.Input.Param(":role")
 	answer := c.GetString("answer")
+	o := orm.NewOrm()
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+
 	if role == "select" {
 		selects, ok := c.GetSession(common.KeySelects).([]common.Select)
 		showSelects := make([]common.Select, 0)
@@ -606,6 +609,21 @@ func (c *AdminController) CommitTraining() {
 					}
 					countView++
 					showSelects = append(showSelects, selects[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: selects[i].Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: selects[i].Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 				} else {
 					if len(answer) > 0 {
 						selects[i].UserAnswer = answer
@@ -619,6 +637,21 @@ func (c *AdminController) CommitTraining() {
 						countView++
 					}
 					showSelects = append(showSelects, selects[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: selects[i].Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: selects[i].Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 					break
 				}
 			}
@@ -647,6 +680,21 @@ func (c *AdminController) CommitTraining() {
 					}
 					countView++
 					showUnSelect = append(showUnSelect, unSelects[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: unSelects[i].Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: unSelects[i].Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 				} else {
 					if len(answer) > 0 {
 						unSelects[i].UserAnswer = answer
@@ -660,6 +708,21 @@ func (c *AdminController) CommitTraining() {
 						countView++
 					}
 					showUnSelect = append(showUnSelect, unSelects[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: unSelects[i].Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: unSelects[i].Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 					break
 				}
 			}
@@ -793,6 +856,8 @@ func (c *AdminController) CommitPractice() {
 	answer := c.GetString("answer")
 	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
 	showPractices := make([]common.Practice, 0)
+	o := orm.NewOrm()
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	if ok {
 		countView := 0
 		countCorrect := 0
@@ -804,6 +869,21 @@ func (c *AdminController) CommitPractice() {
 						countCorrect++
 					}
 					showPractices = append(showPractices, practices[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: practices[i].Select.Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: practices[i].Select.Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 				} else {
 					if len(answer) > 0 {
 						practices[i].Select.UserAnswer = answer
@@ -817,6 +897,21 @@ func (c *AdminController) CommitPractice() {
 						countView++
 					}
 					showPractices = append(showPractices, practices[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: practices[i].Select.Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: practices[i].Select.Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 					break
 				}
 			} else if practices[i].UnSelect != nil {
@@ -826,6 +921,21 @@ func (c *AdminController) CommitPractice() {
 						countCorrect++
 					}
 					showPractices = append(showPractices, practices[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: practices[i].UnSelect.Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: practices[i].UnSelect.Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 				} else {
 					if len(answer) > 0 {
 						practices[i].UnSelect.UserAnswer = answer
@@ -839,6 +949,21 @@ func (c *AdminController) CommitPractice() {
 						countView++
 					}
 					showPractices = append(showPractices, practices[i])
+					answerRecord := models.QuestionAnswerRecord{
+						Correction: practices[i].UnSelect.Correct,
+						User: &models.User{
+							Id: loginUser.Id,
+						},
+						Question: &models.Question{
+							Id: practices[i].UnSelect.Train.Id,
+						},
+					}
+					num, err := o.Insert(&answerRecord)
+					if err != nil {
+						logs.Warning("插入失败", err)
+					} else {
+						logs.Info("插入成功", num)
+					}
 					break
 				}
 			}
@@ -857,4 +982,23 @@ func (c *AdminController) CommitPractice() {
 		c.DelSession(common.KeyPractices)
 	}
 	c.ServeJSON()
+}
+
+// @router /ranking [get]
+func (c *AdminController) Ranking() {
+	o := orm.NewOrm()
+	var answerRankings []common.AnswerRanking
+	qb, _ := orm.NewQueryBuilder("mysql")
+	qb.Select("count(1) as total, count(if(correction = '1', 1, null)) as correct, count(if(correction='1',1,null))/count(1)as accuracy,user_info.name").From("question_answer_record").LeftJoin("user_info").On("question_answer_record.user_id=user_info.user_id").GroupBy("name").OrderBy("accuracy").Asc()
+	sql := qb.String()
+	//num, err := o.Raw("select count(1) as total, count(if(correction = '1', 1, null)) as correct, count(if(correction='1',1,null))/count(1)as accuracy,user_info.name from question_answer_record left join user_info on question_answer_record.user_id=user_info.user_id group by name order by accuracy asc;").QueryRows(&answerRankings)
+	num, err := o.Raw(sql).QueryRows(&answerRankings)
+	if err != nil {
+		logs.Warning("获取排名失败", err)
+	} else {
+		logs.Info("获取", num, "条")
+	}
+	c.Data["json"] = answerRankings
+	c.ServeJSON()
+
 }

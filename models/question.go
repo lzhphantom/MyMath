@@ -15,6 +15,7 @@ type Question struct {
 	BasicCommon  *BasicCommon            `orm:"rel(fk)"`
 	ReviewRecord []*QuestionReviewRecord `orm:"reverse(many)"`
 	AnswerRecord []*QuestionAnswerRecord `orm:"reverse(many)"`
+	User         *User                   `orm:"rel(fk)"`
 }
 
 //审核记录
@@ -28,6 +29,7 @@ type QuestionReviewRecord struct {
 
 type QuestionAnswerRecord struct {
 	Id         int
+	UserAnswer string
 	Correction bool
 	Created    time.Time `orm:"auto_now_add;type(datetime)"`
 	Updated    time.Time `orm:"auto_now;type(datetime)"`

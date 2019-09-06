@@ -390,6 +390,10 @@ func (c *AdminController) UploadQuestion() {
 	}
 	logs.Debug(newQuestion)
 
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	newQuestion.User = &models.User{
+		Id: loginUser.Id,
+	}
 	o := orm.NewOrm()
 	newQuestion.BasicCommon = &models.BasicCommon{}
 	_, err = o.Insert(&newQuestion)
@@ -611,6 +615,7 @@ func (c *AdminController) CommitTraining() {
 					showSelects = append(showSelects, selects[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: selects[i].Correct,
+						UserAnswer: selects[i].UserAnswer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -639,6 +644,7 @@ func (c *AdminController) CommitTraining() {
 					showSelects = append(showSelects, selects[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: selects[i].Correct,
+						UserAnswer: answer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -682,6 +688,7 @@ func (c *AdminController) CommitTraining() {
 					showUnSelect = append(showUnSelect, unSelects[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: unSelects[i].Correct,
+						UserAnswer: unSelects[i].UserAnswer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -710,6 +717,7 @@ func (c *AdminController) CommitTraining() {
 					showUnSelect = append(showUnSelect, unSelects[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: unSelects[i].Correct,
+						UserAnswer: answer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -744,7 +752,7 @@ func (c *AdminController) CommitTraining() {
 	c.ServeJSON()
 }
 
-//随机获取一道特定范围的题
+//随机获取少许特定范围的题
 // @router /admin/getQuestionByCommonId/:id [get]
 func (c *AdminController) GetQuestionByCommonId() {
 	role := c.Ctx.Input.Param(":id")
@@ -871,6 +879,7 @@ func (c *AdminController) CommitPractice() {
 					showPractices = append(showPractices, practices[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: practices[i].Select.Correct,
+						UserAnswer: practices[i].Select.UserAnswer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -899,6 +908,7 @@ func (c *AdminController) CommitPractice() {
 					showPractices = append(showPractices, practices[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: practices[i].Select.Correct,
+						UserAnswer: answer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -923,6 +933,7 @@ func (c *AdminController) CommitPractice() {
 					showPractices = append(showPractices, practices[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: practices[i].UnSelect.Correct,
+						UserAnswer: practices[i].UnSelect.UserAnswer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -951,6 +962,7 @@ func (c *AdminController) CommitPractice() {
 					showPractices = append(showPractices, practices[i])
 					answerRecord := models.QuestionAnswerRecord{
 						Correction: practices[i].UnSelect.Correct,
+						UserAnswer: answer,
 						User: &models.User{
 							Id: loginUser.Id,
 						},
@@ -968,7 +980,6 @@ func (c *AdminController) CommitPractice() {
 				}
 			}
 		}
-
 		data := struct {
 			View      int
 			Correct   int

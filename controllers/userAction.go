@@ -191,11 +191,107 @@ func (c *LoginController) PassQuestionReview() {
 }
 
 //个人中心
-
 // @router /center [get]
 func (c *LoginController) Center() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	c.Data["user"] = loginUser
 	c.Data["isExist"] = true
 	c.TplName = "user/center.html"
+}
+
+//个人做题记录
+// @router /center/trainingHistory [get]
+func (c *LoginController) TrainingHistory() {
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	var records []models.QuestionAnswerRecord
+	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).RelatedSel().All(&records)
+	if err != nil {
+		logs.Warning("获取失败", err)
+	} else {
+		logs.Info("获取", num)
+	}
+	SingleUserTrainingHistories := make([]common.SingleUserTrainingHistory, 0)
+	for i := 0; i < len(records); i++ {
+		var role string
+		var choices []string
+		if records[i].Question.RoleQuestion == 1 {
+			role = "选择题"
+			choices = strings.Split(records[i].Question.Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
+			}
+		} else {
+			role = "非选择题"
+		}
+		userTrainingHistory := common.SingleUserTrainingHistory{
+			Content:    records[i].Question.Content,
+			Role:       role,
+			Addition:   choices,
+			UserAnswer: records[i].UserAnswer,
+			Answer:     records[i].Question.Answer,
+			Correct:    records[i].Correction,
+		}
+		SingleUserTrainingHistories = append(SingleUserTrainingHistories, userTrainingHistory)
+	}
+	c.Data["json"] = SingleUserTrainingHistories
+	c.ServeJSON()
+}
+
+//题目上传记录
+// @router /center/uploadRecord [get]
+func (c *LoginController) UploadRecord() {
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	var questions []models.Question
+	o.QueryTable("question").Filter("user_id", loginUser.Id).All(&questions)
+	uploadRecords := make([]common.UploadQuestionRecord, 0)
+	for i := 0; i < len(questions); i++ {
+		var role string
+		var choices []string
+		if questions[i].RoleQuestion == 1 {
+			role = "选择题"
+			choices = strings.Split(questions[i].Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
+			}
+		} else {
+			role = "非选择题"
+		}
+		var review string
+		if questions[i].Review == 0 {
+			review = "未审核"
+		} else if questions[i].Review > 0 && questions[i].Review < 3 {
+			review = "审核中"
+		} else {
+			review = "审核通过"
+		}
+		reviewers := make([]string, 0)
+		if questions[i].Review > 0 {
+			var reviewRecord []models.QuestionReviewRecord
+			o.QueryTable("question_review_record").Filter("question_id").RelatedSel().All(&reviewRecord)
+			for j := 0; j < len(reviewRecord); j++ {
+				var userInfo models.UserInfo
+				o.QueryTable("user_info").Filter("user_id", reviewRecord[j].User.Id).One(&userInfo)
+				reviewers = append(reviewers, userInfo.Name)
+			}
+		}
+		record := common.UploadQuestionRecord{
+			Content:    questions[i].Content,
+			Addition:   choices,
+			Answer:     questions[i].Answer,
+			Role:       role,
+			CreateTime: questions[i].Created,
+			Review:     review,
+			Reviewers:  reviewers,
+		}
+		uploadRecords = append(uploadRecords, record)
+	}
+	c.Data["json"] = uploadRecords
+
+	c.ServeJSON()
 }

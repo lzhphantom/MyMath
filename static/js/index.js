@@ -93,7 +93,7 @@ $(function () {
                             if (data.BasicContent[0].HDifficulty !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].HDifficulty.length; i++) {
-                                    content += `` + data.BasicContent[0].HDifficulty[i].Content ;
+                                    content += `` + data.BasicContent[0].HDifficulty[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-success">5.重难点</h3>
@@ -381,7 +381,23 @@ function regularEditorContent(data) {
     }
     let content = ``;
     for (let i = 0; i < arr.length; i++) {
-        content += `<p>\\(` + arr[i] + `\\)</p>`;
+        let newString = "";
+        let long=arr[i].length;
+        console.log(long);
+        if (long > 30) {
+            let j = 0;
+            while (j < long) {
+                if (j + 30 < long) {
+                    newString += arr[i].substring(j, j + 30) + "\\\\";
+                } else {
+                    newString += arr[i].substring(j, long);
+                }
+                j = j + 30;
+            }
+        } else {
+            newString = arr[i];
+        }
+        content += `<p>\\(` + newString + `\\)</p>`;
     }
     return content
 }
@@ -419,7 +435,8 @@ function backToLast(backGroup, editorName) {
     editor = null;
     $(showContentName).attr("onclick", "showEditor(this" + ",'" + editorName + "','" + backGroup + "');");
     if (data.length <= 0) {
-        $(showContentName).html("暂无内容")
+        $(showContentName).html("暂无内容");
+        $(showContentName).attr("data-content", "");
     } else {
         $(showContentName).attr("data-content", data);
     }

@@ -116,8 +116,8 @@ $(function () {
                     </tbody>
                 </table>`)
                 }
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "uploadRecord"]);
             });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
         }
     });
     $('a[role-tab="center"]').on('hide.bs.tab', (e) => {

@@ -113,7 +113,13 @@ func (c *LoginController) GetQuestionReview() {
 Loop:
 	for i := 0; i < len(questions); i++ {
 		var records []models.QuestionReviewRecord
-		o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).RelatedSel().All(&records)
+		num, err := o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).All(&records)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		} else {
+			logs.Info("获取成功", num, "条")
+		}
+
 		var reviewers []string
 		if len(records) > 0 {
 			for j := 0; j < len(records); j++ {
@@ -205,7 +211,7 @@ func (c *LoginController) TrainingHistory() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	o := orm.NewOrm()
 	var records []models.QuestionAnswerRecord
-	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).RelatedSel().All(&records)
+	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).RelatedSel("question").All(&records)
 	if err != nil {
 		logs.Warning("获取失败", err)
 	} else {
@@ -273,7 +279,7 @@ func (c *LoginController) UploadRecord() {
 		reviewers := make([]string, 0)
 		if questions[i].Review > 0 {
 			var reviewRecord []models.QuestionReviewRecord
-			o.QueryTable("question_review_record").Filter("question_id").RelatedSel().All(&reviewRecord)
+			o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).RelatedSel("user").All(&reviewRecord)
 			for j := 0; j < len(reviewRecord); j++ {
 				var userInfo models.UserInfo
 				o.QueryTable("user_info").Filter("user_id", reviewRecord[j].User.Id).One(&userInfo)

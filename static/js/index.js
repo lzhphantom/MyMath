@@ -383,7 +383,6 @@ function regularEditorContent(data) {
     for (let i = 0; i < arr.length; i++) {
         let newString = "";
         let long = arr[i].length;
-        console.log(long);
         if (long > 30) {
             newArr = arr[i].split(/,|，/);
             console.log(newArr);
@@ -1171,7 +1170,7 @@ function getQuestionReview(controls) {
             }
             tbody += `<tr>
                         <td>` + (i + 1) + `</td>
-                        <td>` + data[i].Content + `</td>
+                        <td width="320px;">` + data[i].Content + `</td>
                         <td>` + data[i].QuestionType + `</td>
                         <td>` + addition + `</td>
                         <td>` + data[i].Answer + `</td>
@@ -1199,6 +1198,7 @@ function getQuestionReview(controls) {
                         ` + tbody + `
                         </tbody>
                     </table>`);
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
     })
 }
 

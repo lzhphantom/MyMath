@@ -5,6 +5,9 @@ $(function () {
         $(id).removeClass("hidden");
         $("#welcome").addClass("hidden");
         if (id === "#trainingHistory") {
+            $("#personal").addClass("hidden");
+            $("#uploadRecord").addClass("hidden");
+            $("#noPassQuestion").addClass("hidden");
             $.get("/center/trainingHistory", (data, status, xhr) => {
                 if (xhr.status === 200) {
                     let tbody = ``;
@@ -18,8 +21,8 @@ $(function () {
                         if (choices.length == 0) {
                             choices = `无`;
                         }
-                        let final = ``
-                        let finalClass = ``
+                        let final = ``;
+                        let finalClass = ``;
                         if (data[i].Correct) {
                             finalClass = `class="text-success"`
                             final = `<span class="glyphicon glyphicon-ok"></span>`
@@ -30,7 +33,7 @@ $(function () {
 
                         tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td>` + data[i].Content + `</td>
+                                    <td width="320px;">` + data[i].Content + `</td>
                                     <td>` + data[i].Role + `</td>
                                     <td>` + choices + `</td>
                                     <td>` + data[i].UserAnswer + `</td>
@@ -61,6 +64,9 @@ $(function () {
 
         }
         if (id === "#uploadRecord") {
+            $("#personal").addClass("hidden");
+            $("#trainingHistory").addClass("hidden");
+            $("#noPassQuestion").addClass("hidden");
             $.get("/center/uploadRecord", (data, status, xhr) => {
                 console.log(data);
                 if (xhr.status === 200) {
@@ -120,9 +126,5 @@ $(function () {
             });
         }
     });
-    $('a[role-tab="center"]').on('hide.bs.tab', (e) => {
-        let id = $(e.target).attr('href');
-        console.log(id);
-        $(id).addClass("hidden")
-    });
+
 });

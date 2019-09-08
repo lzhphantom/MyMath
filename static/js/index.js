@@ -71,7 +71,7 @@ $(function () {
                             if (data.BasicContent[0].Formula !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].Formula.length; i++) {
-                                    content += `` + data.BasicContent[0].Formula[i].Content ;
+                                    content += `` + data.BasicContent[0].Formula[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3>3.相关公式</h3>
@@ -82,7 +82,7 @@ $(function () {
                             if (data.BasicContent[0].ExaminationCenter !== undefined) {
                                 let content = ``;
                                 for (let i = 0; i < data.BasicContent[0].ExaminationCenter.length; i++) {
-                                    content += `` + data.BasicContent[0].ExaminationCenter[i].Content ;
+                                    content += `` + data.BasicContent[0].ExaminationCenter[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-danger">4.考点</h3>
@@ -357,7 +357,7 @@ async function showEditor(obj, editorName, backGroup) {
 }
 
 function unregularEditorContent(data) {
-    let arr = data.split(/\\\(|\\\)/);
+    let arr = data.split(/\\\(|\\\)|\\\\/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
             arr.splice(i, 1);
@@ -382,17 +382,17 @@ function regularEditorContent(data) {
     let content = ``;
     for (let i = 0; i < arr.length; i++) {
         let newString = "";
-        let long=arr[i].length;
+        let long = arr[i].length;
         console.log(long);
         if (long > 30) {
-            let j = 0;
-            while (j < long) {
-                if (j + 30 < long) {
-                    newString += arr[i].substring(j, j + 30) + "\\\\";
-                } else {
-                    newString += arr[i].substring(j, long);
+            newArr = arr[i].split(/,|，/);
+            console.log(newArr);
+            for (let j = 0; j < newArr.length; j++) {
+                if (newArr !== "" && j !== newArr.length - 1) {
+                    newString += newArr[j] + ",\\\\";
+                }else {
+                    newString += newArr[j];
                 }
-                j = j + 30;
             }
         } else {
             newString = arr[i];

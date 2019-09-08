@@ -84,15 +84,15 @@ $(function () {
                         if (reviewers.length==0){
                             reviewers=`无`;
                         }
-
-
+                        let time=dayjs(data[i].CreateTime).format('YYYY年MM月DD日');
+                        console.log(time);
                         tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td>` + data[i].Content + `</td>
+                                    <td width="320px;">` + data[i].Content + `</td>
                                     <td>` + data[i].Role + `</td>
                                     <td>` + choices + `</td>
                                     <td>` + data[i].Answer + `</td>
-                                    <td>` + data[i].CreateTime + `</td>
+                                    <td>` + time + `</td>
                                     <td>` + data[i].Review + `</td>
                                     <td>` + reviewers + `</td>
                                 </tr>`;
@@ -122,6 +122,7 @@ $(function () {
     });
     $('a[role-tab="center"]').on('hide.bs.tab', (e) => {
         let id = $(e.target).attr('href');
+        console.log(id);
         $(id).addClass("hidden")
     });
 });

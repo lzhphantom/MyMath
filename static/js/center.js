@@ -68,7 +68,6 @@ $(function () {
             $("#trainingHistory").addClass("hidden");
             $("#noPassQuestion").addClass("hidden");
             $.get("/center/uploadRecord", (data, status, xhr) => {
-                console.log(data);
                 if (xhr.status === 200) {
                     let tbody = ``;
                     for (let i = 0; i < data.length; i++) {
@@ -124,6 +123,11 @@ $(function () {
                 }
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, "uploadRecord"]);
             });
+        }
+        if(id==="#personal"){
+            $("#trainingHistory").addClass("hidden");
+            $("#uploadRecord").addClass("hidden");
+            $("#noPassQuestion").addClass("hidden");
         }
     });
 

@@ -108,8 +108,8 @@ func (c *LoginController) GetQuestionReview() {
 	o := orm.NewOrm()
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
-	o.QueryTable("question").Filter("review__lt", 3).All(&questions)
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o.QueryTable("question").Filter("review__lt", 3).Exclude("user_id", loginUser.Id).All(&questions)
 Loop:
 	for i := 0; i < len(questions); i++ {
 		var records []models.QuestionReviewRecord
@@ -200,8 +200,35 @@ func (c *LoginController) PassQuestionReview() {
 // @router /center [get]
 func (c *LoginController) Center() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	var userInfo models.UserInfo
+	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+	if err != nil {
+		logs.Warning("获取个人信息失败", err)
+	} else {
+		logs.Info("获取个人信息成功")
+	}
+	var user models.User
+	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
+	if err != nil {
+		logs.Warning("获取失败", err)
+	}
+	var sex string
+	if userInfo.Sex == 1 {
+		sex = "男"
+	} else {
+		sex = "女"
+	}
+	info := common.UserInfo{
+		user.UserName,
+		userInfo.Name,
+		sex,
+		userInfo.Tel,
+		userInfo.Address,
+	}
 	c.Data["user"] = loginUser
 	c.Data["isExist"] = true
+	c.Data["info"] = info
 	c.TplName = "user/center.html"
 }
 

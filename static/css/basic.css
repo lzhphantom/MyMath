@@ -13,3 +13,14 @@ a:hover{
 li{
     list-style: none;
 }
+
+#personal form{
+    margin-top: 20px;
+}
+#personal form h1{
+    margin-bottom: 35px;
+}
+
+#personal form div span{
+    font-size: 20px;
+}

@@ -8,6 +8,14 @@ type LoginUser struct {
 	Role int
 }
 
+type UserInfo struct {
+	LoginName string
+	UserName  string
+	Sex       string
+	Tel       string
+	Address   string
+}
+
 type SingleUserTrainingHistory struct {
 	Content    string
 	Role       string

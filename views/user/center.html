@@ -21,29 +21,52 @@
                 <h1 class="text-muted text-right"><span class="small">--lzhphantom-Math</span></h1>
             </div>
             <div id="personal" class="hidden">
-                <form class="text-center form-horizontal">
+                <form class="col-xs-12 form-horizontal">
+                    <div><h1 class="text-muted text-center">个人信息详情</h1></div>
                     <div class="form-group">
-                        <label for="loginName">登录名：</label>
-                        <input type="text" id="loginName" value="123">
+                        <div class="row">
+                            <label class="control-label col-xs-4">登录名：</label>
+                            <div class="col-xs-8">
+                                <span>{{.info.LoginName}}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="name">姓名：</label>
-                        <input type="text" id="name" value="sdf">
+                        <div class="row">
+                            <label class="control-label col-xs-4">姓名：</label>
+                            <div class="col-xs-8">
+                                <span>{{.user.Name}}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="sex">性别：</label>
-                        <input type="text" id="sex" value="男">
+                        <div class="row">
+                            <label class="control-label col-xs-4">性别：</label>
+                            <div class="col-xs-8">
+                                <span>
+                                    {{.info.Sex}}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="tel">联系电话：</label>
-                        <input type="text" id="tel" value="13568218369">
+                        <div class="row">
+                            <label class="control-label col-xs-4">联系电话：</label>
+                            <div class="col-xs-8">
+                                <span>{{.info.Tel}}</span>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label for="address">地址</label>
-                        <input type="text" id="address" value="sdfasdf">
+                        <div class="row">
+                            <label class="control-label col-xs-4">地址：</label>
+                            <div class="col-xs-8">
+                                <span>{{.info.Address}}</span>
+                            </div>
+                        </div>
                     </div>
                 </form>
-
             </div>
             <div id="trainingHistory" class="hidden">
 

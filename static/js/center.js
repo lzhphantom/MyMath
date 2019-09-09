@@ -131,4 +131,76 @@ $(function () {
         }
     });
 
+    $("#changeInfo").on('click',()=>{
+       $.get('/center/getPersonalInfo',(data,status,xhr)=>{
+           if(xhr.status==200){
+               $("#personal").empty().append(`
+        <form class="col-xs-12 form-horizontal">
+                    <div><h1 class="text-muted text-center">个人信息详情修改</h1></div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">登录名：</label>
+                            <div class="col-xs-8">
+                                <span>
+                                    `+data.LoginName+`
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">姓名：</label>
+                            <div class="col-xs-8">
+                                <input type="text" value="`+data.UserName+`" name="UserName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">性别：</label>
+                            <div class="col-xs-8">
+                                <span>
+                                    `+data.Sex+`
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">联系电话：</label>
+                            <div class="col-xs-8">
+                                <input type="text" value="`+data.Tel+`" maxlength="11" name="Tel">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">地址：</label>
+                            <div class="col-xs-8">
+                                <div data-toggle="personalAddress">
+                                    <select data-province="---- 选择省 ----" name="province"></select>
+                                    <select data-city="---- 选择市 ----" name="city"></select>
+                                    <select data-district="---- 选择区 ----" name="street"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-8">
+                                <button type="submit" class="btn btn-lg btn-warning">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>`);
+               $("#personalAddress").distpicker({
+                   provice:'四川省',
+                   city:'成都市',
+                   district:'春熙路',
+               });
+           }
+       })
+    });
+
 });

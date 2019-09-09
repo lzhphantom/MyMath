@@ -232,6 +232,40 @@ func (c *LoginController) Center() {
 	c.TplName = "user/center.html"
 }
 
+//获取个人信息
+// @router /center/getPersonalInfo [get]
+func (c *LoginController) GetPersonalInfo() {
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	var userInfo models.UserInfo
+	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+	if err != nil {
+		logs.Warning("获取个人信息失败", err)
+	} else {
+		logs.Info("获取个人信息成功")
+	}
+	var user models.User
+	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
+	if err != nil {
+		logs.Warning("获取失败", err)
+	}
+	var sex string
+	if userInfo.Sex == 1 {
+		sex = "男"
+	} else {
+		sex = "女"
+	}
+	info := common.UserInfo{
+		user.UserName,
+		userInfo.Name,
+		sex,
+		userInfo.Tel,
+		userInfo.Address,
+	}
+	c.Data["json"] = info
+	c.ServeJSON()
+}
+
 //个人做题记录
 // @router /center/trainingHistory [get]
 func (c *LoginController) TrainingHistory() {

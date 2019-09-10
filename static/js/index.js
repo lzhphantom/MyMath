@@ -189,6 +189,27 @@ $(function () {
         $('a[role-tab="upload"]').on("show.bs.tab", (e) => {
             let target = $(e.target).attr("href");
             $(target).removeClass("hidden");
+            if (target === "#UploadSelect") {
+                $.get("/admin/basicCommon", (data, status, xhr) => {
+                    if (xhr.status === 200) {
+                        let options = ``;
+                        for (let i = 0; i < data.length; i++) {
+                            options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>`;
+                        }
+                        $("#selectQuestionRole").empty().append(options)
+                    }
+                })
+            } else if (target === "#UploadBlank") {
+                $.get("/admin/basicCommon", (data, status, xhr) => {
+                    if (xhr.status === 200) {
+                        let options = ``;
+                        for (let i = 0; i < data.length; i++) {
+                            options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>`;
+                        }
+                        $("#blankQuestionRole").empty().append(options)
+                    }
+                })
+            }
         });
         $('a[role-tab="upload"]').on("hide.bs.tab", (e) => {
             let target = $(e.target).attr("href");
@@ -196,6 +217,7 @@ $(function () {
         });
         $("#mulChoiceUpBtn").on("click", () => {
             let allSelect = $("#UploadSelect").find("a[id^=showSelect]");
+            let role = $("#selectQuestionRole").val();
             let select;
             let choice = "";
             let choiceNum = 0;
@@ -226,6 +248,7 @@ $(function () {
                                 content: content,
                                 choices: choice,
                                 answer: ans,
+                                role: role,
                             }),
                             role: 1,
                         },
@@ -246,8 +269,10 @@ $(function () {
                 alert("无可上传的内容");
             } else {
                 let content = $(blank).attr("data-content");
+                let role = $("#blankQuestionRole").val();
                 let db = {
                     content: content,
+                    role: role,
                 };
                 let ans = $("#showAnswerSolve");
                 if (typeof ($(ans).attr("data-content")) !== "undefined") {
@@ -1327,7 +1352,7 @@ function ChangeReview(id, controls) {
                     let choice = "";
                     let choiceNum = 0;
                     for (let i = 0; i < allSelect.length; i++) {
-                        if (typeof ($(allSelect[i]).attr("data-content")) !== "undefined" && $(allSelect[i]).attr("data-content").length>0) {
+                        if (typeof ($(allSelect[i]).attr("data-content")) !== "undefined" && $(allSelect[i]).attr("data-content").length > 0) {
                             choice += $(allSelect[i]).attr("data-content") + "~￥";
                             choiceNum++;
                         }
@@ -1340,7 +1365,7 @@ function ChangeReview(id, controls) {
                         content: content,
                         choices: choice,
                         ans: answer,
-                        role:data.Role,
+                        role: data.Role,
                     };
                 } else {
                     let content = $("#showChangeContent").attr("data-content");
@@ -1348,14 +1373,14 @@ function ChangeReview(id, controls) {
                     changeData = {
                         content: content,
                         ans: answer,
-                        role:data.Role,
+                        role: data.Role,
                     }
                 }
                 $.post(
-                    "/changeQuestion/"+data.Id,
+                    "/changeQuestion/" + data.Id,
                     changeData,
-                    (data,status,xhr)=>{
-                        if(xhr.status===200){
+                    (data, status, xhr) => {
+                        if (xhr.status === 200) {
                             getQuestionReview(controls);
                         }
                     });

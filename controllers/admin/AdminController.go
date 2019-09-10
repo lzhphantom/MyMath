@@ -388,6 +388,13 @@ func (c *AdminController) UploadQuestion() {
 	if answer, ok := dataMap["answer"].(string); ok {
 		newQuestion.Answer = answer
 	}
+	idRole, err := strconv.Atoi(dataMap["role"].(string))
+	if err != nil {
+		logs.Warning("role 不是数字", err)
+	}
+	newQuestion.BasicCommon = &models.BasicCommon{
+		Id: idRole,
+	}
 	logs.Debug(newQuestion)
 
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)

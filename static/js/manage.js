@@ -28,15 +28,42 @@ $(function () {
     $("#blankType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#blankUp").removeClass("hidden");
+        $.get("/admin/basicCommon", (data, status, xhr) => {
+            if (xhr.status === 200) {
+                let options = ``;
+                for (let i = 0; i < data.length; i++) {
+                    options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
+                }
+                $("#blankQuestionRole").empty().append(options);
+            }
+        });
     });
 
     $("#mulChoiceType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#mulChoiceUp").removeClass("hidden");
+        $.get("/admin/basicCommon", (data, status, xhr) => {
+            if (xhr.status === 200) {
+                let options = ``;
+                for (let i = 0; i < data.length; i++) {
+                    options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
+                }
+                $("#selectQuestionRole").empty().append(options);
+            }
+        });
     });
     $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
+        $.get("/admin/basicCommon", (data, status, xhr) => {
+            if (xhr.status === 200) {
+                let options = ``;
+                for (let i = 0; i < data.length; i++) {
+                    options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
+                }
+                $("#solveQuestionRole").empty().append(options);
+            }
+        });
     });
 
     $("a[role-tab='rank']").on('show.bs.tab', () => {
@@ -218,9 +245,11 @@ $(function () {
             alert("无可上传的内容");
         } else {
             let content = $(blank).attr("data-content");
+            let role = $("#blankQuestionRole").val();
             if (content.length > 0) {
                 let db = {
                     content: content,
+                    role: role,
                 }
                 let ans = $("#showAnswerBlank");
                 if (typeof ($(ans).attr("data-content")) !== "undefined") {
@@ -249,8 +278,10 @@ $(function () {
             alert("无可上传的内容");
         } else {
             let content = $(blank).attr("data-content");
+            let role = $("#solveQuestionRole").val();
             let db = {
                 content: content,
+                role: role,
             };
             let ans = $("#showAnswerSolve");
             if (typeof ($(ans).attr("data-content")) !== "undefined") {
@@ -298,6 +329,7 @@ $(function () {
             alert("选择数量不足")
         } else {
             let content = $(select).attr("data-content");
+            let role = $("#selectQuestionRole").val();
             let ans = $("#showAnswerSelect").val();
             if (content.length > 0) {
                 $.post(
@@ -307,6 +339,7 @@ $(function () {
                             content: content,
                             choices: choice,
                             answer: ans,
+                            role: role,
                         }),
                         role: 1,
                     },

@@ -392,17 +392,15 @@ func (c *AdminController) UploadQuestion() {
 	if err != nil {
 		logs.Warning("role 不是数字", err)
 	}
-	newQuestion.BasicCommon = &models.BasicCommon{
-		Id: idRole,
-	}
-	logs.Debug(newQuestion)
 
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	newQuestion.User = &models.User{
 		Id: loginUser.Id,
 	}
 	o := orm.NewOrm()
-	newQuestion.BasicCommon = &models.BasicCommon{}
+	newQuestion.BasicCommon = &models.BasicCommon{
+		Id: idRole,
+	}
 	_, err = o.Insert(&newQuestion)
 	if err != nil {
 		logs.Debug("插入失败：", err)

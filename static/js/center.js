@@ -135,7 +135,7 @@ $(function () {
        $.get('/center/getPersonalInfo',(data,status,xhr)=>{
            if(xhr.status==200){
                $("#personal").empty().append(`
-        <form class="col-xs-12 form-horizontal">
+        <form class="col-xs-12 form-horizontal" method="post" action="/center/changePersonalInfo">
                     <div><h1 class="text-muted text-center">个人信息详情修改</h1></div>
                     <div class="form-group">
                         <div class="row">
@@ -178,10 +178,10 @@ $(function () {
                         <div class="row">
                             <label class="control-label col-xs-4">地址：</label>
                             <div class="col-xs-8">
-                                <div data-toggle="personalAddress">
-                                    <select data-province="---- 选择省 ----" name="province"></select>
-                                    <select data-city="---- 选择市 ----" name="city"></select>
-                                    <select data-district="---- 选择区 ----" name="street"></select>
+                                <div id="personalAddress">
+                                    <select name="province"></select>
+                                    <select name="city"></select>
+                                    <select name="street"></select>
                                 </div>
                             </div>
                         </div>
@@ -194,10 +194,13 @@ $(function () {
                         </div>
                     </div>
                 </form>`);
+                let str=data.Address
+               let arr=str.split(" ")
+               console.log(arr);
                $("#personalAddress").distpicker({
-                   provice:'四川省',
-                   city:'成都市',
-                   district:'春熙路',
+                   province:arr[0],
+                   city:arr[1],
+                   district:arr[2],
                });
            }
        })

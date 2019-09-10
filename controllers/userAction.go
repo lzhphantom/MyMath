@@ -266,6 +266,39 @@ func (c *LoginController) GetPersonalInfo() {
 	c.ServeJSON()
 }
 
+// @router /center/changePersonalInfo [post]
+func (c *LoginController) ChangePersonalInfo() {
+	userName := c.GetString("UserName")
+	tel := c.GetString("Tel")
+	province := c.GetString("province")
+	city := c.GetString("city")
+	street := c.GetString("street")
+	o := orm.NewOrm()
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	if loginUser.Name != userName {
+		loginUser.Name = userName
+		c.SetSession(common.KeyLoginUser, loginUser)
+	}
+	var userInfo models.UserInfo
+	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+	if err != nil {
+		logs.Warning("获取个人信息失败", err)
+	}
+	userInfo.Name = userName
+	userInfo.Tel = tel
+	address := province + " " + city + " " + street
+	userInfo.Address = address
+	num, err := o.Update(&userInfo, "name", "tel", "address")
+	if err != nil {
+		logs.Warning("个人信息更新失败", err)
+	} else {
+		logs.Info("更新成功", num)
+	}
+
+	c.Redirect("/center", 302)
+
+}
+
 //个人做题记录
 // @router /center/trainingHistory [get]
 func (c *LoginController) TrainingHistory() {

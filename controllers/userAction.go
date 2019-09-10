@@ -395,3 +395,84 @@ func (c *LoginController) UploadRecord() {
 
 	c.ServeJSON()
 }
+
+// @router /getQuestion/:id [get]
+func (c *LoginController) GetQuestion() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		logs.Warning(":id参数不为数字", err)
+	}
+	o := orm.NewOrm()
+	question := models.Question{
+		Id: id,
+	}
+	err = o.Read(&question)
+
+	if err != nil {
+		logs.Warning("读取失败", err)
+	}
+
+	if question.RoleQuestion == 1 {
+		choices := strings.Split(question.Choices, "~￥")
+		for i := 0; i < len(choices); i++ {
+			if len(choices[i]) == 0 {
+				choices = append(choices[:i], choices[i+1:]...)
+			}
+		}
+		viewQuestion := common.ChangeQuestion{
+			Id:       question.Id,
+			Content:  question.Content,
+			Addition: choices,
+			Answer:   question.Answer,
+			Role:     int(question.RoleQuestion),
+		}
+		c.Data["json"] = viewQuestion
+	} else {
+		viewQuestion := common.ChangeQuestion{
+			Id:      question.Id,
+			Content: question.Content,
+			Answer:  question.Answer,
+			Role:    int(question.RoleQuestion),
+		}
+		c.Data["json"] = viewQuestion
+	}
+	c.ServeJSON()
+
+}
+
+// @router /changeQuestion/:id [post]
+func (c *LoginController) ChangeQuestion() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		logs.Warning(":id 非数字", err)
+	}
+	role, err := strconv.Atoi(c.GetString("role"))
+	if err != nil {
+		logs.Warning("role 非数字", err)
+	}
+	content := c.GetString("content")
+	answer := c.GetString("ans")
+
+	o := orm.NewOrm()
+	question := models.Question{
+		Id: id,
+	}
+	err = o.Read(&question)
+	if err != nil {
+		logs.Warning("该条数据不存在")
+	}
+	question.Content = content
+	question.Answer = answer
+	if role == 1 {
+		question.Choices = c.GetString("choices")
+	}
+
+	num, err := o.Update(&question, "content", "choices", "answer")
+	if err != nil {
+		logs.Warning("题目更新失败", err)
+	} else {
+		logs.Info("更新成功", num)
+	}
+	c.ServeJSON()
+
+}

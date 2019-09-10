@@ -389,7 +389,7 @@ function regularEditorContent(data) {
             for (let j = 0; j < newArr.length; j++) {
                 if (newArr !== "" && j !== newArr.length - 1) {
                     newString += newArr[j] + ",\\\\";
-                }else {
+                } else {
                     newString += newArr[j];
                 }
             }
@@ -469,6 +469,41 @@ function backToLast(backGroup, editorName) {
             let content = $(selectD).attr("data-content");
             if (content.length > 0) {
                 $("#showAnswerSelect").append(`<option value="` + content + `">D</option>`)
+            }
+
+        }
+
+    }
+
+    if (showContentName === "#showSelectChangeA" || showContentName === "#showSelectChangeB"
+        || showContentName === "#showSelectChangeC" || showContentName === "#showSelectChangeD") {
+        let selectA = $("#showSelectChangeA");
+        let selectB = $("#showSelectChangeB");
+        let selectC = $("#showSelectChangeC");
+        let selectD = $("#showSelectChangeD");
+        $("#showAnswerChangeSelect").empty();
+        if (typeof ($(selectA).attr("data-content")) !== "undefined") {
+            let content = $(selectA).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerChangeSelect").append(`<option value="` + content + `">A</option>`)
+            }
+        }
+        if (typeof ($(selectB).attr("data-content")) !== "undefined") {
+            let content = $(selectB).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerChangeSelect").append(`<option value="` + content + `">B</option>`)
+            }
+        }
+        if (typeof ($(selectC).attr("data-content")) !== "undefined") {
+            let content = $(selectC).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerChangeSelect").append(`<option value="` + content + `">C</option>`)
+            }
+        }
+        if (typeof ($(selectD).attr("data-content")) !== "undefined") {
+            let content = $(selectD).attr("data-content");
+            if (content.length > 0) {
+                $("#showAnswerChangeSelect").append(`<option value="` + content + `">D</option>`)
             }
 
         }
@@ -1144,10 +1179,6 @@ function commitPractice(sp, role) {
         });
 }
 
-function UNACTION() {
-    alert("该功能正在修建中...");
-}
-
 function getQuestionReview(controls) {
     $.get("/getQuestionReview", (data) => {
         let tbody = ``;
@@ -1176,7 +1207,7 @@ function getQuestionReview(controls) {
                         <td>` + data[i].Answer + `</td>
                         <td>` + data[i].ViewNum + `</td>
                         <td>` + reviewer + `</td>
-                        <td><a class="btn btn-warning" href="javascript:void(0);" >修改</a></td>
+                        <td><a class="btn btn-warning" href="javascript:void(0);" onclick="ChangeReview(` + data[i].Id + `,'` + controls + `')">修改</a></td>
                         <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + data[i].Id + `,'` + controls + `')">通过</a></td>
                     </tr>`
         }
@@ -1200,6 +1231,137 @@ function getQuestionReview(controls) {
                     </table>`);
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
     })
+}
+
+function ChangeReview(id, controls) {
+    $.get("/getQuestion/" + id, (data, status, xhr) => {
+        if (xhr.status == 200) {
+            console.log(data);
+            let other = ``;
+            if (data.Role === 1) {
+                other = `<div class="form-group row">
+                            <label for="showSelectChangeA" class="col-sm-1 control-label">A.</label>
+                            <div class="col-sm-5">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showSelectChangeA" data-content="` + data.Addition[0] + `">` + data.Addition[0] + `</a>
+                            </div>
+                            <label for="showSelectChangeB" class="col-sm-1 control-label">B.</label>
+                            <div class="col-sm-5">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showSelectChangeB" data-content="` + data.Addition[1] + `">` + data.Addition[1] + `</a>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="showSelectChangeC" class="col-sm-1 control-label">C.</label>
+                            <div class="col-sm-5">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showSelectChangeC" data-content="` + data.Addition[2] + `">` + data.Addition[2] + `</a>
+                            </div>
+                            <label for="showSelectChangeD" class="col-sm-1 control-label">D.</label>
+                            <div class="col-sm-5">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showSelectChangeD" data-content="` + data.Addition[3] + `">` + data.Addition[3] + `</a>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="showAnswerChangeSelect" class="col-sm-1 control-label">答案：</label>
+                            <div class="col-sm-5">
+                                <select id="showAnswerChangeSelect">
+                                    <option value="` + data.Addition[0] + `" ` + (data.Addition[0] === data.Answer ? "selected='selected'" : "") + `>A</option>
+                                    <option value="` + data.Addition[1] + `" ` + (data.Addition[1] === data.Answer ? "selected='selected'" : "") + `>B</option>
+                                    <option value="` + data.Addition[2] + `" ` + (data.Addition[2] === data.Answer ? "selected='selected'" : "") + `>C</option>
+                                    <option value="` + data.Addition[3] + `" ` + (data.Addition[3] === data.Answer ? "selected='selected'" : "") + `>D</option>
+                                </select>
+                            </div>
+                        </div>`;
+            } else {
+                other = `<div class="form-group row">
+                            <label for="showAnswerChange" class="col-sm-2 control-label">答案：</label>
+                            <div class="col-sm-10">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showAnswerChange" title="可填" data-content="` + data.Answer + `">` + data.Answer + `</a>
+                            </div>
+                        </div>`;
+            }
+            $(controls).empty().append(`
+                    <h1 class="text-center text-muted">试题修改</h1>
+                    <form action="" class="text-muted">
+                        <div class="form-group row">
+                            <label for="showChangeContent" class="col-sm-2 control-label">题目：</label>
+                            <div class="col-sm-10">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
+                                   id="showChangeContent" data-content="` + data.Content + `">` + data.Content + `</a>
+                            </div>
+                        </div>
+                        ` + other + `
+                        <div class="form-group">
+                            <textarea name="content" id="changeEditor" class="hidden"></textarea>
+                        </div>
+                        <div class="form-group row" id="backChangeGroup">
+                            <div class="col-md-3 col-md-offset-9">
+                                <a class="btn btn-warning btn-lg" id="changeBtn">修改</a>
+                            </div>
+                            <div class="col-md-3 col-md-offset-9 hidden">
+                                <a class="btn btn-primary btn-lg"
+                                   onclick="backToLast('#backChangeGroup','#changeEditor');">确认</a>
+                            </div>
+                        </div>
+
+                    </form>
+                `);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
+
+            $("#changeBtn").on("click", () => {
+                let changeData;
+                if (data.Role === 1) {
+                    let content = $("#showChangeContent").attr("data-content");
+                    let answer = $("#showAnswerChangeSelect").val();
+
+                    let allSelect = $(controls).find("a[id^=showSelectChange]");
+                    let choice = "";
+                    let choiceNum = 0;
+                    for (let i = 0; i < allSelect.length; i++) {
+                        if (typeof ($(allSelect[i]).attr("data-content")) !== "undefined" && $(allSelect[i]).attr("data-content").length>0) {
+                            choice += $(allSelect[i]).attr("data-content") + "~￥";
+                            choiceNum++;
+                        }
+                    }
+                    if (choiceNum < 4) {
+                        alert("选项不充足");
+                        return
+                    }
+                    changeData = {
+                        content: content,
+                        choices: choice,
+                        ans: answer,
+                        role:data.Role,
+                    };
+                } else {
+                    let content = $("#showChangeContent").attr("data-content");
+                    let answer = $("#showAnswerChange").attr("data-content");
+                    changeData = {
+                        content: content,
+                        ans: answer,
+                        role:data.Role,
+                    }
+                }
+                $.post(
+                    "/changeQuestion/"+data.Id,
+                    changeData,
+                    (data,status,xhr)=>{
+                        if(xhr.status===200){
+                            getQuestionReview(controls);
+                        }
+                    });
+            });
+        }
+    });
 }
 
 function QuestionReviewPass(id, controls) {

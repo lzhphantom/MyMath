@@ -4,6 +4,10 @@ function notLogin() {
     $("#login").modal("show");
 }
 
+function UNACTION() {
+    alert("该功能正在修建中...");
+}
+
 /**
  * 参数说明：
  * number：要格式化的数字

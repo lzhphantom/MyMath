@@ -54,3 +54,11 @@ type AnswerRanking struct {
 	Accuracy float64
 	Name     string
 }
+
+type ChangeQuestion struct {
+	Id       int
+	Content  string
+	Addition []string
+	Answer   string
+	Role     int
+}

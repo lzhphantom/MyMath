@@ -1,4 +1,5 @@
 $(function () {
+    $('[data-toggle="popover"]').popover();
     let mathBasic = document.getElementById("math_basic");
     $('#collapseOne').on('show.bs.collapse', function () {
         $("#collapseTwo").collapse('hide');

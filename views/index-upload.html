@@ -1,0 +1,109 @@
+<div id="Upload">
+    <div id="UploadSelect" class="hidden">
+        <h1 class="text-center text-muted">选择题上传</h1>
+        <form action="" class="text-muted">
+            <div class="form-group row">
+                <label for="showSelectContent" class="col-sm-2 control-label">题目：</label>
+                <div class="col-sm-10">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#selectEditor','#backSelectGroup');"
+                       id="showSelectContent">暂无内容</a>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="showSelectA" class="col-sm-1 control-label">A.</label>
+                <div class="col-sm-5">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#selectEditor','#backSelectGroup');"
+                       id="showSelectA">暂无内容</a>
+                </div>
+                <label for="showSelectB" class="col-sm-1 control-label">B.</label>
+                <div class="col-sm-5">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#selectEditor','#backSelectGroup');"
+                       id="showSelectB">暂无内容</a>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="showSelectC" class="col-sm-1 control-label">C.</label>
+                <div class="col-sm-5">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#selectEditor','#backSelectGroup');"
+                       id="showSelectC">暂无内容</a>
+                </div>
+                <label for="showSelectD" class="col-sm-1 control-label">D.</label>
+                <div class="col-sm-5">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#selectEditor','#backSelectGroup');"
+                       id="showSelectD">暂无内容</a>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="showAnswerSelect" class="col-sm-1 control-label">答案：</label>
+                <div class="col-sm-5">
+                    <select id="showAnswerSelect">
+                        <option value="-">==暂无答案==</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-1 control-label">类型：</label>
+                <div class="col-sm-10">
+                    <select id="selectQuestionRole"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea name="content" id="selectEditor" class="hidden"></textarea>
+            </div>
+            <div class="form-group row" id="backSelectGroup">
+                <div class="col-md-3 col-md-offset-9">
+                    <a class="btn btn-primary btn-lg" id="mulChoiceUpBtn">上传</a>
+                </div>
+                <div class="col-md-3 col-md-offset-9 hidden">
+                    <a class="btn btn-primary btn-lg"
+                       onclick="backToLast('#backSelectGroup','#selectEditor');">确认</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div id="UploadBlank" class="hidden">
+        <h1 class="text-center text-muted">非选择题上传</h1>
+        <form class="text-muted">
+            <div class="form-group row">
+                <label for="showSolve" class="col-sm-2 control-label">题目：</label>
+                <div class="col-sm-10">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#solveEditor','#backSolveGroup');"
+                       id="showSolve">暂无内容</a>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="showAnswerSolve" class="col-sm-2 control-label">答案：</label>
+                <div class="col-sm-10">
+                    <a href="javascript:void(0);"
+                       onclick="showEditor(this,'#solveEditor','#backSolveGroup');"
+                       id="showAnswerSolve" title="可填">暂无内容</a>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 control-label">类型：</label>
+                <div class="col-sm-10">
+                    <select id="blankQuestionRole"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea name="content" id="solveEditor" class="hidden"></textarea>
+            </div>
+            <div class="form-group row" id="backSolveGroup">
+                <div class="col-md-3 col-md-offset-9">
+                    <a class="btn btn-primary btn-lg" id="solveUpBtn">上传</a>
+                </div>
+                <div class="col-md-3 col-md-offset-9 hidden">
+                    <a class="btn btn-primary btn-lg"
+                       onclick="backToLast('#backSolveGroup','#solveEditor');">确认</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

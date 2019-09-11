@@ -62,3 +62,37 @@ type ChangeQuestion struct {
 	Answer   string
 	Role     int
 }
+
+type BasicCommonReview struct {
+	Id                int
+	Role              string
+	Content           string
+	Review            int
+	TestReviews       []TestReview
+	HDifficultReviews []HDifficultReview
+	FormulaReviews    []FormulaReview
+	KnowledgeReviews  []KnowledgeReview
+}
+
+type TestReview struct {
+	Id      int
+	Content string
+	Review  int
+}
+
+type HDifficultReview struct {
+	Id      int
+	Content string
+	Review  int
+}
+
+type FormulaReview struct {
+	Id      int
+	Content string
+	Review  int
+}
+type KnowledgeReview struct {
+	Id      int
+	Content string
+	Review  int
+}

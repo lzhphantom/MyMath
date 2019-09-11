@@ -476,3 +476,90 @@ func (c *LoginController) ChangeQuestion() {
 	c.ServeJSON()
 
 }
+
+//获取需要审核的基础知识
+// @router /getBasicReview [get]
+func (c *LoginController) GetBasicReview() {
+	o := orm.NewOrm()
+	var basicContets []models.BasicContent
+	_, err := o.QueryTable("basic_content").RelatedSel().All(&basicContets)
+	if err != nil {
+		logs.Warning("获取basicCommon失败")
+	}
+	basicReviews := make([]common.BasicCommonReview, 0)
+	for i := 0; i < len(basicContets); i++ {
+		basicReview := common.BasicCommonReview{
+			Id:      basicContets[i].Id,
+			Role:    basicContets[i].Title,
+			Content: basicContets[i].Concept,
+			Review:  basicContets[i].Review,
+		}
+		var knowledges []*models.KnowledgeImportant
+		_, err := o.QueryTable("knowledge_important").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&knowledges)
+		if err != nil {
+			logs.Warning("知识点获取失败")
+		}
+		knowReviews := make([]common.KnowledgeReview, 0)
+		for k := 0; k < len(knowledges); k++ {
+
+			knowReview := common.KnowledgeReview{
+				Id:      knowledges[k].Id,
+				Content: knowledges[k].Content,
+				Review:  knowledges[k].Review,
+			}
+			knowReviews = append(knowReviews, knowReview)
+		}
+		basicReview.KnowledgeReviews = knowReviews
+
+		var formulas []*models.Formula
+		_, err = o.QueryTable("formula").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&formulas)
+		if err != nil {
+			logs.Warning("获取公式失败")
+		}
+		formulaReviews := make([]common.FormulaReview, 0)
+		for k := 0; k < len(formulas); k++ {
+			formulaReview := common.FormulaReview{
+				Id:      formulas[k].Id,
+				Content: formulas[k].Content,
+				Review:  formulas[k].Review,
+			}
+			formulaReviews = append(formulaReviews, formulaReview)
+		}
+		basicReview.FormulaReviews = formulaReviews
+
+		var hds []*models.HDifficulty
+		_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&hds)
+		if err != nil {
+			logs.Warning("重难点获取失败")
+		}
+		hdReviews := make([]common.HDifficultReview, 0)
+		for k := 0; k < len(hds); k++ {
+			hdReview := common.HDifficultReview{
+				Id:      hds[k].Id,
+				Content: hds[k].Content,
+				Review:  hds[k].Review,
+			}
+			hdReviews = append(hdReviews, hdReview)
+		}
+		basicReview.HDifficultReviews = hdReviews
+
+		var tests []*models.ExaminationCenter
+		_, err = o.QueryTable("examination_center").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&tests)
+		if err != nil {
+			logs.Warning("考点获取失败")
+		}
+		testReviews := make([]common.TestReview, 0)
+		for k := 0; k < len(tests); k++ {
+			testReview := common.TestReview{
+				Id:      tests[k].Id,
+				Content: tests[k].Content,
+				Review:  tests[k].Review,
+			}
+			testReviews = append(testReviews, testReview)
+		}
+		basicReview.TestReviews = testReviews
+		basicReviews = append(basicReviews, basicReview)
+	}
+	c.Data["json"] = basicReviews
+	c.ServeJSON()
+}

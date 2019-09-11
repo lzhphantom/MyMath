@@ -40,3 +40,15 @@ function number_format(number, decimals, dec_point, thousands_sep) {
     }
     return s.join(dec);
 }
+
+function delPagraph(text) {
+    let arr=text.split(/<p>|<\/p>/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+
+    return arr.join("");
+}

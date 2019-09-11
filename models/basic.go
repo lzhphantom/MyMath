@@ -37,6 +37,7 @@ type KnowledgeImportant struct {
 	Id           int
 	Content      string
 	BasicContent *BasicContent `orm:"rel(fk)"`
+	Review       int           `description:"大于等于3，审核完毕"`
 }
 
 //相关公式
@@ -44,6 +45,7 @@ type Formula struct {
 	Id           int
 	Content      string
 	BasicContent *BasicContent `orm:"rel(fk)"`
+	Review       int           `description:"大于等于3，审核完毕"`
 }
 
 //考点
@@ -51,6 +53,7 @@ type ExaminationCenter struct {
 	Id           int
 	Content      string
 	BasicContent *BasicContent `orm:"rel(fk)"`
+	Review       int           `description:"大于等于3，审核完毕"`
 }
 
 //重难点
@@ -58,4 +61,5 @@ type HDifficulty struct {
 	Id           int
 	Content      string
 	BasicContent *BasicContent `orm:"rel(fk)"`
+	Review       int           `description:"大于等于3，审核完毕"`
 }

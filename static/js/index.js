@@ -1,5 +1,4 @@
 $(function () {
-    $('[data-toggle="popover"]').popover();
     let mathBasic = document.getElementById("math_basic");
     $('#collapseOne').on('show.bs.collapse', function () {
         $("#collapseTwo").collapse('hide');
@@ -315,9 +314,9 @@ $(function () {
             let target = $(e.target).attr("href");
             $(target).removeClass("hidden");
             if (target === "#QuestionReview") {
-                getQuestionReview(target)
+                getQuestionReview(target);
             } else if (target === "#KnowledgeReview") {
-
+                getBasicReview(target);
             }
         });
         $('a[role-tab="review"]').on("hide.bs.tab", (e) => {
@@ -1257,6 +1256,111 @@ function getQuestionReview(controls) {
                     </table>`);
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
     })
+}
+
+function getBasicReview(controls) {
+    $.get("/getBasicReview", (data, status, xhr) => {
+        if (xhr.status == 200) {
+            let tbody = ``
+            for (let i = 0; i < data.length; i++) {
+                let formulas = ``;
+                for (let k = 0; k < data[i].FormulaReviews.length; k++) {
+                    formulas += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                                   data-trigger="focus" title="可执行操作"
+                                   data-template="<div class='popover' role='tooltip'>
+                       <div class='arrow'></div>
+                       <h3 class='popover-title'></h3>
+                       <div>
+                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-warning'>修改</a>
+                       </div>
+                       </div>">` + delPagraph(data[i].FormulaReviews[k].Content) + `</a>`;
+                }
+
+                let knowledges = ``;
+                for (let k = 0; k < data[i].KnowledgeReviews.length; k++) {
+                    knowledges += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                                   data-trigger="focus" title="可执行操作"
+                                   data-template="<div class='popover' role='tooltip'>
+                       <div class='arrow'></div>
+                       <h3 class='popover-title'></h3>
+                       <div>
+                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-warning'>修改</a>
+                       </div>
+                       </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content) + `</a>`;
+                }
+
+                let hds = ``;
+                for (let k = 0; k < data[i].HDifficultReviews.length; k++) {
+                    hds += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                                   data-trigger="focus" title="可执行操作" data-placement="top"
+                                   data-template="<div class='popover' role='tooltip'>
+                       <div class='arrow'></div>
+                       <h3 class='popover-title'></h3>
+                       <div>
+                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-warning'>修改</a>
+                       </div>
+                       </div>">` + delPagraph(data[i].HDifficultReviews[k].Content) + `</a>`;
+                }
+
+                let tests = ``;
+                for (let k = 0; k < data[i].TestReviews.length; k++) {
+                    tests += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                                   data-trigger="focus" title="可执行操作"
+                                   data-template="<div class='popover' role='tooltip'>
+                       <div class='arrow'></div>
+                       <h3 class='popover-title'></h3>
+                       <div>
+                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-warning'>修改</a>
+                       </div>
+                       </div>">` + delPagraph(data[i].TestReviews[k].Content) + `</a>`;
+                }
+
+                tbody += `<tr>
+                            <td>` + (i + 1) + `</td>
+                            <td>` + data[i].Role + `</td>
+                            <td>
+                            <a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                                                               data-trigger="focus" title="可执行操作"
+                                                               data-template="<div class='popover' role='tooltip'>
+                                                   <div class='arrow'></div>
+                                                   <h3 class='popover-title'></h3>
+                                                   <div>
+                                                   <a class='btn btn-success'>通过</a>
+                                                   <a class='btn btn-warning'>修改</a>
+                                                   </div>
+                                                   </div>">` + delPagraph(data[i].Content) + `</a>
+                                                   </td>
+                            <td>` + knowledges + `</td>
+                            <td>` + formulas + `</td>
+                            <td>` + tests + `</td>
+                            <td>` + hds + `</td>     
+                           </tr>`;
+            }
+            $(controls).empty().append(`<table class="table table-hover">
+                        <caption><h1 class="text-muted text-center">新增基础知识审核</h1></caption>
+                        <thead>
+                        <tr>
+                            <td>No.</td>
+                            <td>分类</td>
+                            <td>概念</td>
+                            <td>知识点精讲</td>
+                            <td>相关公式</td>
+                            <td>考点</td>
+                            <td>重难点</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ` + tbody + `
+                        </tbody>
+                    </table>`)
+            $('[data-toggle="popover"]').popover();
+            // MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
+        }
+    });
 }
 
 function ChangeReview(id, controls) {

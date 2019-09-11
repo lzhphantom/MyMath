@@ -1265,7 +1265,7 @@ function getBasicReview(controls) {
             for (let i = 0; i < data.length; i++) {
                 let formulas = ``;
                 for (let k = 0; k < data[i].FormulaReviews.length; k++) {
-                    formulas += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                    formulas += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1279,7 +1279,7 @@ function getBasicReview(controls) {
 
                 let knowledges = ``;
                 for (let k = 0; k < data[i].KnowledgeReviews.length; k++) {
-                    knowledges += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                    knowledges += `<a tabindex="0" style="" class="btn btn-default cell_bk" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1293,7 +1293,7 @@ function getBasicReview(controls) {
 
                 let hds = ``;
                 for (let k = 0; k < data[i].HDifficultReviews.length; k++) {
-                    hds += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                    hds += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作" data-placement="top"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1307,7 +1307,7 @@ function getBasicReview(controls) {
 
                 let tests = ``;
                 for (let k = 0; k < data[i].TestReviews.length; k++) {
-                    tests += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                    tests += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1322,8 +1322,8 @@ function getBasicReview(controls) {
                 tbody += `<tr>
                             <td>` + (i + 1) + `</td>
                             <td>` + data[i].Role + `</td>
-                            <td>
-                            <a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
+                            <td class="cell">
+                            <a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
                                                                data-trigger="focus" title="可执行操作"
                                                                data-template="<div class='popover' role='tooltip'>
                                                    <div class='arrow'></div>
@@ -1334,10 +1334,10 @@ function getBasicReview(controls) {
                                                    </div>
                                                    </div>">` + delPagraph(data[i].Content) + `</a>
                                                    </td>
-                            <td>` + knowledges + `</td>
-                            <td>` + formulas + `</td>
-                            <td>` + tests + `</td>
-                            <td>` + hds + `</td>     
+                            <td class="cell">` + knowledges + `</td>
+                            <td class="cell">` + formulas + `</td>
+                            <td class="cell">` + tests + `</td>
+                            <td class="cell">` + hds + `</td>     
                            </tr>`;
             }
             $(controls).empty().append(`<table class="table table-hover">

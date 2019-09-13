@@ -20,16 +20,16 @@ type BasicContent struct {
 	Formula            []*Formula            `orm:"reverse(many)"`
 	ExaminationCenter  []*ExaminationCenter  `orm:"reverse(many)"`
 	HDifficulty        []*HDifficulty        `orm:"reverse(many)"`
-	BasicReviewRecord  []*BasicReviewRecord  `orm:"reverse(many)"`
 	Review             int                   `description:"大于等于3，审核完毕"`
 }
 
 type BasicReviewRecord struct {
-	Id           int
-	Created      time.Time     `orm:"auto_now_add;type(datetime)"`
-	Updated      time.Time     `orm:"auto_now;type(datetime)"`
-	User         *User         `orm:"rel(fk)"`
-	BasicContent *BasicContent `orm:"rel(fk)"`
+	Id      int
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
+	User    *User     `orm:"rel(fk)"`
+	Group   string    `orm:"size(1)"`
+	LinkId  int
 }
 
 //知识点精讲

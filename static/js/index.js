@@ -1271,7 +1271,7 @@ function getBasicReview(controls) {
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-success' onclick='passBasic(` + data[i].FormulaReviews[k].Id + `,70)'>通过</a>
                        <a class='btn btn-warning'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].FormulaReviews[k].Content) + `</a>`;
@@ -1285,7 +1285,7 @@ function getBasicReview(controls) {
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-success' onclick='passBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>通过</a>
                        <a class='btn btn-warning'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content) + `</a>`;
@@ -1299,7 +1299,7 @@ function getBasicReview(controls) {
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-success' onclick='passBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>通过</a>
                        <a class='btn btn-warning'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].HDifficultReviews[k].Content) + `</a>`;
@@ -1313,7 +1313,7 @@ function getBasicReview(controls) {
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success'>通过</a>
+                       <a class='btn btn-success' onclick='passBasic(` + data[i].TestReviews[k].Id + `,69)'>通过</a>
                        <a class='btn btn-warning'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].TestReviews[k].Content) + `</a>`;
@@ -1329,7 +1329,7 @@ function getBasicReview(controls) {
                                                    <div class='arrow'></div>
                                                    <h3 class='popover-title'></h3>
                                                    <div>
-                                                   <a class='btn btn-success'>通过</a>
+                                                   <a class='btn btn-success' onclick='passBasic(` + data[i].Id + `,66)'>通过</a>
                                                    <a class='btn btn-warning'>修改</a>
                                                    </div>
                                                    </div>">` + delPagraph(data[i].Content) + `</a>
@@ -1356,11 +1356,21 @@ function getBasicReview(controls) {
                         <tbody>
                         ` + tbody + `
                         </tbody>
-                    </table>`)
+                    </table>`);
             $('[data-toggle="popover"]').popover();
             // MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
         }
     });
+}
+
+function passBasic(id, group) {
+    let g = String.fromCharCode(group);
+    $.get("/passBasic/" + id + "/" + g, (data, status, xhr) => {
+        if (xhr.status === 200) {
+            getBasicReview('#KnowledgeReview')
+        }
+    });
+
 }
 
 function ChangeReview(id, controls) {

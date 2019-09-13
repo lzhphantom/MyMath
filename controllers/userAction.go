@@ -488,12 +488,17 @@ func (c *LoginController) GetBasicReview() {
 	}
 	basicReviews := make([]common.BasicCommonReview, 0)
 	for i := 0; i < len(basicContets); i++ {
+		isBasic := o.QueryTable("basic_review_record").Filter("group", "B").Filter("link_id", basicContets[i].Id).Exist()
 		basicReview := common.BasicCommonReview{
 			Id:      basicContets[i].Id,
 			Role:    basicContets[i].Title,
 			Content: basicContets[i].Concept,
 			Review:  basicContets[i].Review,
 		}
+		if isBasic {
+			basicReview = common.BasicCommonReview{}
+		}
+
 		var knowledges []*models.KnowledgeImportant
 		_, err := o.QueryTable("knowledge_important").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&knowledges)
 		if err != nil {
@@ -501,7 +506,10 @@ func (c *LoginController) GetBasicReview() {
 		}
 		knowReviews := make([]common.KnowledgeReview, 0)
 		for k := 0; k < len(knowledges); k++ {
-
+			isKnow := o.QueryTable("basic_review_record").Filter("group", "K").Filter("link_id", knowledges[k].Id).Exist()
+			if isKnow {
+				continue
+			}
 			knowReview := common.KnowledgeReview{
 				Id:      knowledges[k].Id,
 				Content: knowledges[k].Content,
@@ -518,6 +526,10 @@ func (c *LoginController) GetBasicReview() {
 		}
 		formulaReviews := make([]common.FormulaReview, 0)
 		for k := 0; k < len(formulas); k++ {
+			isFormula := o.QueryTable("basic_review_record").Filter("group", "F").Filter("link_id", formulas[k].Id).Exist()
+			if isFormula {
+				continue
+			}
 			formulaReview := common.FormulaReview{
 				Id:      formulas[k].Id,
 				Content: formulas[k].Content,
@@ -534,6 +546,10 @@ func (c *LoginController) GetBasicReview() {
 		}
 		hdReviews := make([]common.HDifficultReview, 0)
 		for k := 0; k < len(hds); k++ {
+			isHD := o.QueryTable("basic_review_record").Filter("group", "H").Filter("link_id", hds[k].Id).Exist()
+			if isHD {
+				continue
+			}
 			hdReview := common.HDifficultReview{
 				Id:      hds[k].Id,
 				Content: hds[k].Content,
@@ -550,6 +566,10 @@ func (c *LoginController) GetBasicReview() {
 		}
 		testReviews := make([]common.TestReview, 0)
 		for k := 0; k < len(tests); k++ {
+			isTest := o.QueryTable("basic_review_record").Filter("group", "E").Filter("link_id", tests[k].Id).Exist()
+			if isTest {
+				continue
+			}
 			testReview := common.TestReview{
 				Id:      tests[k].Id,
 				Content: tests[k].Content,
@@ -558,8 +578,110 @@ func (c *LoginController) GetBasicReview() {
 			testReviews = append(testReviews, testReview)
 		}
 		basicReview.TestReviews = testReviews
+		if basicReview.Id == 0 &&
+			len(basicReview.FormulaReviews) == 0 &&
+			len(basicReview.HDifficultReviews) == 0 &&
+			len(basicReview.KnowledgeReviews) == 0 &&
+			len(basicReview.TestReviews) == 0 {
+			continue
+		}
 		basicReviews = append(basicReviews, basicReview)
 	}
 	c.Data["json"] = basicReviews
+	c.ServeJSON()
+}
+
+//审核通过基础知识
+// @router /passBasic/:id/:group [get]
+func (c *LoginController) PassBasic() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		logs.Warning("id 不为数字")
+	}
+	group := c.Ctx.Input.Param(":group")
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	if group == "F" {
+		formula := models.Formula{
+			Id: id,
+		}
+		err = o.Read(&formula)
+		if err != nil {
+			logs.Warning("不存在")
+		}
+		formula.Review += 1
+		_, err = o.Update(&formula, "review")
+		if err != nil {
+			logs.Warning("更新失败")
+		}
+
+	} else if group == "E" {
+		test := models.ExaminationCenter{
+			Id: id,
+		}
+		err = o.Read(&test)
+		if err != nil {
+			logs.Warning("不存在")
+		}
+		test.Review += 1
+		_, err = o.Update(&test, "review")
+		if err != nil {
+			logs.Warning("更新失败")
+		}
+	} else if group == "H" {
+		hd := models.HDifficulty{
+			Id: id,
+		}
+		err = o.Read(&hd)
+		if err != nil {
+			logs.Warning("不存在")
+		}
+		hd.Review += 1
+		_, err = o.Update(&hd, "review")
+		if err != nil {
+			logs.Warning("更新失败")
+		}
+	} else if group == "K" {
+		know := models.KnowledgeImportant{
+			Id: id,
+		}
+		err = o.Read(&know)
+		if err != nil {
+			logs.Warning("不存在")
+		}
+		know.Review += 1
+		_, err = o.Update(&know, "review")
+		if err != nil {
+			logs.Warning("更新失败")
+		}
+	} else if group == "B" {
+		basic := models.BasicContent{
+			Id: id,
+		}
+		err = o.Read(&basic)
+		if err != nil {
+			logs.Warning("不存在")
+		}
+		basic.Review += 1
+		_, err = o.Update(&basic, "review")
+		if err != nil {
+			logs.Warning("更新失败")
+		}
+	} else {
+		logs.Warning("group 不在分组内")
+	}
+
+	record := models.BasicReviewRecord{
+		Group:  group,
+		LinkId: id,
+		User: &models.User{
+			Id: loginUser.Id,
+		},
+	}
+	_, err = o.Insert(&record)
+	if err != nil {
+		logs.Warning("插入记录失败", err)
+	}
+
 	c.ServeJSON()
 }

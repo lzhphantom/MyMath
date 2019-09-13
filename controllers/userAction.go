@@ -486,9 +486,10 @@ func (c *LoginController) GetBasicReview() {
 	if err != nil {
 		logs.Warning("获取basicCommon失败")
 	}
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	basicReviews := make([]common.BasicCommonReview, 0)
 	for i := 0; i < len(basicContets); i++ {
-		isBasic := o.QueryTable("basic_review_record").Filter("group", "B").Filter("link_id", basicContets[i].Id).Exist()
+		isBasic := o.QueryTable("basic_review_record").Filter("group", "B").Filter("link_id", basicContets[i].Id).Filter("user_id", loginUser.Id).Exist()
 		basicReview := common.BasicCommonReview{
 			Id:      basicContets[i].Id,
 			Role:    basicContets[i].Title,
@@ -506,7 +507,7 @@ func (c *LoginController) GetBasicReview() {
 		}
 		knowReviews := make([]common.KnowledgeReview, 0)
 		for k := 0; k < len(knowledges); k++ {
-			isKnow := o.QueryTable("basic_review_record").Filter("group", "K").Filter("link_id", knowledges[k].Id).Exist()
+			isKnow := o.QueryTable("basic_review_record").Filter("group", "K").Filter("link_id", knowledges[k].Id).Filter("user_id", loginUser.Id).Exist()
 			if isKnow {
 				continue
 			}
@@ -526,7 +527,7 @@ func (c *LoginController) GetBasicReview() {
 		}
 		formulaReviews := make([]common.FormulaReview, 0)
 		for k := 0; k < len(formulas); k++ {
-			isFormula := o.QueryTable("basic_review_record").Filter("group", "F").Filter("link_id", formulas[k].Id).Exist()
+			isFormula := o.QueryTable("basic_review_record").Filter("group", "F").Filter("link_id", formulas[k].Id).Filter("user_id", loginUser.Id).Exist()
 			if isFormula {
 				continue
 			}
@@ -546,7 +547,7 @@ func (c *LoginController) GetBasicReview() {
 		}
 		hdReviews := make([]common.HDifficultReview, 0)
 		for k := 0; k < len(hds); k++ {
-			isHD := o.QueryTable("basic_review_record").Filter("group", "H").Filter("link_id", hds[k].Id).Exist()
+			isHD := o.QueryTable("basic_review_record").Filter("group", "H").Filter("link_id", hds[k].Id).Filter("user_id", loginUser.Id).Exist()
 			if isHD {
 				continue
 			}
@@ -566,7 +567,7 @@ func (c *LoginController) GetBasicReview() {
 		}
 		testReviews := make([]common.TestReview, 0)
 		for k := 0; k < len(tests); k++ {
-			isTest := o.QueryTable("basic_review_record").Filter("group", "E").Filter("link_id", tests[k].Id).Exist()
+			isTest := o.QueryTable("basic_review_record").Filter("group", "E").Filter("link_id", tests[k].Id).Filter("user_id", loginUser.Id).Exist()
 			if isTest {
 				continue
 			}

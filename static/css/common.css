@@ -24,26 +24,8 @@ table {
     table-layout: fixed;
 }
 
-/*td {*/
-    /*overflow: hidden;*/
-    /*text-overflow: ellipsis;*/
-    /*word-break: keep-all;*/
-    /*white-space: nowrap;*/
-/*}*/
-
-td > a.btn{
+td > a.btn {
     white-space: normal !important;
 }
 
-.cell {
-    display: table-cell;
-    *display: inline-block;
-}
-
-.cell_bk {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    word-wrap: break-word;
-}
 

@@ -1240,14 +1240,14 @@ function getQuestionReview(controls) {
                         <caption><h1 class="text-center text-muted">新增试题审核</h1></caption>
                         <thead>
                         <tr>
-                            <td>No.</td>
+                            <td width="5%">No.</td>
                             <td>题目</td>
-                            <td>题目类型</td>
+                            <td width="9%">题目类型</td>
                             <td>附加</td>
                             <td>答案</td>
-                            <td>审核次数</td>
-                            <td>审核人</td>
-                            <td colspan="2" class="text-center">操作</td>
+                            <td width="9%">审核次数</td>
+                            <td width="9%">审核人</td>
+                            <td colspan="2" class="text-center" width="10%">操作</td>
                         </tr>
                         </thead>
                         <tbody>
@@ -1260,12 +1260,12 @@ function getQuestionReview(controls) {
 
 function getBasicReview(controls) {
     $.get("/getBasicReview", (data, status, xhr) => {
-        if (xhr.status == 200) {
-            let tbody = ``
+        if (xhr.status === 200) {
+            let tbody = ``;
             for (let i = 0; i < data.length; i++) {
                 let formulas = ``;
                 for (let k = 0; k < data[i].FormulaReviews.length; k++) {
-                    formulas += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
+                    formulas += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1279,7 +1279,7 @@ function getBasicReview(controls) {
 
                 let knowledges = ``;
                 for (let k = 0; k < data[i].KnowledgeReviews.length; k++) {
-                    knowledges += `<a tabindex="0" style="" class="btn btn-default cell_bk" role="button" data-toggle="popover"
+                    knowledges += `<a tabindex="0" style="" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1293,7 +1293,7 @@ function getBasicReview(controls) {
 
                 let hds = ``;
                 for (let k = 0; k < data[i].HDifficultReviews.length; k++) {
-                    hds += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
+                    hds += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作" data-placement="top"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1307,7 +1307,7 @@ function getBasicReview(controls) {
 
                 let tests = ``;
                 for (let k = 0; k < data[i].TestReviews.length; k++) {
-                    tests += `<a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
+                    tests += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
@@ -1322,8 +1322,8 @@ function getBasicReview(controls) {
                 tbody += `<tr>
                             <td>` + (i + 1) + `</td>
                             <td>` + data[i].Role + `</td>
-                            <td class="cell">
-                            <a tabindex="0" class="btn btn-default cell_bk" role="button" data-toggle="popover"
+                            <td>
+                            <a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                                                data-trigger="focus" title="可执行操作"
                                                                data-template="<div class='popover' role='tooltip'>
                                                    <div class='arrow'></div>
@@ -1334,18 +1334,19 @@ function getBasicReview(controls) {
                                                    </div>
                                                    </div>">` + delPagraph(data[i].Content) + `</a>
                                                    </td>
-                            <td class="cell">` + knowledges + `</td>
-                            <td class="cell">` + formulas + `</td>
-                            <td class="cell">` + tests + `</td>
-                            <td class="cell">` + hds + `</td>     
+                            <td>` + knowledges + `</td>
+                            <td>` + formulas + `</td>
+                            <td>` + tests + `</td>
+                            <td>` + hds + `</td>     
                            </tr>`;
             }
             $(controls).empty().append(`<table class="table table-hover">
                         <caption><h1 class="text-muted text-center">新增基础知识审核</h1></caption>
+                        
                         <thead>
                         <tr>
-                            <td>No.</td>
-                            <td>分类</td>
+                            <td width="5%">No.</td>
+                            <td width="10%">分类</td>
                             <td>概念</td>
                             <td>知识点精讲</td>
                             <td>相关公式</td>
@@ -1358,7 +1359,7 @@ function getBasicReview(controls) {
                         </tbody>
                     </table>`);
             $('[data-toggle="popover"]').popover();
-            // MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
         }
     });
 }
@@ -1374,10 +1375,8 @@ function passBasic(id, group) {
 
 function changeBasic(id, group) {
     let g = String.fromCharCode(group);
-    console.log(id, g);
     $.get("/changeBasic/"+id+"/"+g,(data,status,xhr)=>{
         if(xhr.status===200){
-            console.log(data);
             let controls="#KnowledgeReview";
             $(controls).empty().append(`
                     <h1 class="text-center text-muted">基础知识修改</h1>

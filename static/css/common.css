@@ -24,6 +24,17 @@ table {
     table-layout: fixed;
 }
 
+/*td {*/
+    /*overflow: hidden;*/
+    /*text-overflow: ellipsis;*/
+    /*word-break: keep-all;*/
+    /*white-space: nowrap;*/
+/*}*/
+
+td > a.btn{
+    white-space: normal !important;
+}
+
 .cell {
     display: table-cell;
     *display: inline-block;

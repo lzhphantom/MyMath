@@ -1272,7 +1272,7 @@ function getBasicReview(controls) {
                        <h3 class='popover-title'></h3>
                        <div>
                        <a class='btn btn-success' onclick='passBasic(` + data[i].FormulaReviews[k].Id + `,70)'>通过</a>
-                       <a class='btn btn-warning'>修改</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].FormulaReviews[k].Id + `,70)'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].FormulaReviews[k].Content) + `</a>`;
                 }
@@ -1286,7 +1286,7 @@ function getBasicReview(controls) {
                        <h3 class='popover-title'></h3>
                        <div>
                        <a class='btn btn-success' onclick='passBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>通过</a>
-                       <a class='btn btn-warning'>修改</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content) + `</a>`;
                 }
@@ -1300,7 +1300,7 @@ function getBasicReview(controls) {
                        <h3 class='popover-title'></h3>
                        <div>
                        <a class='btn btn-success' onclick='passBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>通过</a>
-                       <a class='btn btn-warning'>修改</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].HDifficultReviews[k].Content) + `</a>`;
                 }
@@ -1314,7 +1314,7 @@ function getBasicReview(controls) {
                        <h3 class='popover-title'></h3>
                        <div>
                        <a class='btn btn-success' onclick='passBasic(` + data[i].TestReviews[k].Id + `,69)'>通过</a>
-                       <a class='btn btn-warning'>修改</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].TestReviews[k].Id + `,69)'>修改</a>
                        </div>
                        </div>">` + delPagraph(data[i].TestReviews[k].Content) + `</a>`;
                 }
@@ -1330,7 +1330,7 @@ function getBasicReview(controls) {
                                                    <h3 class='popover-title'></h3>
                                                    <div>
                                                    <a class='btn btn-success' onclick='passBasic(` + data[i].Id + `,66)'>通过</a>
-                                                   <a class='btn btn-warning'>修改</a>
+                                                   <a class='btn btn-warning' onclick='changeBasic(` + data[i].Id + `,66)'>修改</a>
                                                    </div>
                                                    </div>">` + delPagraph(data[i].Content) + `</a>
                                                    </td>
@@ -1370,7 +1370,59 @@ function passBasic(id, group) {
             getBasicReview('#KnowledgeReview')
         }
     });
+}
 
+function changeBasic(id, group) {
+    let g = String.fromCharCode(group);
+    console.log(id, g);
+    $.get("/changeBasic/"+id+"/"+g,(data,status,xhr)=>{
+        if(xhr.status===200){
+            console.log(data);
+            let controls="#KnowledgeReview";
+            $(controls).empty().append(`
+                    <h1 class="text-center text-muted">基础知识修改</h1>
+                    <form action="" class="text-muted">
+                        <div class="form-group row">
+                            <label for="showChangeBasicContent" class="col-sm-2 control-label">题目：</label>
+                            <div class="col-sm-10">
+                                <a href="javascript:void(0);"
+                                   onclick="showEditor(this,'#changeBasicEditor','#backChangeBasicGroup');"
+                                   id="showChangeBasicContent" data-content="` + data + `">` + data + `</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="content" id="changeBasicEditor" class="hidden"></textarea>
+                        </div>
+                        <div class="form-group row" id="backChangeBasicGroup">
+                            <div class="col-md-3 col-md-offset-9">
+                                <a class="btn btn-warning btn-lg" id="changeBasicBtn">修改</a>
+                            </div>
+                            <div class="col-md-3 col-md-offset-9 hidden">
+                                <a class="btn btn-primary btn-lg"
+                                   onclick="backToLast('#backChangeBasicGroup','#changeBasicEditor');">确认</a>
+                            </div>
+                        </div>
+
+                    </form>
+                `);
+            $("#changeBasicBtn").on("click",()=>{
+               let content=$("#showChangeBasicContent").attr("data-content");
+               $.post(
+                   "/updateBasic",
+                   {
+                       id:id,
+                       content:content,
+                       group:g,
+                   },
+                   (data,status,xhr)=>{
+                       if(xhr.status===200){
+                           getBasicReview(controls);
+                       }
+                   })
+            });
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
+        }
+    })
 }
 
 function ChangeReview(id, controls) {

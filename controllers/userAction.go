@@ -686,3 +686,110 @@ func (c *LoginController) PassBasic() {
 
 	c.ServeJSON()
 }
+
+//需要修改基础知识
+// @router /changeBasic/:id/:group [get]
+func (c *LoginController) ChangeBasic() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		logs.Warning(":id 不为数字")
+	}
+	group := c.Ctx.Input.Param(":group")
+	o := orm.NewOrm()
+	if group == "B" {
+		var basic models.BasicContent
+		err = o.QueryTable("basic_content").Filter("id", id).One(&basic)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		}
+		c.Data["json"] = basic.Concept
+	} else if group == "H" {
+		var hd models.HDifficulty
+		err = o.QueryTable("h_difficulty").Filter("id", id).One(&hd)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		}
+		c.Data["json"] = hd.Content
+
+	} else if group == "E" {
+		var test models.ExaminationCenter
+		err = o.QueryTable("examination_center").Filter("id", id).One(&test)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		}
+		c.Data["json"] = test.Content
+	} else if group == "F" {
+		var formula models.Formula
+		err = o.QueryTable("formula").Filter("id", id).One(&formula)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		}
+		c.Data["json"] = formula.Content
+	} else if group == "K" {
+		var know models.KnowledgeImportant
+		err = o.QueryTable("knowledge_important").Filter("id", id).One(&know)
+		if err != nil {
+			logs.Warning("获取失败", err)
+		}
+		c.Data["json"] = know.Content
+	} else {
+		logs.Warning("group 不在分组内")
+	}
+	c.ServeJSON()
+}
+
+//更新基础知识
+// @router /updateBasic [post]
+func (c *LoginController) UpdateBasic() {
+	id, err := c.GetInt("id")
+	if err != nil {
+		logs.Warning("id 不为数字")
+	}
+	content := c.GetString("content")
+	group := c.GetString("group")
+	o := orm.NewOrm()
+	if group == "B" {
+		var basic models.BasicContent
+		err = o.QueryTable("basic_content").Filter("id", id).One(&basic)
+		basic.Concept = content
+		_,err=o.Update(&basic, "concept")
+		if err!=nil{
+			logs.Warning("更新失败")
+		}
+	} else if group == "F" {
+		var formula models.Formula
+		err = o.QueryTable("formula").Filter("id", id).One(&formula)
+		formula.Content = content
+		_,err=o.Update(&formula, "content")
+		if err!=nil{
+			logs.Warning("更新失败")
+		}
+	} else if group == "H" {
+		var hd models.HDifficulty
+		err = o.QueryTable("h_difficulty").Filter("id", id).One(&hd)
+		hd.Content = content
+		_,err=o.Update(&hd, "content")
+		if err!=nil{
+			logs.Warning("更新失败")
+		}
+	} else if group == "K" {
+		var know models.KnowledgeImportant
+		err = o.QueryTable("knowledge_important").Filter("id", id).One(&know)
+		know.Content = content
+		_,err=o.Update(&know, "content")
+		if err!=nil{
+			logs.Warning("更新失败")
+		}
+	} else if group == "E" {
+		var test models.ExaminationCenter
+		err = o.QueryTable("examination_center").Filter("id", id).One(&test)
+		test.Content = content
+		_,err=o.Update(&test, "content")
+		if err!=nil{
+			logs.Warning("更新失败")
+		}
+	} else {
+		logs.Warning("group 不在分组内")
+	}
+	c.ServeJSON()
+}

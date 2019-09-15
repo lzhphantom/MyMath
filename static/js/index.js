@@ -1345,8 +1345,8 @@ function getBasicReview(controls) {
                         
                         <thead>
                         <tr>
-                            <td width="5%">No.</td>
-                            <td width="10%">分类</td>
+                            <td width="4%">No.</td>
+                            <td width="8%">分类</td>
                             <td>概念</td>
                             <td>知识点精讲</td>
                             <td>相关公式</td>

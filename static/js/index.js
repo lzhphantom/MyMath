@@ -369,7 +369,7 @@ async function showEditor(obj, editorName, backGroup) {
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
         let content = $(obj).attr("data-content");
-        editor.setData(unregularEditorContent(content));
+        editor.setData(unregularEditorContentForSetData(content));
     } else {
         editor.setData("");
     }
@@ -381,7 +381,7 @@ async function showEditor(obj, editorName, backGroup) {
     editorCheck(showContentName);
 }
 
-function unregularEditorContent(data) {
+function unregularEditorContentForSetData(data) {
     let arr = data.split(/\\\(|\\\)|\\\\/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
@@ -404,26 +404,38 @@ function regularEditorContent(data) {
             i--;
         }
     }
-    let content = ``;
+    let newContent = ``;
     for (let i = 0; i < arr.length; i++) {
-        let newString = "";
-        let long = arr[i].length;
-        if (long > 30) {
-            newArr = arr[i].split(/,|，/);
-            console.log(newArr);
-            for (let j = 0; j < newArr.length; j++) {
-                if (newArr !== "" && j !== newArr.length - 1) {
-                    newString += newArr[j] + ",\\\\";
-                } else {
-                    newString += newArr[j];
-                }
+        let content = [];
+
+        let newString = arr[i];
+        let end = 0;
+        let lbrace = 0;
+        let rbrace = 0;
+        while (newString.length > 30) {
+            if (newString[end] === "{") {
+                lbrace++
+            } else if (newString[end] === "}") {
+                rbrace++
             }
-        } else {
-            newString = arr[i];
+            if (end > 30 && lbrace === rbrace) {
+                let param = newString.substring(0, end+1);
+                content.push(param);
+                newString = newString.substring(end+1);
+                lbrace = 0;
+                rbrace = 0;
+                end = 0
+            }
+            end++
         }
-        content += `<p>\\(` + newString + `\\)</p>`;
+        if (newString.length > 0) {
+            content.push(newString)
+        }
+        console.log(content);
+        newContent += `<p>\\(` + content.join("\\\\") + `\\)</p>`;
     }
-    return content
+
+    return newContent
 }
 
 //准备生成富文本编辑器
@@ -451,7 +463,7 @@ function editorCheck(show) {
 
 //提交富文本编辑器内容
 function backToLast(backGroup, editorName) {
-    const data = regularEditorContent(editor.getData());
+    const data = editor.getData();
     editor.model.document.off("change:data");
     editor.destroy().catch(error => {
         console.log(error);
@@ -1375,9 +1387,9 @@ function passBasic(id, group) {
 
 function changeBasic(id, group) {
     let g = String.fromCharCode(group);
-    $.get("/changeBasic/"+id+"/"+g,(data,status,xhr)=>{
-        if(xhr.status===200){
-            let controls="#KnowledgeReview";
+    $.get("/changeBasic/" + id + "/" + g, (data, status, xhr) => {
+        if (xhr.status === 200) {
+            let controls = "#KnowledgeReview";
             $(controls).empty().append(`
                     <h1 class="text-center text-muted">基础知识修改</h1>
                     <form action="" class="text-muted">
@@ -1404,20 +1416,20 @@ function changeBasic(id, group) {
 
                     </form>
                 `);
-            $("#changeBasicBtn").on("click",()=>{
-               let content=$("#showChangeBasicContent").attr("data-content");
-               $.post(
-                   "/updateBasic",
-                   {
-                       id:id,
-                       content:content,
-                       group:g,
-                   },
-                   (data,status,xhr)=>{
-                       if(xhr.status===200){
-                           getBasicReview(controls);
-                       }
-                   })
+            $("#changeBasicBtn").on("click", () => {
+                let content = $("#showChangeBasicContent").attr("data-content");
+                $.post(
+                    "/updateBasic",
+                    {
+                        id: id,
+                        content: content,
+                        group: g,
+                    },
+                    (data, status, xhr) => {
+                        if (xhr.status === 200) {
+                            getBasicReview(controls);
+                        }
+                    })
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
         }

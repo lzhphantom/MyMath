@@ -28,7 +28,7 @@ type BasicReviewRecord struct {
 	Created time.Time `orm:"auto_now_add;type(datetime)"`
 	Updated time.Time `orm:"auto_now;type(datetime)"`
 	User    *User     `orm:"rel(fk)"`
-	Group   string    `orm:"size(1)"`
+	Group   string    `orm:"size(1)";description:"F公式，B概念，E考点，K知识点，H重难点"`
 	LinkId  int
 }
 

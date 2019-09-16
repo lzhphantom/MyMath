@@ -397,7 +397,7 @@ function unregularEditorContent(data) {
         let rbrace = 0;
         let slash = 0;
         let newContent = [];
-        while (newString.length > 2 && end < newString.length) {
+        while (end < newString.length) {
             if (newString[end] == "\\") {
                 slash++
             } else {

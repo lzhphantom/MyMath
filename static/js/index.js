@@ -412,7 +412,7 @@ function unregularEditorContent(data) {
                 rbrace++
             }
             if (lbrace == rbrace && slash == 2) {
-                newContent.push(newString.substring(0, end - 1))
+                newContent.push(newString.substring(0, end - 1));
                 newString = newString.substring(end + 1)
             }
             end++

@@ -369,7 +369,7 @@ async function showEditor(obj, editorName, backGroup) {
     });
     if (typeof ($(obj).attr("data-content")) !== "undefined") {
         let content = $(obj).attr("data-content");
-        editor.setData(unregularEditorContentForSetData(content));
+        editor.setData(unregularEditorContent(content));
     } else {
         editor.setData("");
     }
@@ -381,8 +381,8 @@ async function showEditor(obj, editorName, backGroup) {
     editorCheck(showContentName);
 }
 
-function unregularEditorContentForSetData(data) {
-    let arr = data.split(/\\\(|\\\)|\\\\/);
+function unregularEditorContent(data) {
+    let arr = data.split(/\\\(|\\\)/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
             arr.splice(i, 1);
@@ -391,12 +391,43 @@ function unregularEditorContentForSetData(data) {
     }
     let content = "";
     for (let i = 0; i < arr.length; i++) {
-        content += arr[i];
+        let newString = arr[i];
+        let end = 0;
+        let lbrace = 0;
+        let rbrace = 0;
+        let slash = 0;
+        let newContent = [];
+        while (newString.length > 2 && end < newString.length) {
+            if (newString[end] == "\\") {
+                slash++
+            } else {
+                if (slash > 0) {
+                    slash = 0
+                }
+            }
+
+            if (newString[end] == "{") {
+                lbrace++
+            } else if (newString[end] == "}") {
+                rbrace++
+            }
+            if (lbrace == rbrace && slash == 2) {
+                newContent.push(newString.substring(0, end - 1))
+                newString = newString.substring(end + 1)
+            }
+            end++
+
+        }
+        if (newString.length>0){
+            newContent.push(newString)
+        }
+
+        content += newContent.join("");
     }
     return content
 }
 
-function regularEditorContent(data) {
+function regularEditorContent(data, lineNumber) {
     let arr = data.split(/<p>|<\/p>/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
@@ -412,16 +443,16 @@ function regularEditorContent(data) {
         let end = 0;
         let lbrace = 0;
         let rbrace = 0;
-        while (newString.length > 30) {
+        while (newString.length > lineNumber) {
             if (newString[end] === "{") {
                 lbrace++
             } else if (newString[end] === "}") {
                 rbrace++
             }
             if (end > 30 && lbrace === rbrace) {
-                let param = newString.substring(0, end+1);
+                let param = newString.substring(0, end + 1);
                 content.push(param);
-                newString = newString.substring(end+1);
+                newString = newString.substring(end + 1);
                 lbrace = 0;
                 rbrace = 0;
                 end = 0
@@ -431,7 +462,6 @@ function regularEditorContent(data) {
         if (newString.length > 0) {
             content.push(newString)
         }
-        console.log(content);
         newContent += `<p>\\(` + content.join("\\\\") + `\\)</p>`;
     }
 
@@ -445,7 +475,7 @@ function editorCheck(show) {
         if (editor !== undefined && editor !== null && !knowFlag) {
             editor.model.document.on("change:data", () => {
                 let data = editor.getData();
-                let content = regularEditorContent(data);
+                let content = regularEditorContent(data, 30);
                 if (content.length > 0) {
                     $(show).html(content);
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, show.substring(1)]);

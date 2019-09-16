@@ -418,7 +418,7 @@ function unregularEditorContent(data) {
             end++
 
         }
-        if (newString.length>0){
+        if (newString.length > 0) {
             newContent.push(newString)
         }
 
@@ -443,7 +443,7 @@ function regularEditorContent(data, lineNumber) {
         let end = 0;
         let lbrace = 0;
         let rbrace = 0;
-        while (newString.length > lineNumber) {
+        while (newString.length >= lineNumber) {
             if (newString[end] === "{") {
                 lbrace++
             } else if (newString[end] === "}") {
@@ -493,7 +493,7 @@ function editorCheck(show) {
 
 //提交富文本编辑器内容
 function backToLast(backGroup, editorName) {
-    const data = editor.getData();
+    const data = addMathFormula(editor.getData());
     editor.model.document.off("change:data");
     editor.destroy().catch(error => {
         console.log(error);
@@ -1268,7 +1268,7 @@ function getQuestionReview(controls) {
             }
             tbody += `<tr>
                         <td>` + (i + 1) + `</td>
-                        <td width="320px;">` + data[i].Content + `</td>
+                        <td>` + data[i].Content + `</td>
                         <td>` + data[i].QuestionType + `</td>
                         <td>` + addition + `</td>
                         <td>` + data[i].Answer + `</td>

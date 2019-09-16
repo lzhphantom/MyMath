@@ -42,13 +42,67 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 }
 
 function delPagraph(text) {
-    let arr=text.split(/<p>|<\/p>/);
+    let arr = text.split(/<p>\\\(|\\\)<\/p>/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
             arr.splice(i, 1);
             i--;
         }
     }
+    let newContent = ``;
+    for (let i = 0; i < arr.length; i++) {
+        let content = [];
 
-    return arr.join("");
+        let newString = arr[i];
+        let end = 0;
+        let lbrace = 0;
+        let rbrace = 0;
+        let chnWord = 0;
+        while (newString.length > 14) {
+            if (newString[end] === "{") {
+                lbrace++
+            } else if (newString[end] === "}") {
+                rbrace++
+            } else if (isChinese(newString[end])) {
+                chnWord ++;
+            }
+            if (end + chnWord >= 14 && lbrace === rbrace) {
+                let param = newString.substring(0, end + 1);
+                content.push(param);
+                newString = newString.substring(end + 1);
+                lbrace = 0;
+                rbrace = 0;
+                chnWord = 0;
+                end = 0
+            }
+            end++
+        }
+        if (newString.length > 0) {
+            content.push(newString)
+        }
+        newContent += `<p>\\(` + content.join("\\\\") + `\\)</p>`;
+    }
+
+    return newContent
+}
+
+function addMathFormula(text) {
+    let arr = text.split(/<p>|<\/p>/);
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === "") {
+            arr.splice(i, 1);
+            i--;
+        }
+    }
+    let content = ``;
+    for (let i = 0; i < arr.length; i++) {
+        content += `<p>\\\(` + arr[i] + `\\\)</p>`;
+    }
+    return content
+}
+
+function isChinese(temp) {
+    var re = /[\u4e00-\u9fa5]/;
+    if (re.test(temp)) return true;
+    return false;
 }

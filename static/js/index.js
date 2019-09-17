@@ -749,10 +749,10 @@ function commitUnSelect(controls) {
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <td>No.</td>
-                                    <td>题目</td>
-                                    <td>你的答案</td>
-                                    <td>参考答案</td>
+                                    <td width="3%">No.</td>
+                                    <td width="37%">题目</td>
+                                    <td width="30%">你的答案</td>
+                                    <td width="30%">参考答案</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -938,10 +938,10 @@ function commitSelect(controls) {
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <td>No.</td>
-                                    <td>题目</td>
-                                    <td>你的答案</td>
-                                    <td>参考答案</td>
+                                    <td width="3%">No.</td>
+                                    <td width="37%">题目</td>
+                                    <td width="30%">你的答案</td>
+                                    <td width="30%">参考答案</td>
                                 </tr>
                                 </thead>
                                 <tbody>

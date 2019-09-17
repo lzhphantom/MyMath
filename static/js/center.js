@@ -15,7 +15,7 @@ $(function () {
                         let choices = ``;
                         if (data[i].Addition != null) {
                             for (let j = 0; j < data[i].Addition.length; j++) {
-                                choices += `` + data[i].Addition[j];
+                                choices += `` + delPagraph(data[i].Addition[j], 28);
                             }
                         }
                         if (choices.length == 0) {
@@ -33,11 +33,11 @@ $(function () {
 
                         tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td width="320px;">` + data[i].Content + `</td>
+                                    <td>` + delPagraph(data[i].Content, 28) + `</td>
                                     <td>` + data[i].Role + `</td>
                                     <td>` + choices + `</td>
-                                    <td>` + data[i].UserAnswer + `</td>
-                                    <td>` + data[i].Answer + `</td>
+                                    <td>` + delPagraph(data[i].UserAnswer, 28) + `</td>
+                                    <td>` + delPagraph(data[i].Answer, 28) + `</td>
                                     <td ` + finalClass + `>` + final + `</td>
                                 </tr>`;
                     }
@@ -45,13 +45,13 @@ $(function () {
                     <caption><h1 class="text-muted text-center">题海历史</h1></caption>
                     <thead>
                     <tr>
-                        <td>NO.</td>
-                        <td>题目</td>
-                        <td>类型</td>
-                        <td>附加</td>
-                        <td>答案</td>
-                        <td>参考答案</td>
-                        <td>对错</td>
+                        <td width="1%">NO.</td>
+                        <td width="25%">题目</td>
+                        <td width="8%">类型</td>
+                        <td width="20%">附加</td>
+                        <td width="20%">答案</td>
+                        <td width="20%">参考答案</td>
+                        <td width="6%">对错</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -74,7 +74,7 @@ $(function () {
                         let choices = ``;
                         if (data[i].Addition != null) {
                             for (let j = 0; j < data[i].Addition.length; j++) {
-                                choices += `` + data[i].Addition[j];
+                                choices += `` + delPagraph(data[i].Addition[j], 24);
                             }
                         }
                         if (choices.length == 0) {
@@ -93,10 +93,10 @@ $(function () {
                         console.log(time);
                         tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td width="320px;">` + data[i].Content + `</td>
+                                    <td>` + delPagraph(data[i].Content, 24) + `</td>
                                     <td>` + data[i].Role + `</td>
                                     <td>` + choices + `</td>
-                                    <td>` + data[i].Answer + `</td>
+                                    <td>` + delPagraph(data[i].Answer, 24) + `</td>
                                     <td>` + time + `</td>
                                     <td>` + data[i].Review + `</td>
                                     <td>` + reviewers + `</td>
@@ -106,14 +106,14 @@ $(function () {
                     <caption><h1 class="text-muted text-center">上传题目记录</h1></caption>
                     <thead>
                     <tr>
-                        <td>NO.</td>
-                        <td>内容</td>
-                        <td>类型</td>
-                        <td>附加</td>
-                        <td>参考答案</td>
-                        <td>创建时间</td>
-                        <td>审核</td>
-                        <td>审核人员</td>
+                        <td width="1%">No.</td>
+                        <td width="22%">内容</td>
+                        <td width="8%">类型</td>
+                        <td width="20%">附加</td>
+                        <td width="20%">参考答案</td>
+                        <td width="9%">创建时间</td>
+                        <td width="8%">审核</td>
+                        <td width="12%">审核人员</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -208,11 +208,11 @@ $(function () {
 });
 
 function personalCheck(f) {
-    let name=f.UserName.value;
-    if(name.length==0){
+    let name = f.UserName.value;
+    if (name.length == 0) {
         alert("姓名不能为空");
         return false;
-    }else if( !(/\p{Unified_Ideograph}/ug.test(name))){
+    } else if (!(/\p{Unified_Ideograph}/ug.test(name))) {
         alert("姓名必须为中文");
         return false;
     }
@@ -220,22 +220,22 @@ function personalCheck(f) {
     if (tel.length < 11) {
         alert("联系电话位数不符");
         return false;
-    }else if(!(/^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/.test(tel))){
+    } else if (!(/^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/.test(tel))) {
         alert("联系电话输入不规范");
         return false;
     }
     let province = f.province.value;
-    if(province.length==0){
+    if (province.length == 0) {
         alert("请选择省份");
         return false;
     }
     let city = f.city.value;
-    if (city.length==0){
+    if (city.length == 0) {
         alert("请选择城市");
         return false;
     }
     let street = f.street.value;
-    if (street==0){
+    if (street == 0) {
         alert("请选择乡镇/街道");
         return false;
     }

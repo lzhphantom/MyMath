@@ -1253,7 +1253,7 @@ function getQuestionReview(controls) {
             let addition = ``;
             if (data[i].Addition != null && data[i].Addition.length > 0) {
                 for (let j = 0; j < data[i].Addition.length; j++) {
-                    addition += `` + data[i].Addition[j];
+                    addition += `` + delPagraph(data[i].Addition[j], 18);
                 }
             } else {
                 addition = `无`;
@@ -1268,10 +1268,10 @@ function getQuestionReview(controls) {
             }
             tbody += `<tr>
                         <td>` + (i + 1) + `</td>
-                        <td>` + data[i].Content + `</td>
+                        <td>` + delPagraph(data[i].Content, 18) + `</td>
                         <td>` + data[i].QuestionType + `</td>
                         <td>` + addition + `</td>
-                        <td>` + data[i].Answer + `</td>
+                        <td>` + delPagraph(data[i].Answer, 18) + `</td>
                         <td>` + data[i].ViewNum + `</td>
                         <td>` + reviewer + `</td>
                         <td><a class="btn btn-warning" href="javascript:void(0);" onclick="ChangeReview(` + data[i].Id + `,'` + controls + `')">修改</a></td>
@@ -1316,7 +1316,7 @@ function getBasicReview(controls) {
                        <a class='btn btn-success' onclick='passBasic(` + data[i].FormulaReviews[k].Id + `,70)'>通过</a>
                        <a class='btn btn-warning' onclick='changeBasic(` + data[i].FormulaReviews[k].Id + `,70)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].FormulaReviews[k].Content) + `</a>`;
+                       </div>">` + delPagraph(data[i].FormulaReviews[k].Content, 14) + `</a>`;
                 }
 
                 let knowledges = ``;
@@ -1330,7 +1330,7 @@ function getBasicReview(controls) {
                        <a class='btn btn-success' onclick='passBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>通过</a>
                        <a class='btn btn-warning' onclick='changeBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content) + `</a>`;
+                       </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content, 14) + `</a>`;
                 }
 
                 let hds = ``;
@@ -1344,7 +1344,7 @@ function getBasicReview(controls) {
                        <a class='btn btn-success' onclick='passBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>通过</a>
                        <a class='btn btn-warning' onclick='changeBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].HDifficultReviews[k].Content) + `</a>`;
+                       </div>">` + delPagraph(data[i].HDifficultReviews[k].Content, 14) + `</a>`;
                 }
 
                 let tests = ``;
@@ -1358,7 +1358,7 @@ function getBasicReview(controls) {
                        <a class='btn btn-success' onclick='passBasic(` + data[i].TestReviews[k].Id + `,69)'>通过</a>
                        <a class='btn btn-warning' onclick='changeBasic(` + data[i].TestReviews[k].Id + `,69)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].TestReviews[k].Content) + `</a>`;
+                       </div>">` + delPagraph(data[i].TestReviews[k].Content, 14) + `</a>`;
                 }
 
                 tbody += `<tr>
@@ -1374,7 +1374,7 @@ function getBasicReview(controls) {
                                                    <a class='btn btn-success' onclick='passBasic(` + data[i].Id + `,66)'>通过</a>
                                                    <a class='btn btn-warning' onclick='changeBasic(` + data[i].Id + `,66)'>修改</a>
                                                    </div>
-                                                   </div>">` + delPagraph(data[i].Content) + `</a>
+                                                   </div>">` + delPagraph(data[i].Content, 14) + `</a>
                                                    </td>
                             <td>` + knowledges + `</td>
                             <td>` + formulas + `</td>

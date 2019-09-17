@@ -41,7 +41,7 @@ function number_format(number, decimals, dec_point, thousands_sep) {
     return s.join(dec);
 }
 
-function delPagraph(text) {
+function delPagraph(text,allowLength) {
     let arr = text.split(/<p>\\\(|\\\)<\/p>/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
@@ -58,7 +58,7 @@ function delPagraph(text) {
         let lbrace = 0;
         let rbrace = 0;
         let chnWord = 0;
-        while (isStringLengthIncludeChinese(newString) > 14) {
+        while (isStringLengthIncludeChinese(newString) > allowLength) {
             if (newString[end] === "{") {
                 lbrace++
             } else if (newString[end] === "}") {
@@ -66,7 +66,7 @@ function delPagraph(text) {
             } else if (isChinese(newString[end])) {
                 chnWord++;
             }
-            if (end + chnWord >= 14 && lbrace === rbrace) {
+            if (end + chnWord >= allowLength && lbrace === rbrace) {
                 let param = newString.substring(0, end + 1);
                 content.push(param);
                 newString = newString.substring(end + 1);

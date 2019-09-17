@@ -58,13 +58,13 @@ function delPagraph(text) {
         let lbrace = 0;
         let rbrace = 0;
         let chnWord = 0;
-        while (newString.length > 14) {
+        while (isStringLengthIncludeChinese(newString) > 14) {
             if (newString[end] === "{") {
                 lbrace++
             } else if (newString[end] === "}") {
                 rbrace++
             } else if (isChinese(newString[end])) {
-                chnWord ++;
+                chnWord++;
             }
             if (end + chnWord >= 14 && lbrace === rbrace) {
                 let param = newString.substring(0, end + 1);
@@ -74,6 +74,7 @@ function delPagraph(text) {
                 rbrace = 0;
                 chnWord = 0;
                 end = 0
+                continue
             }
             end++
         }
@@ -102,7 +103,22 @@ function addMathFormula(text) {
 }
 
 function isChinese(temp) {
-    var re = /[\u4e00-\u9fa5]/;
-    if (re.test(temp)) return true;
+    //中文
+    let re = /[\u4e00-\u9fa5]/;
+    //中文符号
+    let pointre = /[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5]/
+    if (re.test(temp) || pointre.test(temp)) return true;
     return false;
+}
+
+function isStringLengthIncludeChinese(text) {
+    let length = 0;
+    for (let i = 0; i < text.length; i++) {
+        if (isChinese(text[i])) {
+            length += 2;
+        } else {
+            length++;
+        }
+    }
+    return length
 }

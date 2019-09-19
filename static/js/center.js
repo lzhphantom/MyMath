@@ -14,62 +14,8 @@ $(function () {
             $("#personal").addClass("hidden");
             $("#trainingHistory").addClass("hidden");
             $("#noPassQuestion").addClass("hidden");
-            $.get("/center/uploadRecord", (data, status, xhr) => {
-                if (xhr.status === 200) {
-                    let tbody = ``;
-                    for (let i = 0; i < data.length; i++) {
-                        let choices = ``;
-                        if (data[i].Addition != null) {
-                            for (let j = 0; j < data[i].Addition.length; j++) {
-                                choices += `` + delPagraph(data[i].Addition[j], 24);
-                            }
-                        }
-                        if (choices.length == 0) {
-                            choices = `无`;
-                        }
-                        let reviewers = ``;
-                        if (data[i].Reviewers != null) {
-                            for (let j = 0; j < data[i].Reviewers.length; j++) {
-                                reviewers += `<p>` + data[j].Reviewers[j] + `</p>`;
-                            }
-                        }
-                        if (reviewers.length == 0) {
-                            reviewers = `无`;
-                        }
-                        let time = dayjs(data[i].CreateTime).format('YYYY年MM月DD日');
-                        console.log(time);
-                        tbody += `<tr>
-                                    <td>` + (i + 1) + `</td>
-                                    <td>` + delPagraph(data[i].Content, 24) + `</td>
-                                    <td>` + data[i].Role + `</td>
-                                    <td>` + choices + `</td>
-                                    <td>` + delPagraph(data[i].Answer, 24) + `</td>
-                                    <td>` + time + `</td>
-                                    <td>` + data[i].Review + `</td>
-                                    <td>` + reviewers + `</td>
-                                </tr>`;
-                    }
-                    $(id).empty().append(`<table class="table table-hover">
-                    <caption><h1 class="text-muted text-center">上传题目记录</h1></caption>
-                    <thead>
-                    <tr>
-                        <td width="1%">No.</td>
-                        <td width="22%">内容</td>
-                        <td width="8%">类型</td>
-                        <td width="20%">附加</td>
-                        <td width="20%">参考答案</td>
-                        <td width="9%">创建时间</td>
-                        <td width="8%">审核</td>
-                        <td width="12%">审核人员</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        ` + tbody + `
-                    </tbody>
-                </table>`)
-                }
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "uploadRecord"]);
-            });
+            getUploadRecord(1, id, 1)
+
         }
         if (id === "#personal") {
             $("#trainingHistory").addClass("hidden");
@@ -154,6 +100,97 @@ $(function () {
 
 });
 
+function getUploadRecord(pageNow, id, total) {
+    if (pageNow < 1) {
+        alert("已经是第一页了，别按了!")
+        return;
+    }
+    if (pageNow > total) {
+        alert("已经是最后一页了，我是有底线的!")
+        return
+    }
+    $.get("/center/uploadRecord/" + pageNow, (data, status, xhr) => {
+        if (xhr.status === 200) {
+            let tbody = ``;
+            for (let i = 0; i < data.Record.length; i++) {
+                let choices = ``;
+                if (data.Record[i].Addition != null) {
+                    for (let j = 0; j < data.Record[i].Addition.length; j++) {
+                        choices += `` + delPagraph(data.Record[i].Addition[j], 24);
+                    }
+                }
+                if (choices.length == 0) {
+                    choices = `无`;
+                }
+                let reviewers = ``;
+                if (data.Record[i].Reviewers != null) {
+                    for (let j = 0; j < data.Record[i].Reviewers.length; j++) {
+                        reviewers += `<p>` + data.Record[i].Reviewers[j] + `</p>`;
+                    }
+                }
+                if (reviewers.length == 0) {
+                    reviewers = `无`;
+                }
+                let time = dayjs(data.Record[i].CreateTime).format('YYYY年MM月DD日');
+                console.log(time);
+                tbody += `<tr>
+                                    <td>` + (i + 1) + `</td>
+                                    <td>` + delPagraph(data.Record[i].Content, 24) + `</td>
+                                    <td>` + data.Record[i].Role + `</td>
+                                    <td>` + choices + `</td>
+                                    <td>` + delPagraph(data.Record[i].Answer, 24) + `</td>
+                                    <td>` + time + `</td>
+                                    <td>` + data.Record[i].Review + `</td>
+                                    <td>` + reviewers + `</td>
+                                </tr>`;
+            }
+            $(id).empty().append(`<table class="table table-hover">
+                    <caption><h1 class="text-muted text-center">上传题目记录</h1></caption>
+                    <thead>
+                    <tr>
+                        <td width="1%">No.</td>
+                        <td width="22%">内容</td>
+                        <td width="8%">类型</td>
+                        <td width="20%">附加</td>
+                        <td width="20%">参考答案</td>
+                        <td width="9%">创建时间</td>
+                        <td width="8%">审核</td>
+                        <td width="12%">审核人员</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        ` + tbody + `
+                    </tbody>
+                </table>
+                `);
+            if (data.TotalPage >= 2) {
+                let pages = ``;
+                for (let i = 1; i <= data.TotalPage; i++) {
+                    pages += `<li><a href="javascript:void(0)" onclick="getUploadRecord(` + i + `,'` + id + `',` + data.TotalPage + `)">` + i + `</a></li>`
+                }
+                let beforePage = pageNow - 1;
+                let nextPage = pageNow + 1;
+                $(id).append(`<nav aria-label="Page navigation" class="text-center">
+                    <ul class="pagination">
+                    <li>
+                    <a href="javascript:void(0);" onclick="getUploadRecord(` + beforePage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
+                    ` + pages + `
+                <li>
+                <a href="javascript:void(0);" onclick="getUploadRecord(` + nextPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+                </ul>
+                </nav>`);
+            }
+        }
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "uploadRecord"]);
+    });
+}
+
 function getSingleAnswerHistory(pageNow, id, total) {
     if (pageNow < 1) {
         alert("已经是第一页了，别按了!")
@@ -196,12 +233,6 @@ function getSingleAnswerHistory(pageNow, id, total) {
                                     <td ` + finalClass + `>` + final + `</td>
                                 </tr>`;
             }
-            let pages = ``;
-            for (let i = 1; i <= data.TotalPage; i++) {
-                pages += `<li><a href="javascript:void(0)" onclick="getSingleAnswerHistory(` + i + `,'` + id + `',` + data.TotalPage + `)">` + i + `</a></li>`
-            }
-            let beforPage = pageNow - 1;
-            let nextPage = pageNow + 1;
             $(id).empty().append(`<table class="table table-hover">
                     <caption><h1 class="text-muted text-center">题海历史</h1></caption>
                     <thead>
@@ -220,21 +251,31 @@ function getSingleAnswerHistory(pageNow, id, total) {
                     </tbody>
                 </table>
 
-                <nav aria-label="Page navigation" class="text-center">
-                  <ul class="pagination">
+                `);
+            if (data.TotalPage >= 2) {
+                let pages = ``;
+                for (let i = 1; i <= data.TotalPage; i++) {
+                    pages += `<li><a href="javascript:void(0)" onclick="getSingleAnswerHistory(` + i + `,'` + id + `',` + data.TotalPage + `)">` + i + `</a></li>`
+                }
+                let beforePage = pageNow - 1;
+                let nextPage = pageNow + 1;
+                $(id).append(`<nav aria-label="Page navigation" class="text-center">
+                    <ul class="pagination">
                     <li>
-                      <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + beforPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                      </a>
-                    </li>
+                    <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + beforePage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
                     ` + pages + `
-                    <li>
-                      <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + nextPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                      </a>
-                    </li>
-                  </ul>
+                <li>
+                <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + nextPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+                </ul>
                 </nav>`);
+            }
+
         }
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
     });

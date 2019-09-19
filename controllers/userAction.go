@@ -363,12 +363,26 @@ func (c *LoginController) TrainingHistory() {
 }
 
 //题目上传记录
-// @router /center/uploadRecord [get]
+// @router /center/uploadRecord/:pageNum [get]
 func (c *LoginController) UploadRecord() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	pageNum, err := strconv.Atoi(c.Ctx.Input.Param(":pageNum"))
+	if err != nil {
+		logs.Warning("pageNum 不为数字")
+	}
 	o := orm.NewOrm()
+	total, err := o.QueryTable("question").Filter("user_id", loginUser.Id).Count()
+	if err != nil {
+		logs.Warning("获取条数失败")
+	}
+	pages := 0
+	if total%5 > 0 {
+		pages = int(total)/5 + 1
+	} else {
+		pages = int(total) / 5
+	}
 	var questions []models.Question
-	o.QueryTable("question").Filter("user_id", loginUser.Id).All(&questions)
+	o.QueryTable("question").Filter("user_id", loginUser.Id).Limit(5, (pageNum-1)*5).All(&questions)
 	uploadRecords := make([]common.UploadQuestionRecord, 0)
 	for i := 0; i < len(questions); i++ {
 		var role string
@@ -413,7 +427,14 @@ func (c *LoginController) UploadRecord() {
 		}
 		uploadRecords = append(uploadRecords, record)
 	}
-	c.Data["json"] = uploadRecords
+	data := struct {
+		Record    []common.UploadQuestionRecord
+		TotalPage int
+	}{
+		Record:    uploadRecords,
+		TotalPage: pages,
+	}
+	c.Data["json"] = data
 
 	c.ServeJSON()
 }

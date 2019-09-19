@@ -23,6 +23,7 @@ type SingleUserTrainingHistory struct {
 	UserAnswer string
 	Answer     string
 	Correct    bool
+	TotalPage  int
 }
 
 type UploadQuestionRecord struct {

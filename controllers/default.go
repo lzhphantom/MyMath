@@ -23,3 +23,9 @@ func (c *MainController) Get() {
 func (c *MainController) TestEditor() {
 	c.TplName = "eqneditorTest.html"
 }
+
+// @router /err/:status [get]
+func (c *MainController) ErrorTest() {
+	status := c.Ctx.Input.Param(":status")
+	c.Abort(status)
+}

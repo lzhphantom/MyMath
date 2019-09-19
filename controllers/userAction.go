@@ -300,12 +300,27 @@ func (c *LoginController) ChangePersonalInfo() {
 }
 
 //个人做题记录
-// @router /center/trainingHistory [get]
+// @router /center/trainingHistory/:pageNum [get]
 func (c *LoginController) TrainingHistory() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	pageNum, err := strconv.Atoi(c.Ctx.Input.Param(":pageNum"))
+	if err != nil {
+		logs.Warning("pageNum 不是数字")
+	}
 	o := orm.NewOrm()
+	total, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).Count()
+	if err != nil {
+		logs.Warning("获取条数失败")
+	}
+	page := 0
+	if total%10 > 0 {
+		page = int(total)/10 + 1
+	} else {
+		page = int(total) / 10
+	}
+	logs.Info(page, "条")
 	var records []models.QuestionAnswerRecord
-	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).RelatedSel("question").All(&records)
+	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).Limit(10, (pageNum-1)*10).RelatedSel("question").All(&records)
 	if err != nil {
 		logs.Warning("获取失败", err)
 	} else {
@@ -336,7 +351,14 @@ func (c *LoginController) TrainingHistory() {
 		}
 		SingleUserTrainingHistories = append(SingleUserTrainingHistories, userTrainingHistory)
 	}
-	c.Data["json"] = SingleUserTrainingHistories
+	data := struct {
+		History   []common.SingleUserTrainingHistory
+		TotalPage int
+	}{
+		History:   SingleUserTrainingHistories,
+		TotalPage: page,
+	}
+	c.Data["json"] = data
 	c.ServeJSON()
 }
 
@@ -752,40 +774,40 @@ func (c *LoginController) UpdateBasic() {
 		var basic models.BasicContent
 		err = o.QueryTable("basic_content").Filter("id", id).One(&basic)
 		basic.Concept = content
-		_,err=o.Update(&basic, "concept")
-		if err!=nil{
+		_, err = o.Update(&basic, "concept")
+		if err != nil {
 			logs.Warning("更新失败")
 		}
 	} else if group == "F" {
 		var formula models.Formula
 		err = o.QueryTable("formula").Filter("id", id).One(&formula)
 		formula.Content = content
-		_,err=o.Update(&formula, "content")
-		if err!=nil{
+		_, err = o.Update(&formula, "content")
+		if err != nil {
 			logs.Warning("更新失败")
 		}
 	} else if group == "H" {
 		var hd models.HDifficulty
 		err = o.QueryTable("h_difficulty").Filter("id", id).One(&hd)
 		hd.Content = content
-		_,err=o.Update(&hd, "content")
-		if err!=nil{
+		_, err = o.Update(&hd, "content")
+		if err != nil {
 			logs.Warning("更新失败")
 		}
 	} else if group == "K" {
 		var know models.KnowledgeImportant
 		err = o.QueryTable("knowledge_important").Filter("id", id).One(&know)
 		know.Content = content
-		_,err=o.Update(&know, "content")
-		if err!=nil{
+		_, err = o.Update(&know, "content")
+		if err != nil {
 			logs.Warning("更新失败")
 		}
 	} else if group == "E" {
 		var test models.ExaminationCenter
 		err = o.QueryTable("examination_center").Filter("id", id).One(&test)
 		test.Content = content
-		_,err=o.Update(&test, "content")
-		if err!=nil{
+		_, err = o.Update(&test, "content")
+		if err != nil {
 			logs.Warning("更新失败")
 		}
 	} else {

@@ -8,60 +8,7 @@ $(function () {
             $("#personal").addClass("hidden");
             $("#uploadRecord").addClass("hidden");
             $("#noPassQuestion").addClass("hidden");
-            $.get("/center/trainingHistory", (data, status, xhr) => {
-                if (xhr.status === 200) {
-                    let tbody = ``;
-                    for (let i = 0; i < data.length; i++) {
-                        let choices = ``;
-                        if (data[i].Addition != null) {
-                            for (let j = 0; j < data[i].Addition.length; j++) {
-                                choices += `` + delPagraph(data[i].Addition[j], 28);
-                            }
-                        }
-                        if (choices.length == 0) {
-                            choices = `无`;
-                        }
-                        let final = ``;
-                        let finalClass = ``;
-                        if (data[i].Correct) {
-                            finalClass = `class="text-success"`
-                            final = `<span class="glyphicon glyphicon-ok"></span>`
-                        } else {
-                            finalClass = `class="text-danger"`
-                            final = `<span class="glyphicon glyphicon-remove"></span>`
-                        }
-
-                        tbody += `<tr>
-                                    <td>` + (i + 1) + `</td>
-                                    <td>` + delPagraph(data[i].Content, 28) + `</td>
-                                    <td>` + data[i].Role + `</td>
-                                    <td>` + choices + `</td>
-                                    <td>` + delPagraph(data[i].UserAnswer, 28) + `</td>
-                                    <td>` + delPagraph(data[i].Answer, 28) + `</td>
-                                    <td ` + finalClass + `>` + final + `</td>
-                                </tr>`;
-                    }
-                    $(id).empty().append(`<table class="table table-hover">
-                    <caption><h1 class="text-muted text-center">题海历史</h1></caption>
-                    <thead>
-                    <tr>
-                        <td width="1%">NO.</td>
-                        <td width="25%">题目</td>
-                        <td width="8%">类型</td>
-                        <td width="20%">附加</td>
-                        <td width="20%">答案</td>
-                        <td width="20%">参考答案</td>
-                        <td width="6%">对错</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        ` + tbody + `
-                    </tbody>
-                </table>`)
-                }
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
-            });
-
+            getSingleAnswerHistory(1, id, 1);
         }
         if (id === "#uploadRecord") {
             $("#personal").addClass("hidden");
@@ -206,6 +153,92 @@ $(function () {
     });
 
 });
+
+function getSingleAnswerHistory(pageNow, id, total) {
+    if (pageNow < 1) {
+        alert("已经是第一页了，别按了!")
+        return;
+    }
+    if (pageNow > total) {
+        alert("已经是最后一页了，我是有底线的!")
+        return
+    }
+    $.get("/center/trainingHistory/" + pageNow, (data, status, xhr) => {
+        if (xhr.status === 200) {
+            let tbody = ``;
+            for (let i = 0; i < data.History.length; i++) {
+                let choices = ``;
+                if (data.History[i].Addition != null) {
+                    for (let j = 0; j < data.History[i].Addition.length; j++) {
+                        choices += `` + delPagraph(data.History[i].Addition[j], 28);
+                    }
+                }
+                if (choices.length == 0) {
+                    choices = `无`;
+                }
+                let final = ``;
+                let finalClass = ``;
+                if (data.History[i].Correct) {
+                    finalClass = `class="text-success"`
+                    final = `<span class="glyphicon glyphicon-ok"></span>`
+                } else {
+                    finalClass = `class="text-danger"`
+                    final = `<span class="glyphicon glyphicon-remove"></span>`
+                }
+
+                tbody += `<tr>
+                                    <td>` + (i + 1) + `</td>
+                                    <td>` + delPagraph(data.History[i].Content, 28) + `</td>
+                                    <td>` + data.History[i].Role + `</td>
+                                    <td>` + choices + `</td>
+                                    <td>` + delPagraph(data.History[i].UserAnswer, 28) + `</td>
+                                    <td>` + delPagraph(data.History[i].Answer, 28) + `</td>
+                                    <td ` + finalClass + `>` + final + `</td>
+                                </tr>`;
+            }
+            let pages = ``;
+            for (let i = 1; i <= data.TotalPage; i++) {
+                pages += `<li><a href="javascript:void(0)" onclick="getSingleAnswerHistory(` + i + `,'` + id + `',` + data.TotalPage + `)">` + i + `</a></li>`
+            }
+            let beforPage = pageNow - 1;
+            let nextPage = pageNow + 1;
+            $(id).empty().append(`<table class="table table-hover">
+                    <caption><h1 class="text-muted text-center">题海历史</h1></caption>
+                    <thead>
+                    <tr>
+                        <td width="1%">NO.</td>
+                        <td width="25%">题目</td>
+                        <td width="8%">类型</td>
+                        <td width="20%">附加</td>
+                        <td width="20%">答案</td>
+                        <td width="20%">参考答案</td>
+                        <td width="6%">对错</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        ` + tbody + `
+                    </tbody>
+                </table>
+
+                <nav aria-label="Page navigation" class="text-center">
+                  <ul class="pagination">
+                    <li>
+                      <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + beforPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                    ` + pages + `
+                    <li>
+                      <a href="javascript:void(0);" onclick="getSingleAnswerHistory(` + nextPage + `,'` + id + `',` + data.TotalPage + `)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>`);
+        }
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
+    });
+}
 
 function personalCheck(f) {
     let name = f.UserName.value;

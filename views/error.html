@@ -15,8 +15,11 @@
 <body>
 {{template "index-header.html" .}}
 <div id="Content-Body" class="container">
-    <h1 class="text-center text-danger">{{.errorTittle}}</h1>
-    <h2 class="text-center text-muted">{{.content}}</h2>
+    <div class="jumbotron">
+        <h1 class="text-center text-danger"><strong>{{.errorTittle}}</strong></h1>
+        <h2 class="text-center text-muted">{{.content}}</h2>
+    </div>
+
 </div>
 {{template "index-footer.html" .}}
 </body>

@@ -23,3 +23,7 @@
 #basic-content tbody tr td, #basic-type tbody tr td {
     vertical-align: middle;
 }
+
+table{
+    table-layout: fixed;
+}

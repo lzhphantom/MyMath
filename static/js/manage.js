@@ -432,29 +432,31 @@ function chooseContentShow(basicContent, data) {
             let hdContent = ``;
             //知识点精讲部分
             for (let know = 0; know < content[j].KnowledgeImportant.length; know++) {
-                knowledgeContent += `` + content[j].KnowledgeImportant[know].Content;
+                knowledgeContent += `` + delPagraph(content[j].KnowledgeImportant[know].Content, 20);
             }
+            //相关公式
             for (let know = 0; know < content[j].Formula.length; know++) {
-                formulaContent += `` + content[j].Formula[know].Content;
+                formulaContent += `` + delPagraph(content[j].Formula[know].Content, 20);
             }
+            //考点
             for (let know = 0; know < content[j].ExaminationCenter.length; know++) {
-                testContent += `` + content[j].ExaminationCenter[know].Content;
+                testContent += `` + delPagraph(content[j].ExaminationCenter[know].Content, 20);
             }
+            //重难点
             for (let know = 0; know < content[j].HDifficulty.length; know++) {
-                hdContent += `` + content[j].HDifficulty[know].Content;
+                hdContent += `` + delPagraph(content[j].HDifficulty[know].Content, 20);
             }
             $(tbody).append(` <tr>
-                            <td>` + content[j].Id + `</td>
+                            <td>` + (i + 1) + `</td>
                             <td>` + data[i].Name + `</td>
                             <td>` + content[j].Title + `</td>
-                            <td>` + content[j].Concept + `</td>
+                            <td>` + delPagraph(content[j].Concept, 20) + `</td>
                             <td>` + knowledgeContent + `</td>
                             <td>` + formulaContent + `</td>
                             <td>` + testContent + `</td>
                             <td>` + hdContent + `</td>
                             <td>
                                 <a href="#" class="btn btn-danger" onclick="` + delContent + `">删除</a>
-                                
                             </td>
                             <td>
                                 <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>

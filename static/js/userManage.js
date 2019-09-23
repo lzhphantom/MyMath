@@ -16,7 +16,6 @@ $(() => {
                     "/admin/searchUser",
                     reqData,
                     function (data, status) {
-                        console.log(data);
                         $(id).find("tbody").empty();
                         for (let i = 0; i < data.length; i++) {
                             let sex = "";

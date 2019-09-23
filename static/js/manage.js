@@ -68,7 +68,6 @@ $(function () {
 
     $("a[role-tab='rank']").on('show.bs.tab', () => {
         $.get("/ranking", (data, status, xhr) => {
-            console.log(data);
             if (xhr.status === 200) {
                 let tbody = ``
                 for (let i = 0; i < data.length; i++) {

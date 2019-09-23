@@ -13,7 +13,7 @@ $(() => {
                     reqData.group = 0
                 }
                 $.post(
-                    "/admin/searchUser",
+                    "/LS/searchUser",
                     reqData,
                     function (data, status) {
                         $(id).find("tbody").empty();

@@ -5,7 +5,7 @@ $(function () {
         $("#collapseThree").collapse('hide');
         $("#collapse4").collapse('hide');
         $("#collapse5").collapse('hide');
-        $.get("/admin/basicCommon",
+        $.get("/user/basicCommon",
             function (data, status, xhr) {
                 if (xhr.status === 264) {
                     notLogin();
@@ -37,7 +37,7 @@ $(function () {
                         return
                     }
                     let controls = $(e.target).attr("href");
-                    $.get("/admin/basicContent/" + id, function (data, status) {
+                    $.get("/lzhphantomAdminService/basicContent/" + id, function (data, status) {
                         let $modal = $(controls);
                         $($modal).empty();
                         $($modal).append(`<h1 class="text-center text-muted">基础知识</h1>`);
@@ -148,7 +148,7 @@ $(function () {
         $("#collapseTwo").collapse('hide');
         $("#collapse4").collapse('hide');
         $("#collapse5").collapse('hide');
-        $.get("/admin/basicCommon", (data, status, xhr) => {
+        $.get("/user/basicCommon", (data, status, xhr) => {
             if (xhr.status === 264) {
                 notLogin();
                 setTimeout(() => {
@@ -162,7 +162,7 @@ $(function () {
                 $(threeUl).append(`<li role="presentation"><a href="#SpecialPractice" aria-controls="SpecialPractice" role="tab"
                                                            data-toggle="tab" data-id="` + data[i].Id + `" role-tab="sp">` + data[i].Name + `<br></a></li>`);
             }
-            // /admin/getQuestionByCommonId/:id
+            // /lzhphantomAdminService/getQuestionByCommonId/:id
             $('a[role-tab="sp"]').on('hide.bs.tab', (e) => {
                 let controls = $(e.target).attr("href");
                 $(controls).empty();
@@ -190,7 +190,7 @@ $(function () {
             let target = $(e.target).attr("href");
             $(target).removeClass("hidden");
             if (target === "#UploadSelect") {
-                $.get("/admin/basicCommon", (data, status, xhr) => {
+                $.get("/user/basicCommon", (data, status, xhr) => {
                     if (xhr.status === 200) {
                         let options = ``;
                         for (let i = 0; i < data.length; i++) {
@@ -200,7 +200,7 @@ $(function () {
                     }
                 })
             } else if (target === "#UploadBlank") {
-                $.get("/admin/basicCommon", (data, status, xhr) => {
+                $.get("/user/basicCommon", (data, status, xhr) => {
                     if (xhr.status === 200) {
                         let options = ``;
                         for (let i = 0; i < data.length; i++) {
@@ -242,7 +242,7 @@ $(function () {
                 let ans = $("#showAnswerSelect").val();
                 if (content.length > 0) {
                     $.post(
-                        "/admin/uploadQuestion",
+                        "/lzhphantomAdminService/uploadQuestion",
                         {
                             data: JSON.stringify({
                                 content: content,
@@ -280,7 +280,7 @@ $(function () {
                 }
                 if (content.length > 0) {
                     $.post(
-                        "/admin/uploadQuestion",
+                        "/lzhphantomAdminService/uploadQuestion",
                         {
                             data: JSON.stringify(db),
                             role: 3,
@@ -583,7 +583,7 @@ function backToLast(backGroup, editorName) {
 
 //获取非选择题
 function getUnSelectFirst(controls) {
-    $.get("/admin/getQuestion/-1", (data, status, xhr) => {
+    $.get("/user/getQuestion/-1", (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -646,7 +646,7 @@ function getUnSelectFirst(controls) {
 }
 
 function getUnSelect(controls, num, commitData) {
-    $.post("/getTrain/unselect/" + num, commitData, (data, status, xhr) => {
+    $.post("/user/getTrain/unselect/" + num, commitData, (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -716,7 +716,7 @@ function commitUnSelect(controls) {
         alert("请填写你的答案！");
         return
     }
-    $.post("/commitTraining/unselect",
+    $.post("/user/commitTraining/unselect",
         {answer: userAnswer},
         (data) => {
             let tbody = ``;
@@ -775,7 +775,7 @@ function commitUnSelect(controls) {
 //获取选择题
 function getSelectFirst(controls) {
 
-    $.get("/admin/getQuestion/1", (data, status, xhr) => {
+    $.get("/user/getQuestion/1", (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -837,7 +837,7 @@ function getSelectFirst(controls) {
 }
 
 function getSelect(controls, num, commitData) {
-    $.post("/getTrain/select/" + num, commitData, (data, status, xhr) => {
+    $.post("/user/getTrain/select/" + num, commitData, (data, status, xhr) => {
         if (xhr.status === 264) {
             notLogin();
             setTimeout(() => {
@@ -906,7 +906,7 @@ function commitSelect(controls) {
         alert("请选择你认为正确的答案！");
         return
     }
-    $.post("/commitTraining/select",
+    $.post("/user/commitTraining/select",
         {answer: userAnswer},
         (data) => {
             let tbody = ``;
@@ -964,7 +964,7 @@ function commitSelect(controls) {
 
 //专项练习获取题
 function getSpecialPracticeFirst(sp, id) {
-    $.get("/admin/getQuestionByCommonId/" + id, (data) => {
+    $.get("/user/getQuestionByCommonId/" + id, (data) => {
         let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
@@ -1061,7 +1061,7 @@ function getSpecialPracticeFirst(sp, id) {
 }
 
 function getSpecialPractice(sp, num, commitData) {
-    $.post("/getPractice/" + num, commitData, (data) => {
+    $.post("/user/getPractice/" + num, commitData, (data) => {
         let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
@@ -1176,7 +1176,7 @@ function commitPractice(sp, role) {
             return
         }
     }
-    $.post("/commitPractice",
+    $.post("/user/commitPractice",
         {answer: userAnswer},
         (data) => {
             let tbody = ``;
@@ -1247,7 +1247,7 @@ function commitPractice(sp, role) {
 }
 
 function getQuestionReview(controls) {
-    $.get("/getQuestionReview", (data) => {
+    $.get("/user/getQuestionReview", (data) => {
         let tbody = ``;
         for (let i = 0; i < data.length; i++) {
             let addition = ``;
@@ -1301,7 +1301,7 @@ function getQuestionReview(controls) {
 }
 
 function getBasicReview(controls) {
-    $.get("/getBasicReview", (data, status, xhr) => {
+    $.get("/user/getBasicReview", (data, status, xhr) => {
         if (xhr.status === 200) {
             let tbody = ``;
             for (let i = 0; i < data.length; i++) {
@@ -1408,7 +1408,7 @@ function getBasicReview(controls) {
 
 function passBasic(id, group) {
     let g = String.fromCharCode(group);
-    $.get("/passBasic/" + id + "/" + g, (data, status, xhr) => {
+    $.get("/user/passBasic/" + id + "/" + g, (data, status, xhr) => {
         if (xhr.status === 200) {
             getBasicReview('#KnowledgeReview')
         }
@@ -1417,7 +1417,7 @@ function passBasic(id, group) {
 
 function changeBasic(id, group) {
     let g = String.fromCharCode(group);
-    $.get("/changeBasic/" + id + "/" + g, (data, status, xhr) => {
+    $.get("/user/changeBasic/" + id + "/" + g, (data, status, xhr) => {
         if (xhr.status === 200) {
             let controls = "#KnowledgeReview";
             $(controls).empty().append(`
@@ -1449,7 +1449,7 @@ function changeBasic(id, group) {
             $("#changeBasicBtn").on("click", () => {
                 let content = $("#showChangeBasicContent").attr("data-content");
                 $.post(
-                    "/updateBasic",
+                    "/user/updateBasic",
                     {
                         id: id,
                         content: content,
@@ -1467,9 +1467,8 @@ function changeBasic(id, group) {
 }
 
 function ChangeReview(id, controls) {
-    $.get("/getQuestion/" + id, (data, status, xhr) => {
+    $.get("/user/getSingleReviewQuestion/" + id, (data, status, xhr) => {
         if (xhr.status == 200) {
-            console.log(data);
             let other = ``;
             if (data.Role === 1) {
                 other = `<div class="form-group row">
@@ -1585,7 +1584,7 @@ function ChangeReview(id, controls) {
                     }
                 }
                 $.post(
-                    "/changeQuestion/" + data.Id,
+                    "/user/changeQuestion/" + data.Id,
                     changeData,
                     (data, status, xhr) => {
                         if (xhr.status === 200) {

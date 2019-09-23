@@ -9,7 +9,7 @@ $(function () {
     let basicContent = document.getElementById("basic-content");
     //显示基础知识大纲版块
     $(chooseType).on("click", function () {
-        $.get("/admin/basicCommon", function (data, status) {
+        $.get("/LS/basicCommon", function (data, status) {
             basicCommon(data, basicType)
         });
 
@@ -18,7 +18,7 @@ $(function () {
     });
     //显示基础知识内容版块
     $(chooseContent).on("click", function () {
-        $.get("/admin/basicContent/-1", function (data, status) {
+        $.get("/LS/basicContent/-1", function (data, status) {
             chooseContentShow(basicContent, data);
         });
         choose.className = "hidden";
@@ -28,7 +28,7 @@ $(function () {
     $("#blankType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#blankUp").removeClass("hidden");
-        $.get("/admin/basicCommon", (data, status, xhr) => {
+        $.get("/LS/basicCommon", (data, status, xhr) => {
             if (xhr.status === 200) {
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
@@ -42,7 +42,7 @@ $(function () {
     $("#mulChoiceType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#mulChoiceUp").removeClass("hidden");
-        $.get("/admin/basicCommon", (data, status, xhr) => {
+        $.get("/LS/basicCommon", (data, status, xhr) => {
             if (xhr.status === 200) {
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
@@ -55,7 +55,7 @@ $(function () {
     $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
-        $.get("/admin/basicCommon", (data, status, xhr) => {
+        $.get("/LS/basicCommon", (data, status, xhr) => {
             if (xhr.status === 200) {
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
@@ -67,7 +67,7 @@ $(function () {
     });
 
     $("a[role-tab='rank']").on('show.bs.tab', () => {
-        $.get("/ranking", (data, status, xhr) => {
+        $.get("/LS/ranking", (data, status, xhr) => {
             if (xhr.status === 200) {
                 let tbody = ``
                 for (let i = 0; i < data.length; i++) {
@@ -113,7 +113,7 @@ $(function () {
             Data["ti"] = $('input[name="ti"]').val();
         }
         $.post(
-            "/admin/basicType/" + cop,
+            "/LS/basicType/" + cop,
             Data,
             function (data, status) {
                 basicCommon(data, document.getElementById("basic-type"));
@@ -132,7 +132,7 @@ $(function () {
     });
     //基础知识内容添加版块，添加种类搜索
     $("#basicContentAdd").on("show.bs.modal", function () {
-        $.get("/admin/basicCommon", function (data, status) {
+        $.get("/LS/basicCommon", function (data, status) {
             let $typeSelect = "#typeSelect";
             $($typeSelect).empty().append(`<option value="0">==请选择==</option>`);
             let content = ``;
@@ -179,7 +179,7 @@ $(function () {
         }
 
         $.post(
-            "/admin/publishContent/" + contentSelect,
+            "/LS/publishContent/" + contentSelect,
             {
                 typeId: typeSelect,
                 content: basicPublishContent,
@@ -221,7 +221,7 @@ $(function () {
             }
         }
         $.post(
-            "/admin/changeContent",
+            "/LS/changeContent",
             {
                 id: id,
                 content1: JSON.stringify(content1),
@@ -255,7 +255,7 @@ $(function () {
                     db.answer = $(ans).attr("data-content");
                 }
                 $.post(
-                    "/admin/uploadQuestion",
+                    "/LS/uploadQuestion",
                     {
                         data: JSON.stringify(db),
                         role: 2,
@@ -288,7 +288,7 @@ $(function () {
             }
             if (content.length > 0) {
                 $.post(
-                    "/admin/uploadQuestion",
+                    "/LS/uploadQuestion",
                     {
                         data: JSON.stringify(db),
                         role: 3,
@@ -332,7 +332,7 @@ $(function () {
             let ans = $("#showAnswerSelect").val();
             if (content.length > 0) {
                 $.post(
-                    "/admin/uploadQuestion",
+                    "/LS/uploadQuestion",
                     {
                         data: JSON.stringify({
                             content: content,
@@ -587,7 +587,7 @@ function showChangeBasicType(id, name) {
  */
 function delBasicType(id) {
     $.post(
-        "/admin/delBasicType",
+        "/LS/delBasicType",
         {id: id},
         function (data, status) {
             basicCommon(data, document.getElementById("basic-type"));
@@ -598,7 +598,7 @@ function delBasicType(id) {
 //基础知识内容删除
 function delBasicContent(id) {
     $.post(
-        "/admin/delBasicContent",
+        "/LS/delBasicContent",
         {id: id},
         function (data, status) {
             chooseContentShow(document.getElementById("basic-content"), data);
@@ -612,7 +612,7 @@ var changeData;
 function showChangeBasicContent(id, changeModal) {
 
     $.post(
-        "/admin/showChangeContent",
+        "/LS/showChangeContent",
         {id: id},
         function (data, status) {
             $(changeModal).find("#typeSelectChange").val(data.Title).attr("disabled", true).attr("data-id", id);

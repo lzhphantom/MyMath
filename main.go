@@ -42,12 +42,19 @@ func main() {
 	FileterLogin := func(ctx *context2.Context) {
 		user := ctx.Input.CruSession.Get(common.KeyLoginUser)
 		logs.Info(ctx.Request.RequestURI)
-		if user == nil && !(ctx.Request.RequestURI == "/login" || ctx.Request.RequestURI == "/" || ctx.Request.RequestURI == "/register" ||
-			ctx.Request.RequestURI == "/LSLogin") {
+		if user == nil {
 			ctx.ResponseWriter.WriteHeader(common.KeyNotLogin)
 		}
 	}
-	beego.InsertFilter("/*", beego.BeforeRouter, FileterLogin)
+	FileterAdminLogin := func(ctx *context2.Context) {
+		user := ctx.Input.CruSession.Get(common.KeyLoginAdmin)
+		if user == nil && !(ctx.Request.RequestURI == "/LS/login" || ctx.Request.RequestURI == "/LS" || ctx.Request.RequestURI == "/LS/admin") {
+			ctx.Redirect(302, "/LS")
+		}
+	}
+	beego.InsertFilter("/user/*", beego.BeforeRouter, FileterLogin)
+	beego.InsertFilter("/center/*", beego.BeforeRouter, FileterLogin)
+	beego.InsertFilter("/LS/*", beego.BeforeRouter, FileterAdminLogin)
 
 	beego.Run()
 }

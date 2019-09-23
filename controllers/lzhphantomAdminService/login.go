@@ -1,4 +1,4 @@
-package admin
+package lzhphantomAdminService
 
 import (
 	"fmt"
@@ -13,20 +13,21 @@ type AdminLoginCtroller struct {
 	beego.Controller
 }
 
-// @router /LSLogin [get]
+// @router /LS [get]
 func (c *AdminLoginCtroller) ShowLoginPage() {
 	isExistUser := c.GetSession(common.KeyLoginAdmin)
 	if isExistUser == nil {
 		c.TplName = "admin/admin-login.html"
 	} else {
-		c.Redirect("/LSLogin/login", 302)
+		c.Redirect("/LS/login", 302)
 	}
 
 }
 
-// @router /LSLogin/login [post,get]
+// @router /LS/login [post,get]
 func (c *AdminLoginCtroller) Login() {
 	isExistUser := c.GetSession(common.KeyLoginAdmin)
+	logs.Info(isExistUser == nil)
 	if isExistUser == nil {
 		userName := c.GetString("Name")
 		password := c.GetString("Password")
@@ -39,7 +40,7 @@ func (c *AdminLoginCtroller) Login() {
 		err := o.Read(&user, "Name", "Pwd")
 		if err != nil {
 			logs.Warning("改用户不存在", userName, password, err)
-			c.Redirect("/LSLogin", 302)
+			c.Redirect("/LS", 302)
 			return
 		}
 		loginAdmin := common.LoginAdmin{
@@ -51,8 +52,8 @@ func (c *AdminLoginCtroller) Login() {
 	c.TplName = "admin/manage.html"
 }
 
-// @router /LSLogin/logOut [get]
+// @router /LS/logOut [get]
 func (c *AdminLoginCtroller) LogOut() {
 	c.DelSession(common.KeyLoginAdmin)
-	c.Redirect("/LSLogin", 302)
+	c.Redirect("/LS", 302)
 }

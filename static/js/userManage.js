@@ -27,12 +27,12 @@ $(() => {
                             }
                             $(id).find("tbody").append(`
                             <tr>
-                                <td>` + data[i].Id + `</td>
+                                <td>` + (i + 1) + `</td>
                                 <td>` + data[i].UserName + `</td>
-                                <td>` + data[i].Password + `</td>
-                                <td>` + data[i].UserInfo.Name + `</td>
+                                <td>` + data[i].Password.replace(/\S{28}(\S{4})/, '*********$1') + `</td>
+                                <td>` + data[i].UserInfo.Name.replace(/(\S{1})\S*/, '$1**') + `</td>
                                 <td>` + sex + `</td>
-                                <td>` + data[i].UserInfo.Tel + `</td>
+                                <td>` + data[i].UserInfo.Tel.replace(/\d{7}(\d{4})/, '*******$1') + `</td>
                                 <td>` + data[i].UserInfo.Address + `</td>
                             </tr>`)
                         }
@@ -50,10 +50,10 @@ $(() => {
 });
 
 function backToUserModal(obj) {
-    let userAdd=$(obj).closest("#userAdd");
-    if(userAdd.length>0){
+    let userAdd = $(obj).closest("#userAdd");
+    if (userAdd.length > 0) {
         $("#userAdd").addClass("hidden");
-    }else {
+    } else {
         $(obj).parent("div").parent("div").addClass("hidden");
     }
     $("#userModal").removeClass("hidden");

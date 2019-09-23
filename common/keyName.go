@@ -3,6 +3,8 @@ package common
 //储存登录用户信息
 const KeyLoginUser string = "loginUser"
 
+const KeyLoginAdmin string = "LoginAdmin"
+
 //未登录httpStatus
 const KeyNotLogin int = 264
 

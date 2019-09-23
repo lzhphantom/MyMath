@@ -13,6 +13,23 @@ import (
 
 func init() {
 	gob.Register(common.LoginUser{})
+	gob.Register(common.LoginAdmin{})
+	gob.Register(common.UploadQuestionRecord{})
+	gob.Register(common.SingleUserTrainingHistory{})
+	gob.Register(common.KnowledgeReview{})
+	gob.Register(common.FormulaReview{})
+	gob.Register(common.HDifficultReview{})
+	gob.Register(common.TestReview{})
+	gob.Register(common.Select{})
+	gob.Register(common.UserInfo{})
+	gob.Register(common.AnswerRanking{})
+	gob.Register(common.BasicCommonReview{})
+	gob.Register(common.ChangeQuestion{})
+	gob.Register(common.Practice{})
+	gob.Register(common.ReviewQuestion{})
+	gob.Register(common.TrainingSelect{})
+	gob.Register(common.TrainingUnSelect{})
+	gob.Register(common.UnSelect{})
 }
 
 func main() {
@@ -25,7 +42,8 @@ func main() {
 	FileterLogin := func(ctx *context2.Context) {
 		user := ctx.Input.CruSession.Get(common.KeyLoginUser)
 		logs.Info(ctx.Request.RequestURI)
-		if user == nil && !(ctx.Request.RequestURI == "/login" || ctx.Request.RequestURI == "/" || ctx.Request.RequestURI == "/register") {
+		if user == nil && !(ctx.Request.RequestURI == "/login" || ctx.Request.RequestURI == "/" || ctx.Request.RequestURI == "/register" ||
+			ctx.Request.RequestURI == "/LSLogin") {
 			ctx.ResponseWriter.WriteHeader(common.KeyNotLogin)
 		}
 	}

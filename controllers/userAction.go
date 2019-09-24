@@ -319,3 +319,26 @@ func (c *LoginController) UploadRecord() {
 
 	c.ServeJSON()
 }
+
+//个人题目比
+// @router /center/trainingAnalysis [get]
+func (c *LoginController) Analysis() {
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	o := orm.NewOrm()
+	var analysis []common.TrainingAnalysis
+	_, err := o.Raw("select b.name,count(basic_common_id) as num from question_answer_record r left join  question q on r.question_id=q.id left join basic_common b on b.id=q.basic_common_id where r.user_id = ? group by basic_common_id;", loginUser.Id).QueryRows(&analysis)
+	if err != nil {
+		logs.Warning("获取个人题目比失败", err)
+	}
+	logs.Debug(analysis)
+	total := 0
+	for _, val := range analysis {
+		total += val.Num
+	}
+	for i := 0; i < len(analysis); i++ {
+		analysis[i].Percent = float64(analysis[i].Num) / float64(total) * 100
+	}
+	c.Data["json"] = analysis
+	c.ServeJSON()
+
+}

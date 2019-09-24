@@ -35,3 +35,9 @@ type UploadQuestionRecord struct {
 	Review     string
 	Reviewers  []string
 }
+
+type TrainingAnalysis struct {
+	Name    string
+	Num     int
+	Percent float64
+}

@@ -1,27 +1,30 @@
 $(() => {
-    window.onload=function () {
-        $.get("/center/trainingAnalysis",(data,status,xhr)=>{
-            if(xhr.status===200){
-                console.log(data);
-                let trainingAnalysis=[]
-                let max=0;
-                let index=0;
-                for (let i = 0; i < data.length; i++) {
-                    if(max<data[i].Num){
-                        max=data[i].Num;
-                        index=i;
-                    }
-                    trainingAnalysis.push({y:data[i].Percent,name:data[i].Name});
+    window.onload = function () {
+        $.get("/center/trainingAnalysis", (data, status, xhr) => {
+            if (xhr.status === 200) {
+                if (data === null || data.length === 0) {
+                    $("#trainingAnalysis").append(`<p class="text-warning">暂无记录无法分析</p>`)
+                    return
                 }
-                trainingAnalysis[index].exploded=true;
+                let trainingAnalysis = [];
+                let max = 0;
+                let index = 0;
+                for (let i = 0; i < data.length; i++) {
+                    if (max < data[i].Num) {
+                        max = data[i].Num;
+                        index = i;
+                    }
+                    trainingAnalysis.push({y: number_format(data[i].Percent, 2, '.', ','), name: data[i].Name});
+                }
+                trainingAnalysis[index].exploded = true;
 
                 var chart = new CanvasJS.Chart("trainingAnalysis", {
-                    exportEnabled: true,
+                    // exportEnabled: true,
                     animationEnabled: true,
-                    title:{
-                        text: "题量比"
+                    title: {
+                        text: "分析比"
                     },
-                    legend:{
+                    legend: {
                         cursor: "pointer",
                         itemclick: explodePie
                     },
@@ -42,8 +45,8 @@ $(() => {
 
 });
 
-function explodePie (e) {
-    if(typeof (e.dataSeries.dataPoints[e.dataPointIndex].exploded) === "undefined" || !e.dataSeries.dataPoints[e.dataPointIndex].exploded) {
+function explodePie(e) {
+    if (typeof (e.dataSeries.dataPoints[e.dataPointIndex].exploded) === "undefined" || !e.dataSeries.dataPoints[e.dataPointIndex].exploded) {
         e.dataSeries.dataPoints[e.dataPointIndex].exploded = true;
     } else {
         e.dataSeries.dataPoints[e.dataPointIndex].exploded = false;

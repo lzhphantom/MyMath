@@ -1,18 +1,19 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/common"
+	"github.com/lzhphantom/MyMath/controllers/base"
 	"github.com/lzhphantom/MyMath/models"
 	"strconv"
 	"strings"
 )
 
 type LoginController struct {
-	beego.Controller
+	base.UserBaseController
 }
 
 //用户登录
@@ -24,19 +25,11 @@ func (c *LoginController) Login() {
 	md5pwd := fmt.Sprintf("%x", common.MD5Password(pwd))
 	o := orm.NewOrm()
 	var user models.User
-	err := o.QueryTable("user").Filter("user_name", username).One(&user)
+	user.UserName = username
+	user.Password = md5pwd
+	err := o.Read(&user, "user_name", "password")
 	if err != nil {
-		logs.Debug("改用户不存在")
-		c.Redirect("/", 302)
-		return
-	}
-
-	if md5pwd == user.Password {
-		logs.Debug("验证通过")
-	} else {
-		logs.Debug("密码不正确")
-		c.Redirect("/", 302)
-		return
+		c.Abort500(errors.New("用户或密码不正确"))
 	}
 
 	var userInfo models.UserInfo
@@ -68,11 +61,18 @@ func (c *LoginController) Register() {
 		Role:     common.KeyRoleStudent,
 	}
 	o := orm.NewOrm()
-	num, err := o.Insert(&user)
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	_, err := o.Insert(&user)
 	if err != nil {
-		logs.Warning("插入失败", err)
+		o.Rollback()
+		c.Abort500(err)
 	} else {
-		logs.Info("成功插入", num, "条")
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+		logs.Info("注册成功", user)
 	}
 	c.Redirect("/", 302)
 }
@@ -85,14 +85,12 @@ func (c *LoginController) Center() {
 	var userInfo models.UserInfo
 	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
 	if err != nil {
-		logs.Warning("获取个人信息失败", err)
-	} else {
-		logs.Info("获取个人信息成功")
+		c.Abort500(err)
 	}
 	var user models.User
 	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
 	if err != nil {
-		logs.Warning("获取失败", err)
+		c.Abort500(err)
 	}
 	var sex string
 	if userInfo.Sex == 1 {
@@ -121,14 +119,12 @@ func (c *LoginController) GetPersonalInfo() {
 	var userInfo models.UserInfo
 	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
 	if err != nil {
-		logs.Warning("获取个人信息失败", err)
-	} else {
-		logs.Info("获取个人信息成功")
+		c.Abort500(err)
 	}
 	var user models.User
 	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
 	if err != nil {
-		logs.Warning("获取失败", err)
+		c.Abort500(err)
 	}
 	var sex string
 	if userInfo.Sex == 1 {
@@ -143,8 +139,7 @@ func (c *LoginController) GetPersonalInfo() {
 		userInfo.Tel,
 		userInfo.Address,
 	}
-	c.Data["json"] = info
-	c.ServeJSON()
+	c.JSONOkData(1, info)
 }
 
 // @router /center/changePersonalInfo [post]
@@ -163,19 +158,25 @@ func (c *LoginController) ChangePersonalInfo() {
 	var userInfo models.UserInfo
 	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
 	if err != nil {
-		logs.Warning("获取个人信息失败", err)
+		c.Abort500(err)
 	}
 	userInfo.Name = userName
 	userInfo.Tel = tel
 	address := province + " " + city + " " + street
 	userInfo.Address = address
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	num, err := o.Update(&userInfo, "name", "tel", "address")
 	if err != nil {
-		logs.Warning("个人信息更新失败", err)
+		o.Rollback()
+		c.Abort500(err)
 	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
 		logs.Info("更新成功", num)
 	}
-
 	c.Redirect("/center", 302)
 
 }
@@ -186,12 +187,12 @@ func (c *LoginController) TrainingHistory() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	pageNum, err := strconv.Atoi(c.Ctx.Input.Param(":pageNum"))
 	if err != nil {
-		logs.Warning("pageNum 不是数字")
+		c.Abort500(err)
 	}
 	o := orm.NewOrm()
 	total, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).Count()
 	if err != nil {
-		logs.Warning("获取条数失败")
+		c.Abort500(err)
 	}
 	page := 0
 	if total%10 > 0 {
@@ -201,11 +202,9 @@ func (c *LoginController) TrainingHistory() {
 	}
 	logs.Info(page, "条")
 	var records []models.QuestionAnswerRecord
-	num, err := o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).Limit(10, (pageNum-1)*10).RelatedSel("question").All(&records)
+	_, err = o.QueryTable("question_answer_record").Filter("user_id", loginUser.Id).Limit(10, (pageNum-1)*10).RelatedSel("question").All(&records)
 	if err != nil {
-		logs.Warning("获取失败", err)
-	} else {
-		logs.Info("获取", num)
+		c.Abort500(err)
 	}
 	SingleUserTrainingHistories := make([]common.SingleUserTrainingHistory, 0)
 	for i := 0; i < len(records); i++ {
@@ -239,8 +238,7 @@ func (c *LoginController) TrainingHistory() {
 		History:   SingleUserTrainingHistories,
 		TotalPage: page,
 	}
-	c.Data["json"] = data
-	c.ServeJSON()
+	c.JSONOkData(len(data.History), data)
 }
 
 //题目上传记录
@@ -249,12 +247,12 @@ func (c *LoginController) UploadRecord() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	pageNum, err := strconv.Atoi(c.Ctx.Input.Param(":pageNum"))
 	if err != nil {
-		logs.Warning("pageNum 不为数字")
+		c.Abort500(err)
 	}
 	o := orm.NewOrm()
 	total, err := o.QueryTable("question").Filter("user_id", loginUser.Id).Count()
 	if err != nil {
-		logs.Warning("获取条数失败")
+		c.Abort500(err)
 	}
 	pages := 0
 	if total%5 > 0 {
@@ -315,9 +313,7 @@ func (c *LoginController) UploadRecord() {
 		Record:    uploadRecords,
 		TotalPage: pages,
 	}
-	c.Data["json"] = data
-
-	c.ServeJSON()
+	c.JSONOkData(len(data.Record), data)
 }
 
 //个人题目比
@@ -328,7 +324,7 @@ func (c *LoginController) Analysis() {
 	var analysis []common.TrainingAnalysis
 	_, err := o.Raw("select b.name,count(basic_common_id) as num from question_answer_record r left join  question q on r.question_id=q.id left join basic_common b on b.id=q.basic_common_id where r.user_id = ? group by basic_common_id;", loginUser.Id).QueryRows(&analysis)
 	if err != nil {
-		logs.Warning("获取个人题目比失败", err)
+		c.Abort500(err)
 	}
 	logs.Debug(analysis)
 	total := 0
@@ -338,6 +334,5 @@ func (c *LoginController) Analysis() {
 	for i := 0; i < len(analysis); i++ {
 		analysis[i].Percent = float64(analysis[i].Num) / float64(total) * 100
 	}
-	c.Data["json"] = analysis
-	c.ServeJSON()
+	c.JSONOkData(len(analysis), analysis)
 }

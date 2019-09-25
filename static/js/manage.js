@@ -9,7 +9,12 @@ $(function () {
     let basicContent = document.getElementById("basic-content");
     //显示基础知识大纲版块
     $(chooseType).on("click", function () {
-        $.get("/LS/basicCommon", function (data, status) {
+        $.get("/LS/basicCommon", function (Data) {
+            if (Data.code !== 0) {
+                alert(Data.msg);
+                return
+            }
+            let data = Data.data;
             basicCommon(data, basicType)
         });
 
@@ -18,7 +23,11 @@ $(function () {
     });
     //显示基础知识内容版块
     $(chooseContent).on("click", function () {
-        $.get("/LS/basicContent/-1", function (data, status) {
+        $.get("/LS/basicContent/-1", function (Data) {
+            if (Data.code !== 0) {
+                alert(Data.msg);
+            }
+            let data = Data.data;
             chooseContentShow(basicContent, data);
         });
         choose.className = "hidden";
@@ -28,8 +37,9 @@ $(function () {
     $("#blankType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#blankUp").removeClass("hidden");
-        $.get("/LS/basicCommon", (data, status, xhr) => {
-            if (xhr.status === 200) {
+        $.get("/LS/basicCommon", (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
                     options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
@@ -42,8 +52,9 @@ $(function () {
     $("#mulChoiceType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#mulChoiceUp").removeClass("hidden");
-        $.get("/LS/basicCommon", (data, status, xhr) => {
-            if (xhr.status === 200) {
+        $.get("/LS/basicCommon", (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
                     options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
@@ -55,8 +66,9 @@ $(function () {
     $("#solveType").on("click", function () {
         $("#chooseUp").addClass("hidden");
         $("#solveUp").removeClass("hidden");
-        $.get("/LS/basicCommon", (data, status, xhr) => {
-            if (xhr.status === 200) {
+        $.get("/LS/basicCommon", (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
                 let options = ``;
                 for (let i = 0; i < data.length; i++) {
                     options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>>`;
@@ -67,8 +79,9 @@ $(function () {
     });
 
     $("a[role-tab='rank']").on('show.bs.tab', () => {
-        $.get("/LS/ranking", (data, status, xhr) => {
-            if (xhr.status === 200) {
+        $.get("/LS/ranking", (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
                 let tbody = ``
                 for (let i = 0; i < data.length; i++) {
                     tbody += `<tr>
@@ -132,7 +145,12 @@ $(function () {
     });
     //基础知识内容添加版块，添加种类搜索
     $("#basicContentAdd").on("show.bs.modal", function () {
-        $.get("/LS/basicCommon", function (data, status) {
+        $.get("/LS/basicCommon", function (Data) {
+            if (Data !== 0) {
+                alert(Data.msg);
+                return
+            }
+            let data = Data.data;
             let $typeSelect = "#typeSelect";
             $($typeSelect).empty().append(`<option value="0">==请选择==</option>`);
             let content = ``;
@@ -260,8 +278,9 @@ $(function () {
                         data: JSON.stringify(db),
                         role: 2,
                     },
-                    (data, status) => {
-                        if (status === "success") {
+                    (Data) => {
+                        alert(Data.msg);
+                        if (Data.code === 0) {
                             backToUp("#showBlank")
                         }
                     }
@@ -293,8 +312,9 @@ $(function () {
                         data: JSON.stringify(db),
                         role: 3,
                     },
-                    (data, status) => {
-                        if (status === "success") {
+                    (Data) => {
+                        alert(Data.msg);
+                        if (Data.code === 0) {
                             backToUp("#showSolve")
                         }
                     }
@@ -342,8 +362,9 @@ $(function () {
                         }),
                         role: 1,
                     },
-                    (data, status) => {
-                        if (status === "success") {
+                    (Data) => {
+                        alert(Data.msg);
+                        if (Data.code === 0) {
                             backToUp("#showSelectContent")
                         }
                     }
@@ -600,7 +621,7 @@ function delBasicContent(id) {
     $.post(
         "/LS/delBasicContent",
         {id: id},
-        function (data, status) {
+        function (data) {
             chooseContentShow(document.getElementById("basic-content"), data);
         }
     );
@@ -614,7 +635,12 @@ function showChangeBasicContent(id, changeModal) {
     $.post(
         "/LS/showChangeContent",
         {id: id},
-        function (data, status) {
+        function (Data) {
+            if (Data.code !== 0) {
+                alert(Data.msg);
+                return
+            }
+            let data = Data.data;
             $(changeModal).find("#typeSelectChange").val(data.Title).attr("disabled", true).attr("data-id", id);
             $(changeModal).find("option[value='5']").attr("selected", true);
             $(changeModal).find("#publishArea").empty();

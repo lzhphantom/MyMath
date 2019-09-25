@@ -171,10 +171,18 @@ func (c *UserController) CommitTraining() {
 							Id: selects[i].Train.Id,
 						},
 					}
+
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 				} else {
@@ -200,10 +208,18 @@ func (c *UserController) CommitTraining() {
 							Id: selects[i].Train.Id,
 						},
 					}
+
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err = o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 					break
@@ -244,10 +260,18 @@ func (c *UserController) CommitTraining() {
 							Id: unSelects[i].Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
+
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 				} else {
@@ -273,10 +297,17 @@ func (c *UserController) CommitTraining() {
 							Id: unSelects[i].Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 					break
@@ -438,10 +469,17 @@ func (c *UserController) CommitPractice() {
 							Id: practices[i].Select.Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 				} else {
@@ -467,10 +505,17 @@ func (c *UserController) CommitPractice() {
 							Id: practices[i].Select.Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 					break
@@ -492,10 +537,17 @@ func (c *UserController) CommitPractice() {
 							Id: practices[i].UnSelect.Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 				} else {
@@ -521,10 +573,17 @@ func (c *UserController) CommitPractice() {
 							Id: practices[i].UnSelect.Train.Id,
 						},
 					}
+					if err := o.Begin(); err != nil {
+						c.Abort500(err)
+					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
+						o.Rollback()
 						c.Abort500(err)
 					} else {
+						if err := o.Commit(); err != nil {
+							c.Abort500(err)
+						}
 						logs.Info("插入成功", num)
 					}
 					break
@@ -559,13 +618,20 @@ func (c *UserController) ChangePassword() {
 		newpwd := c.GetString("newPwd")
 		newMD5Pwd := fmt.Sprintf("%x", common.MD5Password(newpwd))
 		u.Password = newMD5Pwd
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		if num, err := o.Update(&u); err != nil {
+			o.Rollback()
 			c.Abort500(err)
 		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
 			logs.Info("更了", num, "条")
 		}
 	} else {
-		logs.Debug("密码不正确")
+		c.Abort500(errors.New("密码不正确"))
 	}
 	c.Redirect("/", 302)
 }
@@ -648,16 +714,30 @@ func (c *UserController) PassQuestionReview() {
 	var question models.Question
 	o.QueryTable("question").Filter("id", id).One(&question)
 	question.Review = question.Review + 1
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	num, err := o.Update(&question, "review")
 	if err != nil {
+		o.Rollback()
 		c.Abort500(err)
 	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
 		logs.Info("更了", num, "条")
+	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
 	}
 	num, err = o.Insert(&newRecord)
 	if err != nil {
+		o.Rollback()
 		c.Abort500(err)
 	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
 		logs.Info("成功插入", num)
 	}
 	c.JSONOk("审核通过")
@@ -735,8 +815,15 @@ func (c *UserController) ChangeQuestion() {
 		question.Choices = c.GetString("choices")
 	}
 
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	num, err := o.Update(&question, "content", "choices", "answer")
 	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	}
+	if err := o.Commit(); err != nil {
 		c.Abort500(err)
 	}
 	c.JSONOkData(int(num), nil)
@@ -867,6 +954,7 @@ func (c *UserController) PassBasic() {
 	group := c.Ctx.Input.Param(":group")
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	o := orm.NewOrm()
+
 	if group == "F" {
 		formula := models.Formula{
 			Id: id,
@@ -876,8 +964,15 @@ func (c *UserController) PassBasic() {
 			c.Abort500(err)
 		}
 		formula.Review += 1
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&formula, "review")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 
@@ -890,8 +985,15 @@ func (c *UserController) PassBasic() {
 			c.Abort500(err)
 		}
 		test.Review += 1
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&test, "review")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "H" {
@@ -903,8 +1005,15 @@ func (c *UserController) PassBasic() {
 			c.Abort500(err)
 		}
 		hd.Review += 1
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&hd, "review")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "K" {
@@ -916,8 +1025,15 @@ func (c *UserController) PassBasic() {
 			c.Abort500(err)
 		}
 		know.Review += 1
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&know, "review")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "B" {
@@ -929,8 +1045,15 @@ func (c *UserController) PassBasic() {
 			c.Abort500(err)
 		}
 		basic.Review += 1
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&basic, "review")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else {
@@ -944,9 +1067,15 @@ func (c *UserController) PassBasic() {
 			Id: loginUser.Id,
 		},
 	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.Insert(&record)
-	logs.Debug(err)
 	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	}
+	if err := o.Commit(); err != nil {
 		c.Abort500(err)
 	}
 	c.JSONOk("审核通过")
@@ -1019,8 +1148,15 @@ func (c *UserController) UpdateBasic() {
 			c.Abort500(err)
 		}
 		basic.Concept = content
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&basic, "concept")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "F" {
@@ -1030,8 +1166,15 @@ func (c *UserController) UpdateBasic() {
 			c.Abort500(err)
 		}
 		formula.Content = content
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&formula, "content")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "H" {
@@ -1041,8 +1184,15 @@ func (c *UserController) UpdateBasic() {
 			c.Abort500(err)
 		}
 		hd.Content = content
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&hd, "content")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "K" {
@@ -1052,8 +1202,15 @@ func (c *UserController) UpdateBasic() {
 			c.Abort500(err)
 		}
 		know.Content = content
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&know, "content")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else if group == "E" {
@@ -1063,8 +1220,15 @@ func (c *UserController) UpdateBasic() {
 			c.Abort500(err)
 		}
 		test.Content = content
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		_, err = o.Update(&test, "content")
 		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	} else {

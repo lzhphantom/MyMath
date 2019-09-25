@@ -15,7 +15,12 @@ $(() => {
                 $.post(
                     "/LS/searchUser",
                     reqData,
-                    function (data, status) {
+                    function (Data) {
+                        if (Data.code !== 0) {
+                            alert(Data.msg);
+                            return
+                        }
+                        let data = Data.data;
                         $(id).find("tbody").empty();
                         for (let i = 0; i < data.length; i++) {
                             let sex = "";

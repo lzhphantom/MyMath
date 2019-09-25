@@ -4,17 +4,17 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/common"
+	"github.com/lzhphantom/MyMath/controllers/base"
 	"github.com/lzhphantom/MyMath/models"
 	"reflect"
 	"strconv"
 )
 
 type AdminController struct {
-	beego.Controller
+	base.UserBaseController
 }
 
 // @router /LS/admin [get]
@@ -40,12 +40,9 @@ func (c *AdminController) BasicCommon() {
 	newOrm := orm.NewOrm()
 	num, err := newOrm.QueryTable("basic_common").All(&basicCommons)
 	if err != nil {
-		logs.Debug("基础知识种类获取失败！")
-	} else {
-		logs.Debug("基础知识种类共获取:", num, "个")
+		c.Abort500(err)
 	}
-	c.Data["json"] = basicCommons
-	c.ServeJSON()
+	c.JSONOkData(int(num), basicCommons)
 }
 
 //添加、修改基础知识种类
@@ -62,22 +59,33 @@ func (c *AdminController) AddBasicCommon() {
 	basicCommon.Name = typeName
 	o := orm.NewOrm()
 	if cop == "1" { // 1 ：添加新基础知识种类
-		id, err := o.Insert(&basicCommon)
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
+		_, err := o.Insert(&basicCommon)
 		if err != nil {
-			logs.Debug("新分类名添加失败")
-		} else {
-			logs.Debug("新分类名添加成功:", id)
+			o.Rollback()
+			c.Abort500(err)
+		}
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
 		}
 	} else {
 		id, err := c.GetInt("ti")
 		if err != nil {
-			logs.Debug("获取ti失败")
+			c.Abort500(err)
 		}
 		basicCommon.Id = id
-		if num, err := o.Update(&basicCommon); err != nil {
-			logs.Debug("更新失败")
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
+		if _, err := o.Update(&basicCommon); err != nil {
+			o.Rollback()
+			c.Abort500(err)
 		} else {
-			logs.Debug("更新成功，影响", num)
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
 		}
 	}
 
@@ -89,13 +97,19 @@ func (c *AdminController) AddBasicCommon() {
 func (c *AdminController) DelBasicCommon() {
 	typeId, err := c.GetInt("id")
 	if err != nil {
-		logs.Debug("id获取失败")
+		c.Abort500(err)
 	}
 	o := orm.NewOrm()
-	if num, err := o.Delete(&models.BasicCommon{Id: typeId}); err != nil {
-		logs.Debug("删除失败")
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	if _, err := o.Delete(&models.BasicCommon{Id: typeId}); err != nil {
+		o.Rollback()
+		c.Abort500(err)
 	} else {
-		logs.Debug("删除编号为：", num)
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
 	}
 	c.Redirect("/LS/basicCommon", 302)
 }
@@ -109,30 +123,41 @@ func (c *AdminController) BasicContent() {
 	if id == "-1" {
 		var basicContents []*models.BasicCommon
 		_, err := o.QueryTable("basic_common").All(&basicContents)
+		if err != nil {
+			c.Abort500(err)
+		}
 		for _, common := range basicContents {
 			_, err := o.QueryTable("basic_content").Filter("basic_common_id", (*common).Id).RelatedSel().All(&common.BasicContent)
 			if err != nil {
-				logs.Debug("BasicContent 获取失败")
+				c.Abort500(err)
 			}
 			for _, value := range common.BasicContent {
 				_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
+				if err != nil {
+					c.Abort500(err)
+				}
 				_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", (*value).Id).All(&value.KnowledgeImportant)
+				if err != nil {
+					c.Abort500(err)
+				}
 				_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
+				if err != nil {
+					c.Abort500(err)
+				}
 				_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
 				if err != nil {
-					logs.Debug("BasicContent 其他信息获取失败")
+					c.Abort500(err)
 				}
 			}
 		}
 		if err != nil {
-			logs.Debug("基础知识详情获取失败1")
+			c.Abort500(err)
 		}
-		c.Data["json"] = basicContents
-		c.ServeJSON()
+		c.JSONOkData(len(basicContents), basicContents)
 	} else {
 		Id, err := strconv.Atoi(id)
 		if err != nil {
-			logs.Debug("id转换int失败")
+			c.Abort500(err)
 		}
 		basicContent := models.BasicCommon{Id: Id}
 
@@ -140,23 +165,31 @@ func (c *AdminController) BasicContent() {
 
 		_, err = o.QueryTable("basic_content").Filter("basic_common_id", basicContent.Id).RelatedSel().All(&basicContent.BasicContent)
 		if err != nil {
-			logs.Debug("BasicContent 获取失败")
+			c.Abort500(err)
 		}
 		for _, value := range basicContent.BasicContent {
 			_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
+			if err != nil {
+				c.Abort500(err)
+			}
 			_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", (*value).Id).All(&value.KnowledgeImportant)
+			if err != nil {
+				c.Abort500(err)
+			}
 			_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
+			if err != nil {
+				c.Abort500(err)
+			}
 			_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
 			if err != nil {
-				logs.Debug("BasicContent 其他信息获取失败")
+				c.Abort500(err)
 			}
 		}
 
 		if err != nil {
-			logs.Debug("基础知识详情获取失败1")
+			c.Abort500(err)
 		}
-		c.Data["json"] = basicContent
-		c.ServeJSON()
+		c.JSONOkData(1, basicContent)
 	}
 }
 
@@ -167,7 +200,7 @@ func (c *AdminController) AddPublishContent() {
 	var err error
 	id, err := c.GetInt("typeId")
 	if err != nil {
-		logs.Debug("添加版块内容->获取id失败")
+		c.Abort500(err)
 	}
 	content := c.GetString("content")
 	o := orm.NewOrm()
@@ -178,7 +211,13 @@ func (c *AdminController) AddPublishContent() {
 		Id: id,
 	}
 	err = o.Read(&basicCommon)
+	if err != nil {
+		c.Abort500(err)
+	}
 	err = o.QueryTable("basic_content").Filter("basic_common_id", id).RelatedSel().One(&basicContent)
+	if err != nil {
+		c.Abort500(err)
+	}
 	if basicContent.BasicCommon == nil {
 		logs.Info("无记录")
 		basicContent.Title = basicCommon.Name
@@ -186,17 +225,31 @@ func (c *AdminController) AddPublishContent() {
 			basicContent.Concept = content
 		}
 		basicContent.BasicCommon = &basicCommon
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		okId, err = o.Insert(&basicContent)
 		if err != nil {
-			logs.Debug("插入失败", err)
+			o.Rollback()
+			c.Abort500(err)
 		} else {
-			logs.Debug("插入成功", okId)
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
 		}
 	} else {
 		if area == "5" {
 			basicContent.Concept = content
-			if _, err := o.Update(&basicContent); err == nil {
-				logs.Debug("Concept添加成功")
+			if err := o.Begin(); err != nil {
+				c.Abort500(err)
+			}
+			if _, err := o.Update(&basicContent); err != nil {
+				o.Rollback()
+				c.Abort500(err)
+			} else {
+				if err := o.Commit(); err != nil {
+					c.Abort500(err)
+				}
 			}
 		}
 		okId = int64(basicContent.Id)
@@ -209,7 +262,18 @@ func (c *AdminController) AddPublishContent() {
 				Id: int(okId),
 			},
 		}
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		okId, err = o.Insert(&know)
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+		}
 	} else if area == "2" { //相关公式
 		formula := models.Formula{
 			Content: content,
@@ -217,7 +281,18 @@ func (c *AdminController) AddPublishContent() {
 				Id: int(okId),
 			},
 		}
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		okId, err = o.Insert(&formula)
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+		}
 	} else if area == "3" { //考点
 		testCenter := models.ExaminationCenter{
 			Content: content,
@@ -225,7 +300,18 @@ func (c *AdminController) AddPublishContent() {
 				Id: int(okId),
 			},
 		}
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		okId, err = o.Insert(&testCenter)
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+		}
 	} else if area == "4" { //重难点
 		hd := models.HDifficulty{
 			Content: content,
@@ -233,12 +319,21 @@ func (c *AdminController) AddPublishContent() {
 				Id: int(okId),
 			},
 		}
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
 		okId, err = o.Insert(&hd)
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+		}
 	}
 	if err != nil {
-		logs.Debug("插入失败", err)
-	} else {
-		logs.Debug("插入成功", okId)
+		c.Abort500(err)
 	}
 	c.Redirect("/LS/basicContent/-1", 302)
 }
@@ -248,38 +343,39 @@ func (c *AdminController) AddPublishContent() {
 func (c *AdminController) DelBasicContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		logs.Debug("获取Id失败")
+		c.Abort500(err)
 	}
 	o := orm.NewOrm()
-	delNum, err := o.QueryTable("examination_center").Filter("basic_content_id", id).Delete()
-	if err != nil {
-		logs.Debug("examination_center表删除数据失败")
-	} else {
-		logs.Debug("examination_center删除", delNum, "条数据")
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
 	}
-	delNum, err = o.QueryTable("formula").Filter("basic_content_id", id).Delete()
+	_, err = o.QueryTable("examination_center").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		logs.Debug("formula表删除数据失败")
-	} else {
-		logs.Debug("formula删除", delNum, "条数据")
+		o.Rollback()
+		c.Abort500(err)
 	}
-	delNum, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).Delete()
+	_, err = o.QueryTable("formula").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		logs.Debug("h_difficulty表删除数据失败")
-	} else {
-		logs.Debug("h_difficulty删除", delNum, "条数据")
+		o.Rollback()
+		c.Abort500(err)
 	}
-	delNum, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).Delete()
+	_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		logs.Debug("knowledge_important表删除数据失败")
-	} else {
-		logs.Debug("knowledge_important删除", delNum, "条数据")
+		o.Rollback()
+		c.Abort500(err)
 	}
-	delNum, err = o.QueryTable("basic_content").Filter("id", id).Delete()
+	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).Delete()
 	if err != nil {
-		logs.Debug("basic_content表删除数据失败")
-	} else {
-		logs.Debug("basic_content删除", delNum, "条数据")
+		o.Rollback()
+		c.Abort500(err)
+	}
+	_, err = o.QueryTable("basic_content").Filter("id", id).Delete()
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	}
+	if err := o.Commit(); err != nil {
+		c.Abort500(err)
 	}
 	c.Redirect("/LS/basicContent/-1", 302)
 }
@@ -289,21 +385,31 @@ func (c *AdminController) DelBasicContent() {
 func (c *AdminController) ShowChangeContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		logs.Debug("获取id失败")
+		c.Abort500(err)
 	}
 	content := models.BasicContent{}
 	o := orm.NewOrm()
 	err = o.QueryTable("basic_content").Filter("id", id).RelatedSel().One(&content)
 	if err != nil {
-		logs.Debug("basic_content=>showChangeContent失败")
+		c.Abort500(err)
 	}
 	_, err = o.QueryTable("formula").Filter("basic_content_id", id).All(&content.Formula)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).All(&content.KnowledgeImportant)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("examination_center").Filter("basic_content_id", id).All(&content.ExaminationCenter)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).All(&content.HDifficulty)
-
-	c.Data["json"] = content
-	c.ServeJSON()
+	if err != nil {
+		c.Abort500(err)
+	}
+	c.JSONOkData(1, content)
 }
 
 //修改基础知识内容
@@ -311,7 +417,7 @@ func (c *AdminController) ShowChangeContent() {
 func (c *AdminController) ChangeContent() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		logs.Debug("修改基础知识内容=>获取id失败")
+		c.Abort500(err)
 	}
 	logs.Info(id)
 	content1 := c.GetString("content1")
@@ -325,44 +431,88 @@ func (c *AdminController) ChangeContent() {
 	content4Map := make(map[string]interface{})
 	content5Map := make(map[string]interface{})
 	err = json.Unmarshal([]byte(content1), &content1Map)
+	if err != nil {
+		c.Abort500(err)
+	}
 	err = json.Unmarshal([]byte(content2), &content2Map)
+	if err != nil {
+		c.Abort500(err)
+	}
 	err = json.Unmarshal([]byte(content3), &content3Map)
+	if err != nil {
+		c.Abort500(err)
+	}
 	err = json.Unmarshal([]byte(content4), &content4Map)
+	if err != nil {
+		c.Abort500(err)
+	}
 	err = json.Unmarshal([]byte(content5), &content5Map)
 	if err != nil {
-		logs.Debug("content*转换失败")
-	} else {
-		logs.Info(content1Map, content2Map, content3Map, content4Map, content5Map)
+		c.Abort500(err)
 	}
 
 	o := orm.NewOrm()
 	content := models.BasicContent{}
 	err = o.QueryTable("basic_content").Filter("id", id).RelatedSel().One(&content)
 	if err != nil {
-		logs.Debug("basic_content=>showChangeContent失败")
+		c.Abort500(err)
 	}
 	_, err = o.QueryTable("formula").Filter("basic_content_id", id).All(&content.Formula)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", id).All(&content.KnowledgeImportant)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("examination_center").Filter("basic_content_id", id).All(&content.ExaminationCenter)
+	if err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", id).All(&content.HDifficulty)
+	if err != nil {
+		c.Abort500(err)
+	}
 
 	content.Concept = content5Map["5"].(string)
-	o.Update(&content)
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	if _, err := o.Update(&content); err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	}
+
 	for key, value := range content.KnowledgeImportant {
 		(*value).Content = content1Map[strconv.Itoa(key)].(string)
-		o.Update(value)
+		if _, err := o.Update(value); err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
 	}
 	for key, value := range content.HDifficulty {
 		value.Content = content4Map[strconv.Itoa(key)].(string)
-		o.Update(value)
+		if _, err := o.Update(value); err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
 	}
 	for key, value := range content.Formula {
 		value.Content = content2Map[strconv.Itoa(key)].(string)
-		o.Update(value)
+		if _, err := o.Update(value); err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
 	}
 	for key, value := range content.ExaminationCenter {
 		value.Content = content3Map[strconv.Itoa(key)].(string)
-		o.Update(value)
+		if _, err := o.Update(value); err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		}
+	}
+	if err := o.Commit(); err != nil {
+		c.Abort500(err)
 	}
 
 	c.Redirect("/LS/basicContent/-1", 302)
@@ -377,13 +527,13 @@ func (c *AdminController) UploadQuestion() {
 	dataMap := make(map[string]interface{})
 	err := json.Unmarshal([]byte(data), &dataMap)
 	if err != nil {
-		logs.Debug("json解析失败")
+		c.Abort500(err)
 	}
 
 	newQuestion.Content = dataMap["content"].(string)
 	role, err := c.GetUint8("role")
 	if err != nil {
-		logs.Debug("未获取题型类型")
+		c.Abort500(err)
 	}
 	logs.Debug(role)
 	newQuestion.RoleQuestion = uint8(role)
@@ -397,7 +547,7 @@ func (c *AdminController) UploadQuestion() {
 	}
 	idRole, err := strconv.Atoi(dataMap["role"].(string))
 	if err != nil {
-		logs.Warning("role 不是数字", err)
+		c.Abort500(err)
 	}
 
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
@@ -408,11 +558,19 @@ func (c *AdminController) UploadQuestion() {
 	newQuestion.BasicCommon = &models.BasicCommon{
 		Id: idRole,
 	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.Insert(&newQuestion)
 	if err != nil {
-		logs.Debug("插入失败：", err)
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
 	}
-	c.ServeJSON()
+	c.JSONOk("上传成功")
 }
 
 //添加用户
@@ -441,7 +599,7 @@ func (c *AdminController) UserAdd() {
 	o := orm.NewOrm()
 	_, err := o.Insert(&user)
 	if err != nil {
-		logs.Debug("用户表添加失败：", err)
+		c.Abort500(err)
 	}
 
 	userInfo := models.UserInfo{
@@ -451,9 +609,16 @@ func (c *AdminController) UserAdd() {
 		Address: province + " " + city + " " + street,
 		User:    &user,
 	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
 	_, err = o.Insert(&userInfo)
 	if err != nil {
-		logs.Debug("用户信息表添加失败：", err)
+		o.Rollback()
+		c.Abort500(err)
+	}
+	if err := o.Commit(); err != nil {
+		c.Abort500(err)
 	}
 	c.Redirect("/LS", 302)
 }
@@ -463,11 +628,14 @@ func (c *AdminController) UserAdd() {
 func (c *AdminController) SearchUser() {
 	userGroup, err := c.GetInt("group")
 	if err != nil {
-		logs.Debug("获取用户分组失败")
+		c.Abort500(err)
 	}
 	users := make([]models.User, 0)
 	o := orm.NewOrm()
 	num, err := o.QueryTable("user").Filter("role", byte(userGroup)).All(&users)
+	if err != nil {
+		c.Abort500(err)
+	}
 
 	//range 会为每个元素生成一个副本
 	for i := 0; i < len(users); i++ {
@@ -476,13 +644,9 @@ func (c *AdminController) SearchUser() {
 		users[i].UserInfo = &t
 	}
 	if err != nil {
-		logs.Debug("获取user表失败")
-	} else {
-		logs.Debug("获取了", num, "条")
+		c.Abort500(err)
 	}
-
-	c.Data["json"] = users
-	c.ServeJSON()
+	c.JSONOkData(int(num), users)
 }
 
 // @router /LS/ranking [get]
@@ -495,11 +659,8 @@ func (c *AdminController) Ranking() {
 	//num, err := o.Raw("select count(1) as total, count(if(correction = '1', 1, null)) as correct, count(if(correction='1',1,null))/count(1)as accuracy,user_info.name from question_answer_record left join user_info on question_answer_record.user_id=user_info.user_id group by name order by accuracy asc;").QueryRows(&answerRankings)
 	num, err := o.Raw(sql).QueryRows(&answerRankings)
 	if err != nil {
-		logs.Warning("获取排名失败", err)
-	} else {
-		logs.Info("获取", num, "条")
+		c.Abort500(err)
 	}
-	c.Data["json"] = answerRankings
-	c.ServeJSON()
+	c.JSONOkData(int(num), answerRankings)
 
 }

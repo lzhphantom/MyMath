@@ -25,8 +25,9 @@ $(function () {
     });
 
     $("#changeInfo").on('click', () => {
-        $.get('/center/getPersonalInfo', (data, status, xhr) => {
-            if (xhr.status == 200) {
+        $.get('/center/getPersonalInfo', (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
                 $("#personal").empty().append(`
         <form class="col-xs-12 form-horizontal" method="post" action="/center/changePersonalInfo" onsubmit="return personalCheck(this);">
                     <div><h1 class="text-muted text-center">个人信息详情修改</h1></div>
@@ -109,8 +110,9 @@ function getUploadRecord(pageNow, id, total) {
         alert("已经是最后一页了，我是有底线的!")
         return
     }
-    $.get("/center/uploadRecord/" + pageNow, (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/center/uploadRecord/" + pageNow, (Data) => {
+        if (Data.code === 0) {
+            let data = Data.data;
             let tbody = ``;
             for (let i = 0; i < data.Record.length; i++) {
                 let choices = ``;
@@ -200,8 +202,9 @@ function getSingleAnswerHistory(pageNow, id, total) {
         alert("已经是最后一页了，我是有底线的!")
         return
     }
-    $.get("/center/trainingHistory/" + pageNow, (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/center/trainingHistory/" + pageNow, (Data) => {
+        if (Data.code === 0) {
+            let data = Data.data;
             let tbody = ``;
             for (let i = 0; i < data.History.length; i++) {
                 let choices = ``;

@@ -2,15 +2,15 @@ package lzhphantomAdminService
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/common"
+	"github.com/lzhphantom/MyMath/controllers/base"
 	"github.com/lzhphantom/MyMath/models"
 )
 
 type AdminLoginCtroller struct {
-	beego.Controller
+	base.UserBaseController
 }
 
 // @router /LS [get]
@@ -39,9 +39,7 @@ func (c *AdminLoginCtroller) Login() {
 		}
 		err := o.Read(&user, "Name", "Pwd")
 		if err != nil {
-			logs.Warning("改用户不存在", userName, password, err)
-			c.Redirect("/LS", 302)
-			return
+			c.Abort500(err)
 		}
 		loginAdmin := common.LoginAdmin{
 			Id:        user.Id,

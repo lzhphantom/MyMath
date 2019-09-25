@@ -1,20 +1,21 @@
 $(() => {
     window.onload = function () {
-        $.get("/center/trainingAnalysis", (data, status, xhr) => {
-            if (xhr.status === 200) {
-                if (data === null || data.length === 0) {
+        $.get("/center/trainingAnalysis", (data) => {
+            if (data.code===0) {
+                let Data=data.data;
+                if (Data === null || Data.length === 0) {
                     $("#trainingAnalysis").append(`<p class="text-warning">暂无记录无法分析</p>`)
                     return
                 }
                 let trainingAnalysis = [];
                 let max = 0;
                 let index = 0;
-                for (let i = 0; i < data.length; i++) {
-                    if (max < data[i].Num) {
-                        max = data[i].Num;
+                for (let i = 0; i < Data.length; i++) {
+                    if (max < Data[i].Num) {
+                        max = Data[i].Num;
                         index = i;
                     }
-                    trainingAnalysis.push({y: number_format(data[i].Percent, 2, '.', ','), name: data[i].Name});
+                    trainingAnalysis.push({y: number_format(Data[i].Percent, 2, '.', ','), name: Data[i].Name});
                 }
                 trainingAnalysis[index].exploded = true;
 

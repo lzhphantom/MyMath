@@ -128,7 +128,12 @@ $(function () {
         $.post(
             "/LS/basicType/" + cop,
             Data,
-            function (data, status) {
+            function (Data) {
+                if (Data.code !== 0) {
+                    alert(Data.msg);
+                    return
+                }
+                let data = Data.data;
                 basicCommon(data, document.getElementById("basic-type"));
             });
         $(document.getElementById("newBasicType")).val('');
@@ -146,7 +151,7 @@ $(function () {
     //基础知识内容添加版块，添加种类搜索
     $("#basicContentAdd").on("show.bs.modal", function () {
         $.get("/LS/basicCommon", function (Data) {
-            if (Data !== 0) {
+            if (Data.code !== 0) {
                 alert(Data.msg);
                 return
             }
@@ -202,8 +207,9 @@ $(function () {
                 typeId: typeSelect,
                 content: basicPublishContent,
             },
-            function (data, status, xhr) {
-                if (xhr.status === 200) {
+            function (Data) {
+                if (Data.code === 0) {
+                    let data = Data.data;
                     chooseContentShow(document.getElementById("basic-content"), data);
                 }
             });
@@ -479,13 +485,13 @@ function chooseContentShow(basicContent, data) {
                                 <a href="#" class="btn btn-danger" onclick="` + delContent + `">删除</a>
                             </td>
                             <td>
-                                <a class="btn btn-success" data-toggle="modal" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>
+                                <a class="btn btn-success" data-toggle="modal" data-for="basicContentChange" data-target="#basicContentChange" data-value="` + content[j].Id + `" id="basicCC-btn">修改</a>
                             </td>
                         </tr>`);
 
         }
     }
-    $('a[data-toggle="modal"]').on('click', function (e) {
+    $('a[data-for="basicContentChange"]').on('click', function (e) {
         let id = $(e.target).attr("data-value");
         let changeModal = $("#basicContentChange");
         showChangeBasicContent(id, changeModal);
@@ -610,7 +616,12 @@ function delBasicType(id) {
     $.post(
         "/LS/delBasicType",
         {id: id},
-        function (data, status) {
+        function (Data) {
+            if (Data.code !== 0) {
+                alert(Data.msg);
+                return
+            }
+            let data = Data.data;
             basicCommon(data, document.getElementById("basic-type"));
         }
     )
@@ -621,7 +632,12 @@ function delBasicContent(id) {
     $.post(
         "/LS/delBasicContent",
         {id: id},
-        function (data) {
+        function (Data) {
+            if (Data.code !== 0) {
+                alert(Data.msg);
+                return
+            }
+            let data = Data.data;
             chooseContentShow(document.getElementById("basic-content"), data);
         }
     );

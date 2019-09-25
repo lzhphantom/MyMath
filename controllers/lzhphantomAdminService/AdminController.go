@@ -214,10 +214,13 @@ func (c *AdminController) AddPublishContent() {
 	if err != nil {
 		c.Abort500(err)
 	}
-	err = o.QueryTable("basic_content").Filter("basic_common_id", id).RelatedSel().One(&basicContent)
-	if err != nil {
-		c.Abort500(err)
+	if o.QueryTable("basic_content").Filter("basic_common_id",id).Exist(){
+		err = o.QueryTable("basic_content").Filter("basic_common_id", id).RelatedSel().One(&basicContent)
+		if err != nil {
+			c.Abort500(err)
+		}
 	}
+
 	if basicContent.BasicCommon == nil {
 		logs.Info("无记录")
 		basicContent.Title = basicCommon.Name

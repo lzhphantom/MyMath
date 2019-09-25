@@ -254,7 +254,12 @@ $(function () {
                 content4: JSON.stringify(content4),
                 content5: JSON.stringify(content5),
             },
-            function (data, status) {
+            function (Data) {
+                if (Data.code !== 0) {
+                    alert(Data.msg);
+                    return
+                }
+                let data = Data.data;
                 chooseContentShow(document.getElementById("basic-content"), data);
                 $("#basicContentChange").modal('hide');
             },

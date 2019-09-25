@@ -16,13 +16,14 @@ $(function () {
                 }
                 let oneUl = $('#collapseOne').children('div').children('ul');
                 $(oneUl).empty();
-                for (let i = 0; i < data.length; i++) {
+                let Data = data.data;
+                for (let i = 0; i < Data.length; i++) {
                     if ((i + 1) % 2 === 0) {
                         $(oneUl).append(`<li role="presentation"><a href="#jihe" aria-controls="jihe" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + Data[i].Id + `" role-tab="basic">` + Data[i].Name + `<br></a></li>`);
                     } else {
                         $(oneUl).append(`<li role="presentation"><a href="#sjhs" aria-controls="sjhs" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="basic">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + Data[i].Id + `" role-tab="basic">` + Data[i].Name + `<br></a></li>`);
                     }
                 }
 
@@ -37,29 +38,34 @@ $(function () {
                         return
                     }
                     let controls = $(e.target).attr("href");
-                    $.get("/lzhphantomAdminService/basicContent/" + id, function (data, status) {
+                    $.get("/user/basicContent/" + id, function (data) {
+                        if (data.code !== 0) {
+                            alert(data.msg);
+                            return
+                        }
+                        let Data = data.data;
                         let $modal = $(controls);
                         $($modal).empty();
                         $($modal).append(`<h1 class="text-center text-muted">基础知识</h1>`);
 
                         $($modal).append(`<div>
-                    <h2>` + data.Name + `</h2>
+                    <h2>` + Data.Name + `</h2>
                 </div>`);
                         //概念部分
-                        if (data.BasicContent[0] !== undefined) {
+                        if (Data.BasicContent[0] !== undefined) {
                             $($modal).append(`<div>
-                    <h3>1.` + data.BasicContent[0].Title + `的概念</h3>
-                    ` + data.BasicContent[0].Concept + `
+                    <h3>1.` + Data.BasicContent[0].Title + `的概念</h3>
+                    ` + Data.BasicContent[0].Concept + `
                 </div>`);
                             //知识点精讲部分
-                            if (data.BasicContent[0].KnowledgeImportant !== undefined) {
+                            if (Data.BasicContent[0].KnowledgeImportant !== undefined) {
                                 let content = ``;
                                 let letterNumber = 97;
 
-                                for (let i = 0; i < data.BasicContent[0].KnowledgeImportant.length; i++) {
+                                for (let i = 0; i < Data.BasicContent[0].KnowledgeImportant.length; i++) {
                                     content += `<div>
                         <h4>` + String.fromCharCode(letterNumber++) + `.</h4>
-                        ` + data.BasicContent[0].KnowledgeImportant[i].Content + `
+                        ` + Data.BasicContent[0].KnowledgeImportant[i].Content + `
                     </div>`;
                                 }
                                 $($modal).append(`<div>
@@ -68,10 +74,10 @@ $(function () {
                 </div>`);
                             }
                             //公式部分
-                            if (data.BasicContent[0].Formula !== undefined) {
+                            if (Data.BasicContent[0].Formula !== undefined) {
                                 let content = ``;
-                                for (let i = 0; i < data.BasicContent[0].Formula.length; i++) {
-                                    content += `` + data.BasicContent[0].Formula[i].Content;
+                                for (let i = 0; i < Data.BasicContent[0].Formula.length; i++) {
+                                    content += `` + Data.BasicContent[0].Formula[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3>3.相关公式</h3>
@@ -79,10 +85,10 @@ $(function () {
                 </div>`);
                             }
                             //考点部分
-                            if (data.BasicContent[0].ExaminationCenter !== undefined) {
+                            if (Data.BasicContent[0].ExaminationCenter !== undefined) {
                                 let content = ``;
-                                for (let i = 0; i < data.BasicContent[0].ExaminationCenter.length; i++) {
-                                    content += `` + data.BasicContent[0].ExaminationCenter[i].Content;
+                                for (let i = 0; i < Data.BasicContent[0].ExaminationCenter.length; i++) {
+                                    content += `` + Data.BasicContent[0].ExaminationCenter[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-danger">4.考点</h3>
@@ -90,10 +96,10 @@ $(function () {
                 </div>`);
                             }
                             //重难点部分
-                            if (data.BasicContent[0].HDifficulty !== undefined) {
+                            if (Data.BasicContent[0].HDifficulty !== undefined) {
                                 let content = ``;
-                                for (let i = 0; i < data.BasicContent[0].HDifficulty.length; i++) {
-                                    content += `` + data.BasicContent[0].HDifficulty[i].Content;
+                                for (let i = 0; i < Data.BasicContent[0].HDifficulty.length; i++) {
+                                    content += `` + Data.BasicContent[0].HDifficulty[i].Content;
                                 }
                                 $($modal).append(`<div>
                     <h3 class="text-success">5.重难点</h3>
@@ -158,9 +164,10 @@ $(function () {
             }
             let threeUl = $('#collapseThree').find('ul');
             $(threeUl).empty();
-            for (let i = 0; i < data.length; i++) {
+            let Data = data.data;
+            for (let i = 0; i < Data.length; i++) {
                 $(threeUl).append(`<li role="presentation"><a href="#SpecialPractice" aria-controls="SpecialPractice" role="tab"
-                                                           data-toggle="tab" data-id="` + data[i].Id + `" role-tab="sp">` + data[i].Name + `<br></a></li>`);
+                                                           data-toggle="tab" data-id="` + Data[i].Id + `" role-tab="sp">` + Data[i].Name + `<br></a></li>`);
             }
             // /lzhphantomAdminService/getQuestionByCommonId/:id
             $('a[role-tab="sp"]').on('hide.bs.tab', (e) => {
@@ -193,8 +200,9 @@ $(function () {
                 $.get("/user/basicCommon", (data, status, xhr) => {
                     if (xhr.status === 200) {
                         let options = ``;
-                        for (let i = 0; i < data.length; i++) {
-                            options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>`;
+                        let Data = data.data;
+                        for (let i = 0; i < Data.length; i++) {
+                            options += `<option value="` + Data[i].Id + `">` + Data[i].Name + `</option>`;
                         }
                         $("#selectQuestionRole").empty().append(options)
                     }
@@ -203,8 +211,9 @@ $(function () {
                 $.get("/user/basicCommon", (data, status, xhr) => {
                     if (xhr.status === 200) {
                         let options = ``;
-                        for (let i = 0; i < data.length; i++) {
-                            options += `<option value="` + data[i].Id + `">` + data[i].Name + `</option>`;
+                        let Data = data.data;
+                        for (let i = 0; i < Data.length; i++) {
+                            options += `<option value="` + Data[i].Id + `">` + Data[i].Name + `</option>`;
                         }
                         $("#blankQuestionRole").empty().append(options)
                     }
@@ -591,9 +600,14 @@ function getUnSelectFirst(controls) {
             }, 0);
             return
         }
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         let button1 = ``;
-        if ((data.QueueNum + 1) === data.Total) {
+        if ((Data.QueueNum + 1) === Data.Total) {
             button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
         } else {
             button1 = `<a class="btn btn-danger btn-lg" onclick="commitUnSelect('` + controls + `');">结束训练</a>
@@ -618,7 +632,7 @@ function getUnSelectFirst(controls) {
                     </div>`);
         let content = $(controls).find("#blankContent");
 
-        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).empty().append(`<h2 class="well">` + Data.Content + `</h2>`);
         $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
                                id="showEditor">填写你最简正确的答案</a>
@@ -632,7 +646,7 @@ function getUnSelectFirst(controls) {
                 let userAnswer = $(parent).find('#showEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getUnSelect(controls, QueueNum, commitData)
@@ -654,9 +668,14 @@ function getUnSelect(controls, num, commitData) {
             }, 0);
             return
         }
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         let button1 = ``;
-        if ((data.QueueNum + 1) === data.Total) {
+        if ((Data.QueueNum + 1) === Data.Total) {
             button1 = `<a class="btn btn-success btn-lg" onclick="commitUnSelect('` + controls + `');">提交检测</a>`
         } else {
             button1 = `<a class="btn btn-danger btn-lg" onclick="commitUnSelect('` + controls + `');">结束训练</a>
@@ -681,7 +700,7 @@ function getUnSelect(controls, num, commitData) {
                     </div>`);
         let content = $(controls).find("#blankContent");
 
-        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).empty().append(`<h2 class="well">` + Data.Content + `</h2>`);
         $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#blankEditor','#backGroup');"
                                id="showEditor">填写你最简正确的答案</a>
@@ -695,7 +714,7 @@ function getUnSelect(controls, num, commitData) {
                 let userAnswer = $(parent).find('#showEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getUnSelect(controls, QueueNum, commitData)
@@ -719,26 +738,31 @@ function commitUnSelect(controls) {
     $.post("/user/commitTraining/unselect",
         {answer: userAnswer},
         (data) => {
+            if (data.code !== 0) {
+                alert(data.msg);
+                return
+            }
+            let Data = data.data;
             let tbody = ``;
-            for (let i = 0; i < data.UnSelects.length; i++) {
+            for (let i = 0; i < Data.UnSelects.length; i++) {
                 let textClass = ``;
-                if (data.UnSelects[i].Correct) {
+                if (Data.UnSelects[i].Correct) {
                     textClass = `class="text-success"`;
                 } else {
                     textClass = `class="text-danger"`;
                 }
                 tbody += `<tr>
                                 <td>` + (i + 1) + `</td>
-                                <td>` + data.UnSelects[i].Train.Content + `</td>
-                                <td ` + textClass + `>` + data.UnSelects[i].UserAnswer + `</td>
-                                <td>` + data.UnSelects[i].Answer + `</td>
+                                <td>` + Data.UnSelects[i].Train.Content + `</td>
+                                <td ` + textClass + `>` + Data.UnSelects[i].UserAnswer + `</td>
+                                <td>` + Data.UnSelects[i].Answer + `</td>
                             </tr>`;
             }
             $(controls).append(`<div>
                         <h1 class="text-center text-muted">训练成果</h1>
-                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
-                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
-                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
+                        <h2 class="text-center text-muted">当前总计：` + Data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + Data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((Data.Correct / Data.View * 100), 2, ".", ",") + `%</h2>          
                         </div>
                         <div>
                         <a class="btn btn-primary" role="button" data-for="detail" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
@@ -783,9 +807,14 @@ function getSelectFirst(controls) {
             }, 0);
             return
         }
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         let button1 = ``;
-        if ((data.QueueNum + 1) === data.Total) {
+        if ((Data.QueueNum + 1) === Data.Total) {
             button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
         } else {
             button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">结束训练</a>
@@ -806,15 +835,15 @@ function getSelectFirst(controls) {
         let content = $(controls).find("#selectContent");
         let choices = ``;
         let letterNumber = 65;
-        for (let i = 0; i < data.Choices.length; i++) {
+        for (let i = 0; i < Data.Choices.length; i++) {
             choices += `<div>
                             <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            <input type="radio" name="choice" value="` + Data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + Data.Choices[i] + `</span>
                             </label>
                         </div>`
         }
-        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).empty().append(`<h2 class="well">` + Data.Content + `</h2>`);
         $(content).append(choices);
         $(content).find("p").css("display", "inline");
         $("#nextQuestion").on("click", (e) => {
@@ -823,7 +852,7 @@ function getSelectFirst(controls) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getSelect(controls, QueueNum, commitData);
@@ -845,9 +874,14 @@ function getSelect(controls, num, commitData) {
             }, 0);
             return
         }
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         let button1 = ``;
-        if ((data.QueueNum + 1) === data.Total) {
+        if ((Data.QueueNum + 1) === Data.Total) {
             button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">提交检测</a>`
         } else {
             button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitSelect('` + controls + `')">结束训练</a>
@@ -868,15 +902,15 @@ function getSelect(controls, num, commitData) {
         let content = $(controls).find("#selectContent");
         let choices = ``;
         let letterNumber = 65;
-        for (let i = 0; i < data.Choices.length; i++) {
+        for (let i = 0; i < Data.Choices.length; i++) {
             choices += `<div>
                             <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            <input type="radio" name="choice" value="` + Data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + Data.Choices[i] + `</span>
                             </label>
                         </div>`
         }
-        $(content).empty().append(`<h2 class="well">` + data.Content + `</h2>`);
+        $(content).empty().append(`<h2 class="well">` + Data.Content + `</h2>`);
         $(content).append(choices);
         $(content).find("p").css("display", "inline");
         $("#nextQuestion").on("click", (e) => {
@@ -885,7 +919,7 @@ function getSelect(controls, num, commitData) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getSelect(controls, QueueNum, commitData);
@@ -909,26 +943,31 @@ function commitSelect(controls) {
     $.post("/user/commitTraining/select",
         {answer: userAnswer},
         (data) => {
+            if (data.code !== 0) {
+                alert(data.msg);
+                return
+            }
+            let Data = data.data;
             let tbody = ``;
-            for (let i = 0; i < data.Selects.length; i++) {
+            for (let i = 0; i < Data.Selects.length; i++) {
                 let textClass = ``;
-                if (data.Selects[i].Correct) {
+                if (Data.Selects[i].Correct) {
                     textClass = `class="text-success"`;
                 } else {
                     textClass = `class="text-danger"`;
                 }
                 tbody += `<tr>
                                 <td>` + (i + 1) + `</td>
-                                <td>` + data.Selects[i].Train.Content + `</td>
-                                <td ` + textClass + `>` + data.Selects[i].UserAnswer + `</td>
-                                <td>` + data.Selects[i].Answer + `</td>
+                                <td>` + Data.Selects[i].Train.Content + `</td>
+                                <td ` + textClass + `>` + Data.Selects[i].UserAnswer + `</td>
+                                <td>` + Data.Selects[i].Answer + `</td>
                             </tr>`;
             }
             $(controls).append(`<div>
                         <h1 class="text-center text-muted">训练成果</h1>
-                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
-                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
-                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>
+                        <h2 class="text-center text-muted">当前总计：` + Data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + Data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((Data.Correct / Data.View * 100), 2, ".", ",") + `%</h2>
                         <div>
                         <a class="btn btn-primary" role="button" data-for="detail" data-toggle="collapse" href="#TrainingDetail" aria-expanded="false" aria-controls="TrainingDetail">
                           详情查看 <span class="caret"></span>
@@ -965,7 +1004,12 @@ function commitSelect(controls) {
 //专项练习获取题
 function getSpecialPracticeFirst(sp, id) {
     $.get("/user/getQuestionByCommonId/" + id, (data) => {
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
@@ -979,29 +1023,29 @@ function getSpecialPracticeFirst(sp, id) {
                         </div>`);
         let content = $(sp).find("#SpecialPracticeContent");
         let backGroup = $(sp).find("#backGroup");
-        if (data.Content === undefined) {
+        if (Data.Content === undefined) {
             $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
             return
         }
-        if (data.Role === 1) {
+        if (Data.Role === 1) {
             let choices = ``;
             let letterNumber = 65;
-            for (let i = 0; i < data.Choices.length; i++) {
+            for (let i = 0; i < Data.Choices.length; i++) {
                 choices += `<div>
                             <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            <input type="radio" name="choice" value="` + Data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + Data.Choices[i] + `</span>
                             </label>
                         </div>`
             }
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).empty().append(`<h2 class="text-muted well">` + Data.Content + `</h2>`);
             $(content).append(choices);
             $(content).find("p").css("display", "inline");
             let button1 = ``;
-            if ((data.QueueNum + 1) === data.Total) {
-                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            if ((Data.QueueNum + 1) === Data.Total) {
+                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(button1);
@@ -1010,7 +1054,7 @@ function getSpecialPracticeFirst(sp, id) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
@@ -1020,7 +1064,7 @@ function getSpecialPracticeFirst(sp, id) {
 
             });
         } else {
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).empty().append(`<h2 class="text-muted well">` + Data.Content + `</h2>`);
             $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
                                id="showSPEditor">填写你最简正确的答案</a>
@@ -1029,10 +1073,10 @@ function getSpecialPracticeFirst(sp, id) {
                             <textarea name="content" id="SPEditor" class="hidden"></textarea>
                         </div>`);
             let button1 = ``;
-            if ((data.QueueNum + 1) === data.Total) {
-                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            if ((Data.QueueNum + 1) === Data.Total) {
+                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
@@ -1047,7 +1091,7 @@ function getSpecialPracticeFirst(sp, id) {
                 let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer}
                     getSpecialPractice(sp, QueueNum, commitData);
@@ -1062,7 +1106,12 @@ function getSpecialPracticeFirst(sp, id) {
 
 function getSpecialPractice(sp, num, commitData) {
     $.post("/user/getPractice/" + num, commitData, (data) => {
-        let percent = number_format((data.QueueNum + 1) / data.Total * 100, 2, ".", ",");
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
+        let Data = data.data;
+        let percent = number_format((Data.QueueNum + 1) / Data.Total * 100, 2, ".", ",");
         $(sp).empty().append(`<h1 class="text-center text-muted">专项练习</h1>
                         <div id="progress" class="progress">
                         <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: ` + percent + `%">
@@ -1076,29 +1125,29 @@ function getSpecialPractice(sp, num, commitData) {
                         </div>`);
         let content = $(sp).find("#SpecialPracticeContent");
         let backGroup = $(sp).find("#backGroup");
-        if (data.Content === undefined) {
+        if (Data.Content === undefined) {
             $(content).empty().append(`<h2 class="text-center text-danger"> 暂无题库</h2>`);
             return
         }
-        if (data.Role === 1) {
+        if (Data.Role === 1) {
             let choices = ``;
             let letterNumber = 65;
-            for (let i = 0; i < data.Choices.length; i++) {
+            for (let i = 0; i < Data.Choices.length; i++) {
                 choices += `<div>
                             <label for="">
-                            <input type="radio" name="choice" value="` + data.Choices[i] + `">
-                                <span>` + String.fromCharCode(letterNumber++) + `.` + data.Choices[i] + `</span>
+                            <input type="radio" name="choice" value="` + Data.Choices[i] + `">
+                                <span>` + String.fromCharCode(letterNumber++) + `.` + Data.Choices[i] + `</span>
                             </label>
                         </div>`
             }
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).empty().append(`<h2 class="text-muted well">` + Data.Content + `</h2>`);
             $(content).append(choices);
             $(content).find("p").css("display", "inline");
             let button1 = ``;
-            if ((data.QueueNum + 1) === data.Total) {
-                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            if ((Data.QueueNum + 1) === Data.Total) {
+                button1 = `<a class="btn btn-success btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg col-sm-offset-9" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(button1);
@@ -1107,7 +1156,7 @@ function getSpecialPractice(sp, num, commitData) {
                 let userAnswer = $(parent).find('input[name="choice"]:checked').val();
                 if (userAnswer !== undefined) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
@@ -1117,7 +1166,7 @@ function getSpecialPractice(sp, num, commitData) {
 
             });
         } else {
-            $(content).empty().append(`<h2 class="text-muted well">` + data.Content + `</h2>`);
+            $(content).empty().append(`<h2 class="text-muted well">` + Data.Content + `</h2>`);
             $(content).append(`<div>
                             <a href="javascript:void(0);" onclick="showEditor(this,'#SPEditor','#backGroup');"
                                id="showSPEditor">填写你最简正确的答案</a>
@@ -1126,10 +1175,10 @@ function getSpecialPractice(sp, num, commitData) {
                             <textarea name="content" id="SPEditor" class="hidden"></textarea>
                         </div>`);
             let button1 = ``;
-            if ((data.QueueNum + 1) === data.Total) {
-                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">提交检测</a>`
+            if ((Data.QueueNum + 1) === Data.Total) {
+                button1 = `<a class="btn btn-success btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">提交检测</a>`
             } else {
-                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + data.Role + `)">结束训练</a>
+                button1 = `<a class="btn btn-danger btn-lg" onclick="commitPractice('#` + $(sp).attr('id') + `',` + Data.Role + `)">结束训练</a>
                             <a class="btn btn-success btn-lg" id="nextSPQuestion">下一题</a>`
             }
             $(backGroup).empty().append(`<div class="col-sm-offset-9">
@@ -1144,7 +1193,7 @@ function getSpecialPractice(sp, num, commitData) {
                 let userAnswer = $(parent).find('#showSPEditor').attr("data-content");
                 if (userAnswer !== undefined && userAnswer.length > 0) {
                     $(parent).empty();
-                    let QueueNum = data.QueueNum;
+                    let QueueNum = Data.QueueNum;
                     QueueNum++;
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
@@ -1179,40 +1228,45 @@ function commitPractice(sp, role) {
     $.post("/user/commitPractice",
         {answer: userAnswer},
         (data) => {
+            if (data.code !== 0) {
+                alert(data.msg);
+                return
+            }
+            let Data = data.data;
             let tbody = ``;
-            for (let i = 0; i < data.Practices.length; i++) {
+            for (let i = 0; i < Data.Practices.length; i++) {
                 let textClass = ``;
-                if (data.Practices[i].Select !== null) {
-                    if (data.Practices[i].Select.Correct) {
+                if (Data.Practices[i].Select !== null) {
+                    if (Data.Practices[i].Select.Correct) {
                         textClass = `class="text-success"`;
                     } else {
                         textClass = `class="text-danger"`;
                     }
                     tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td>` + data.Practices[i].Select.Train.Content + `</td>
-                                    <td ` + textClass + `>` + data.Practices[i].Select.UserAnswer + `</td>
-                                    <td>` + data.Practices[i].Select.Answer + `</td>
+                                    <td>` + Data.Practices[i].Select.Train.Content + `</td>
+                                    <td ` + textClass + `>` + Data.Practices[i].Select.UserAnswer + `</td>
+                                    <td>` + Data.Practices[i].Select.Answer + `</td>
                                 </tr>`;
                 } else {
-                    if (data.Practices[i].UnSelect.Correct) {
+                    if (Data.Practices[i].UnSelect.Correct) {
                         textClass = `class="text-success"`;
                     } else {
                         textClass = `class="text-danger"`;
                     }
                     tbody += `<tr>
                                     <td>` + (i + 1) + `</td>
-                                    <td>` + data.Practices[i].UnSelect.Train.Content + `</td>
-                                    <td ` + textClass + `>` + data.Practices[i].UnSelect.UserAnswer + `</td>
-                                    <td>` + data.Practices[i].UnSelect.Answer + `</td>
+                                    <td>` + Data.Practices[i].UnSelect.Train.Content + `</td>
+                                    <td ` + textClass + `>` + Data.Practices[i].UnSelect.UserAnswer + `</td>
+                                    <td>` + Data.Practices[i].UnSelect.Answer + `</td>
                                 </tr>`;
                 }
             }
             $(sp).append(`<div>
                         <h1 class="text-center text-muted">训练成果</h1>
-                        <h2 class="text-center text-muted">当前总计：` + data.View + `</h2>
-                        <h2 class="text-center text-success">正确数目：` + data.Correct + `</h2>   
-                        <h2 class="text-center text-primary">正确率：` + number_format((data.Correct / data.View * 100), 2, ".", ",") + `%</h2>          
+                        <h2 class="text-center text-muted">当前总计：` + Data.View + `</h2>
+                        <h2 class="text-center text-success">正确数目：` + Data.Correct + `</h2>   
+                        <h2 class="text-center text-primary">正确率：` + number_format((Data.Correct / Data.View * 100), 2, ".", ",") + `%</h2>          
                         </div>
                         <div>
                         <a class="btn btn-primary" role="button" data-toggle="collapse" data-for="detail" href="#PracticeDetail" aria-expanded="false" aria-controls="PracticeDetail">
@@ -1248,34 +1302,39 @@ function commitPractice(sp, role) {
 
 function getQuestionReview(controls) {
     $.get("/user/getQuestionReview", (data) => {
+        if (data.code !== 0) {
+            alert(data.msg);
+            return
+        }
         let tbody = ``;
-        for (let i = 0; i < data.length; i++) {
+        let Data = data.data;
+        for (let i = 0; i < Data.length; i++) {
             let addition = ``;
-            if (data[i].Addition != null && data[i].Addition.length > 0) {
-                for (let j = 0; j < data[i].Addition.length; j++) {
-                    addition += `` + delPagraph(data[i].Addition[j], 18);
+            if (Data[i].Addition != null && Data[i].Addition.length > 0) {
+                for (let j = 0; j < Data[i].Addition.length; j++) {
+                    addition += `` + delPagraph(Data[i].Addition[j], 18);
                 }
             } else {
                 addition = `无`;
             }
             let reviewer = ``;
-            if (data[i].Reviewers != null && data[i].Reviewers.length > 0) {
-                for (let j = 0; j < data[i].Reviewers.length; j++) {
-                    reviewer += `<p>` + data[i].Reviewers[j] + `</p>`;
+            if (Data[i].Reviewers != null && Data[i].Reviewers.length > 0) {
+                for (let j = 0; j < Data[i].Reviewers.length; j++) {
+                    reviewer += `<p>` + Data[i].Reviewers[j] + `</p>`;
                 }
             } else {
                 reviewer = `无`;
             }
             tbody += `<tr>
                         <td>` + (i + 1) + `</td>
-                        <td>` + delPagraph(data[i].Content, 18) + `</td>
-                        <td>` + data[i].QuestionType + `</td>
+                        <td>` + delPagraph(Data[i].Content, 18) + `</td>
+                        <td>` + Data[i].QuestionType + `</td>
                         <td>` + addition + `</td>
-                        <td>` + delPagraph(data[i].Answer, 18) + `</td>
-                        <td>` + data[i].ViewNum + `</td>
+                        <td>` + delPagraph(Data[i].Answer, 18) + `</td>
+                        <td>` + Data[i].ViewNum + `</td>
                         <td>` + reviewer + `</td>
-                        <td><a class="btn btn-warning" href="javascript:void(0);" onclick="ChangeReview(` + data[i].Id + `,'` + controls + `')">修改</a></td>
-                        <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + data[i].Id + `,'` + controls + `')">通过</a></td>
+                        <td><a class="btn btn-warning" href="javascript:void(0);" onclick="ChangeReview(` + Data[i].Id + `,'` + controls + `')">修改</a></td>
+                        <td><a class="btn btn-success" href="javascript:void(0);" onclick="QuestionReviewPass(` + Data[i].Id + `,'` + controls + `')">通过</a></td>
                     </tr>`
         }
         $(controls).empty().append(`<table class="table table-hover">
@@ -1301,69 +1360,70 @@ function getQuestionReview(controls) {
 }
 
 function getBasicReview(controls) {
-    $.get("/user/getBasicReview", (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/user/getBasicReview", (data) => {
+        if (data.code === 0) {
             let tbody = ``;
-            for (let i = 0; i < data.length; i++) {
+            let Data = data.data;
+            for (let i = 0; i < Data.length; i++) {
                 let formulas = ``;
-                for (let k = 0; k < data[i].FormulaReviews.length; k++) {
+                for (let k = 0; k < Data[i].FormulaReviews.length; k++) {
                     formulas += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success' onclick='passBasic(` + data[i].FormulaReviews[k].Id + `,70)'>通过</a>
-                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].FormulaReviews[k].Id + `,70)'>修改</a>
+                       <a class='btn btn-success' onclick='passBasic(` + Data[i].FormulaReviews[k].Id + `,70)'>通过</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + Data[i].FormulaReviews[k].Id + `,70)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].FormulaReviews[k].Content, 14) + `</a>`;
+                       </div>">` + delPagraph(Data[i].FormulaReviews[k].Content, 14) + `</a>`;
                 }
 
                 let knowledges = ``;
-                for (let k = 0; k < data[i].KnowledgeReviews.length; k++) {
+                for (let k = 0; k < Data[i].KnowledgeReviews.length; k++) {
                     knowledges += `<a tabindex="0" style="" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success' onclick='passBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>通过</a>
-                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].KnowledgeReviews[k].Id + `,75)'>修改</a>
+                       <a class='btn btn-success' onclick='passBasic(` + Data[i].KnowledgeReviews[k].Id + `,75)'>通过</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + Data[i].KnowledgeReviews[k].Id + `,75)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].KnowledgeReviews[k].Content, 14) + `</a>`;
+                       </div>">` + delPagraph(Data[i].KnowledgeReviews[k].Content, 14) + `</a>`;
                 }
 
                 let hds = ``;
-                for (let k = 0; k < data[i].HDifficultReviews.length; k++) {
+                for (let k = 0; k < Data[i].HDifficultReviews.length; k++) {
                     hds += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作" data-placement="top"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success' onclick='passBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>通过</a>
-                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].HDifficultReviews[k].Id + `,72)'>修改</a>
+                       <a class='btn btn-success' onclick='passBasic(` + Data[i].HDifficultReviews[k].Id + `,72)'>通过</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + Data[i].HDifficultReviews[k].Id + `,72)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].HDifficultReviews[k].Content, 14) + `</a>`;
+                       </div>">` + delPagraph(Data[i].HDifficultReviews[k].Content, 14) + `</a>`;
                 }
 
                 let tests = ``;
-                for (let k = 0; k < data[i].TestReviews.length; k++) {
+                for (let k = 0; k < Data[i].TestReviews.length; k++) {
                     tests += `<a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                    data-trigger="focus" title="可执行操作"
                                    data-template="<div class='popover' role='tooltip'>
                        <div class='arrow'></div>
                        <h3 class='popover-title'></h3>
                        <div>
-                       <a class='btn btn-success' onclick='passBasic(` + data[i].TestReviews[k].Id + `,69)'>通过</a>
-                       <a class='btn btn-warning' onclick='changeBasic(` + data[i].TestReviews[k].Id + `,69)'>修改</a>
+                       <a class='btn btn-success' onclick='passBasic(` + Data[i].TestReviews[k].Id + `,69)'>通过</a>
+                       <a class='btn btn-warning' onclick='changeBasic(` + Data[i].TestReviews[k].Id + `,69)'>修改</a>
                        </div>
-                       </div>">` + delPagraph(data[i].TestReviews[k].Content, 14) + `</a>`;
+                       </div>">` + delPagraph(Data[i].TestReviews[k].Content, 14) + `</a>`;
                 }
 
                 tbody += `<tr>
                             <td>` + (i + 1) + `</td>
-                            <td>` + data[i].Role + `</td>
+                            <td>` + Data[i].Role + `</td>
                             <td>
                             <a tabindex="0" class="btn btn-default" role="button" data-toggle="popover"
                                                                data-trigger="focus" title="可执行操作"
@@ -1371,10 +1431,10 @@ function getBasicReview(controls) {
                                                    <div class='arrow'></div>
                                                    <h3 class='popover-title'></h3>
                                                    <div>
-                                                   <a class='btn btn-success' onclick='passBasic(` + data[i].Id + `,66)'>通过</a>
-                                                   <a class='btn btn-warning' onclick='changeBasic(` + data[i].Id + `,66)'>修改</a>
+                                                   <a class='btn btn-success' onclick='passBasic(` + Data[i].Id + `,66)'>通过</a>
+                                                   <a class='btn btn-warning' onclick='changeBasic(` + Data[i].Id + `,66)'>修改</a>
                                                    </div>
-                                                   </div>">` + delPagraph(data[i].Content, 14) + `</a>
+                                                   </div>">` + delPagraph(Data[i].Content, 14) + `</a>
                                                    </td>
                             <td>` + knowledges + `</td>
                             <td>` + formulas + `</td>
@@ -1408,8 +1468,9 @@ function getBasicReview(controls) {
 
 function passBasic(id, group) {
     let g = String.fromCharCode(group);
-    $.get("/user/passBasic/" + id + "/" + g, (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/user/passBasic/" + id + "/" + g, (data) => {
+        if (data.code === 0) {
+            alert(data.msg);
             getBasicReview('#KnowledgeReview')
         }
     });
@@ -1417,8 +1478,8 @@ function passBasic(id, group) {
 
 function changeBasic(id, group) {
     let g = String.fromCharCode(group);
-    $.get("/user/changeBasic/" + id + "/" + g, (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/user/changeBasic/" + id + "/" + g, (data) => {
+        if (data.code === 0) {
             let controls = "#KnowledgeReview";
             $(controls).empty().append(`
                     <h1 class="text-center text-muted">基础知识修改</h1>
@@ -1428,7 +1489,7 @@ function changeBasic(id, group) {
                             <div class="col-sm-10">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeBasicEditor','#backChangeBasicGroup');"
-                                   id="showChangeBasicContent" data-content="` + data + `">` + data + `</a>
+                                   id="showChangeBasicContent" data-content="` + data.data + `">` + data.data + `</a>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1455,8 +1516,9 @@ function changeBasic(id, group) {
                         content: content,
                         group: g,
                     },
-                    (data, status, xhr) => {
-                        if (xhr.status === 200) {
+                    (data) => {
+                        if (data.code === 0) {
+                            alert(data.msg);
                             getBasicReview(controls);
                         }
                     })
@@ -1467,22 +1529,23 @@ function changeBasic(id, group) {
 }
 
 function ChangeReview(id, controls) {
-    $.get("/user/getSingleReviewQuestion/" + id, (data, status, xhr) => {
-        if (xhr.status == 200) {
+    $.get("/user/getSingleReviewQuestion/" + id, (data) => {
+        if (data.code === 0) {
             let other = ``;
-            if (data.Role === 1) {
+            let Data = data.data;
+            if (Data.Role === 1) {
                 other = `<div class="form-group row">
                             <label for="showSelectChangeA" class="col-sm-1 control-label">A.</label>
                             <div class="col-sm-5">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showSelectChangeA" data-content="` + data.Addition[0] + `">` + data.Addition[0] + `</a>
+                                   id="showSelectChangeA" data-content="` + Data.Addition[0] + `">` + Data.Addition[0] + `</a>
                             </div>
                             <label for="showSelectChangeB" class="col-sm-1 control-label">B.</label>
                             <div class="col-sm-5">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showSelectChangeB" data-content="` + data.Addition[1] + `">` + data.Addition[1] + `</a>
+                                   id="showSelectChangeB" data-content="` + Data.Addition[1] + `">` + Data.Addition[1] + `</a>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -1490,23 +1553,23 @@ function ChangeReview(id, controls) {
                             <div class="col-sm-5">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showSelectChangeC" data-content="` + data.Addition[2] + `">` + data.Addition[2] + `</a>
+                                   id="showSelectChangeC" data-content="` + Data.Addition[2] + `">` + Data.Addition[2] + `</a>
                             </div>
                             <label for="showSelectChangeD" class="col-sm-1 control-label">D.</label>
                             <div class="col-sm-5">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showSelectChangeD" data-content="` + data.Addition[3] + `">` + data.Addition[3] + `</a>
+                                   id="showSelectChangeD" data-content="` + Data.Addition[3] + `">` + Data.Addition[3] + `</a>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="showAnswerChangeSelect" class="col-sm-1 control-label">答案：</label>
                             <div class="col-sm-5">
                                 <select id="showAnswerChangeSelect">
-                                    <option value="` + data.Addition[0] + `" ` + (data.Addition[0] === data.Answer ? "selected='selected'" : "") + `>A</option>
-                                    <option value="` + data.Addition[1] + `" ` + (data.Addition[1] === data.Answer ? "selected='selected'" : "") + `>B</option>
-                                    <option value="` + data.Addition[2] + `" ` + (data.Addition[2] === data.Answer ? "selected='selected'" : "") + `>C</option>
-                                    <option value="` + data.Addition[3] + `" ` + (data.Addition[3] === data.Answer ? "selected='selected'" : "") + `>D</option>
+                                    <option value="` + Data.Addition[0] + `" ` + (Data.Addition[0] === Data.Answer ? "selected='selected'" : "") + `>A</option>
+                                    <option value="` + Data.Addition[1] + `" ` + (Data.Addition[1] === Data.Answer ? "selected='selected'" : "") + `>B</option>
+                                    <option value="` + Data.Addition[2] + `" ` + (Data.Addition[2] === Data.Answer ? "selected='selected'" : "") + `>C</option>
+                                    <option value="` + Data.Addition[3] + `" ` + (Data.Addition[3] === Data.Answer ? "selected='selected'" : "") + `>D</option>
                                 </select>
                             </div>
                         </div>`;
@@ -1516,7 +1579,7 @@ function ChangeReview(id, controls) {
                             <div class="col-sm-10">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showAnswerChange" title="可填" data-content="` + data.Answer + `">` + data.Answer + `</a>
+                                   id="showAnswerChange" title="可填" data-content="` + Data.Answer + `">` + Data.Answer + `</a>
                             </div>
                         </div>`;
             }
@@ -1528,7 +1591,7 @@ function ChangeReview(id, controls) {
                             <div class="col-sm-10">
                                 <a href="javascript:void(0);"
                                    onclick="showEditor(this,'#changeEditor','#backChangeGroup');"
-                                   id="showChangeContent" data-content="` + data.Content + `">` + data.Content + `</a>
+                                   id="showChangeContent" data-content="` + Data.Content + `">` + Data.Content + `</a>
                             </div>
                         </div>
                         ` + other + `
@@ -1551,7 +1614,7 @@ function ChangeReview(id, controls) {
 
             $("#changeBtn").on("click", () => {
                 let changeData;
-                if (data.Role === 1) {
+                if (Data.Role === 1) {
                     let content = $("#showChangeContent").attr("data-content");
                     let answer = $("#showAnswerChangeSelect").val();
 
@@ -1572,7 +1635,7 @@ function ChangeReview(id, controls) {
                         content: content,
                         choices: choice,
                         ans: answer,
-                        role: data.Role,
+                        role: Data.Role,
                     };
                 } else {
                     let content = $("#showChangeContent").attr("data-content");
@@ -1580,14 +1643,15 @@ function ChangeReview(id, controls) {
                     changeData = {
                         content: content,
                         ans: answer,
-                        role: data.Role,
+                        role: Data.Role,
                     }
                 }
                 $.post(
-                    "/user/changeQuestion/" + data.Id,
+                    "/user/changeQuestion/" + Data.Id,
                     changeData,
-                    (data, status, xhr) => {
-                        if (xhr.status === 200) {
+                    (data) => {
+                        if (data.code === 0) {
+                            alert(data.msg);
                             getQuestionReview(controls);
                         }
                     });
@@ -1597,8 +1661,9 @@ function ChangeReview(id, controls) {
 }
 
 function QuestionReviewPass(id, controls) {
-    $.get("/passQuestionReview/" + id, (data, status, xhr) => {
-        if (xhr.status === 200) {
+    $.get("/user/passQuestionReview/" + id, (data) => {
+        if (data.code === 0) {
+            alert(data.msg);
             getQuestionReview(controls)
         }
     })

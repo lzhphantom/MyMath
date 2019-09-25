@@ -340,5 +340,4 @@ func (c *LoginController) Analysis() {
 	}
 	c.Data["json"] = analysis
 	c.ServeJSON()
-
 }

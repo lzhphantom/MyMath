@@ -1,20 +1,22 @@
 package front
 
 import (
+	"errors"
 	"fmt"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lzhphantom/MyMath/common"
+	"github.com/lzhphantom/MyMath/controllers/base"
 	"github.com/lzhphantom/MyMath/models"
 	"math/rand"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 )
 
 type UserController struct {
-	beego.Controller
+	base.UserBaseController
 }
 
 //获取训练所需要的题
@@ -27,7 +29,7 @@ func (c *UserController) GetQuestion() {
 	if role == "-1" {
 		num, err := o.Raw("SELECT id,content,answer,role_question FROM question WHERE role_question != ? and review >= 3", 1).QueryRows(&questions)
 		if err != nil {
-			logs.Debug("获取题失败：", err)
+			c.Abort500(err)
 		} else {
 			logs.Info("一共获取了", num, "条")
 		}
@@ -58,7 +60,7 @@ func (c *UserController) GetQuestion() {
 	} else {
 		num, err := o.QueryTable("question").Filter("role_question", role).Filter("review__gte", 3).All(&questions)
 		if err != nil {
-			logs.Debug("获取题失败：", err)
+			c.Abort500(err)
 		} else {
 			logs.Info("一共获取了", num, "条")
 		}
@@ -101,7 +103,10 @@ func (c *UserController) GetQuestion() {
 func (c *UserController) GetTrain() {
 	role := c.Ctx.Input.Param(":role")
 	answer := c.GetString("answer")
-	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	num, err := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	if err != nil {
+		c.Abort500(err)
+	}
 	if role == "select" {
 		selects := c.GetSession(common.KeySelects).([]common.Select)
 		if num > 0 {
@@ -115,7 +120,7 @@ func (c *UserController) GetTrain() {
 		}
 		data := selects[num].Train
 		data.QueueNum = num
-		c.Data["json"] = data
+		c.JSONOkData(1, data)
 	} else if role == "unselect" {
 		unSelects := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
 		if num > 0 {
@@ -129,11 +134,10 @@ func (c *UserController) GetTrain() {
 		}
 		data := unSelects[num].Train
 		data.QueueNum = num
-		c.Data["json"] = data
+		c.JSONOkData(1, data)
 	} else {
-		logs.Warning("不存在这样的选择")
+		c.Abort500(errors.New("不存在这样的选择"))
 	}
-	c.ServeJSON()
 }
 
 //提交并检测训练
@@ -169,7 +173,7 @@ func (c *UserController) CommitTraining() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -198,7 +202,7 @@ func (c *UserController) CommitTraining() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -215,7 +219,7 @@ func (c *UserController) CommitTraining() {
 				&showSelects,
 			}
 			c.DelSession(common.KeySelects)
-			c.Data["json"] = data
+			c.JSONOkData(len(*data.Selects), data)
 		}
 	} else if role == "unselect" {
 		unSelects, ok := c.GetSession(common.KeyUnSelects).([]common.UnSelect)
@@ -242,7 +246,7 @@ func (c *UserController) CommitTraining() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -271,7 +275,7 @@ func (c *UserController) CommitTraining() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -288,12 +292,11 @@ func (c *UserController) CommitTraining() {
 				&showUnSelect,
 			}
 			c.DelSession(common.KeyUnSelects)
-			c.Data["json"] = data
+			c.JSONOkData(len(*data.UnSelects), data)
 		}
 	} else {
-		logs.Info("role 参数不正常")
+		c.Abort500(errors.New("role 参数不正常"))
 	}
-	c.ServeJSON()
 }
 
 //随机获取少许特定范围的题
@@ -305,7 +308,7 @@ func (c *UserController) GetQuestionByCommonId() {
 	rand.Seed(time.Now().UnixNano())
 	num, err := o.QueryTable("question").Filter("basic_common_id", role).All(&questions)
 	if err != nil {
-		logs.Debug("获取题失败：", err)
+		c.Abort500(err)
 	} else {
 		logs.Info("一共获取了", num, "条")
 	}
@@ -365,7 +368,10 @@ func (c *UserController) GetQuestionByCommonId() {
 //冲缓存中抽取专项训练题目
 // @router /user/getPractice/:num [post,get]
 func (c *UserController) GetPractice() {
-	num, _ := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	num, err := strconv.Atoi(c.Ctx.Input.Param(":num"))
+	if err != nil {
+		c.Abort500(err)
+	}
 	practices, ok := c.GetSession(common.KeyPractices).([]common.Practice)
 	if num > 0 {
 		answer := c.GetString("answer")
@@ -393,13 +399,14 @@ func (c *UserController) GetPractice() {
 			data := practice.Select
 			data.Train.QueueNum = num
 			c.Data["json"] = data.Train
+			c.JSONOkData(1, data.Train)
 		} else if practice.UnSelect != nil {
 			data := practice.UnSelect
 			data.Train.QueueNum = num
 			c.Data["json"] = data.Train
+			c.JSONOkData(1, data.Train)
 		}
 	}
-	c.ServeJSON()
 }
 
 //提交并检测专项训练
@@ -433,7 +440,7 @@ func (c *UserController) CommitPractice() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -462,7 +469,7 @@ func (c *UserController) CommitPractice() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -487,7 +494,7 @@ func (c *UserController) CommitPractice() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -516,7 +523,7 @@ func (c *UserController) CommitPractice() {
 					}
 					num, err := o.Insert(&answerRecord)
 					if err != nil {
-						logs.Warning("插入失败", err)
+						c.Abort500(err)
 					} else {
 						logs.Info("插入成功", num)
 					}
@@ -533,10 +540,9 @@ func (c *UserController) CommitPractice() {
 			countCorrect,
 			&showPractices,
 		}
-		c.Data["json"] = data
 		c.DelSession(common.KeyPractices)
+		c.JSONOkData(len(*data.Practices), data)
 	}
-	c.ServeJSON()
 }
 
 //修改密码
@@ -554,7 +560,7 @@ func (c *UserController) ChangePassword() {
 		newMD5Pwd := fmt.Sprintf("%x", common.MD5Password(newpwd))
 		u.Password = newMD5Pwd
 		if num, err := o.Update(&u); err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		} else {
 			logs.Info("更了", num, "条")
 		}
@@ -577,7 +583,7 @@ Loop:
 		var records []models.QuestionReviewRecord
 		num, err := o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).All(&records)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		} else {
 			logs.Info("获取成功", num, "条")
 		}
@@ -619,8 +625,7 @@ Loop:
 		}
 		reviewQuestions = append(reviewQuestions, reviewQuestion)
 	}
-	c.Data["json"] = reviewQuestions
-	c.ServeJSON()
+	c.JSONOkData(len(reviewQuestions), reviewQuestions)
 }
 
 //题目审核通过
@@ -628,7 +633,7 @@ Loop:
 func (c *UserController) PassQuestionReview() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		logs.Warning("id 不正确", err)
+		c.Abort500(err)
 	}
 	user := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	newRecord := models.QuestionReviewRecord{
@@ -645,17 +650,17 @@ func (c *UserController) PassQuestionReview() {
 	question.Review = question.Review + 1
 	num, err := o.Update(&question, "review")
 	if err != nil {
-		logs.Warning("更新失败", err)
+		c.Abort500(err)
 	} else {
 		logs.Info("更了", num, "条")
 	}
 	num, err = o.Insert(&newRecord)
 	if err != nil {
-		logs.Info("插入失败", err)
+		c.Abort500(err)
 	} else {
 		logs.Info("成功插入", num)
 	}
-	c.ServeJSON()
+	c.JSONOk("审核通过")
 }
 
 //获取单个题目->审核
@@ -663,7 +668,7 @@ func (c *UserController) PassQuestionReview() {
 func (c *UserController) GetSingleReviewQuestion() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		logs.Warning(":id参数不为数字", err)
+		c.Abort500(err)
 	}
 	o := orm.NewOrm()
 	question := models.Question{
@@ -672,7 +677,7 @@ func (c *UserController) GetSingleReviewQuestion() {
 	err = o.Read(&question)
 
 	if err != nil {
-		logs.Warning("读取失败", err)
+		c.Abort500(err)
 	}
 
 	if question.RoleQuestion == 1 {
@@ -689,7 +694,7 @@ func (c *UserController) GetSingleReviewQuestion() {
 			Answer:   question.Answer,
 			Role:     int(question.RoleQuestion),
 		}
-		c.Data["json"] = viewQuestion
+		c.JSONOkData(1, viewQuestion)
 	} else {
 		viewQuestion := common.ChangeQuestion{
 			Id:      question.Id,
@@ -697,9 +702,8 @@ func (c *UserController) GetSingleReviewQuestion() {
 			Answer:  question.Answer,
 			Role:    int(question.RoleQuestion),
 		}
-		c.Data["json"] = viewQuestion
+		c.JSONOkData(1, viewQuestion)
 	}
-	c.ServeJSON()
 
 }
 
@@ -708,11 +712,11 @@ func (c *UserController) GetSingleReviewQuestion() {
 func (c *UserController) ChangeQuestion() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		logs.Warning(":id 非数字", err)
+		c.Abort500(err)
 	}
 	role, err := strconv.Atoi(c.GetString("role"))
 	if err != nil {
-		logs.Warning("role 非数字", err)
+		c.Abort500(err)
 	}
 	content := c.GetString("content")
 	answer := c.GetString("ans")
@@ -723,7 +727,7 @@ func (c *UserController) ChangeQuestion() {
 	}
 	err = o.Read(&question)
 	if err != nil {
-		logs.Warning("该条数据不存在")
+		c.Abort500(err)
 	}
 	question.Content = content
 	question.Answer = answer
@@ -733,11 +737,9 @@ func (c *UserController) ChangeQuestion() {
 
 	num, err := o.Update(&question, "content", "choices", "answer")
 	if err != nil {
-		logs.Warning("题目更新失败", err)
-	} else {
-		logs.Info("更新成功", num)
+		c.Abort500(err)
 	}
-	c.ServeJSON()
+	c.JSONOkData(int(num), nil)
 
 }
 
@@ -748,7 +750,7 @@ func (c *UserController) GetBasicReview() {
 	var basicContets []models.BasicContent
 	_, err := o.QueryTable("basic_content").RelatedSel().All(&basicContets)
 	if err != nil {
-		logs.Warning("获取basicCommon失败")
+		c.Abort500(err)
 	}
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	basicReviews := make([]common.BasicCommonReview, 0)
@@ -767,7 +769,7 @@ func (c *UserController) GetBasicReview() {
 		var knowledges []*models.KnowledgeImportant
 		_, err := o.QueryTable("knowledge_important").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&knowledges)
 		if err != nil {
-			logs.Warning("知识点获取失败")
+			c.Abort500(err)
 		}
 		knowReviews := make([]common.KnowledgeReview, 0)
 		for k := 0; k < len(knowledges); k++ {
@@ -787,7 +789,7 @@ func (c *UserController) GetBasicReview() {
 		var formulas []*models.Formula
 		_, err = o.QueryTable("formula").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&formulas)
 		if err != nil {
-			logs.Warning("获取公式失败")
+			c.Abort500(err)
 		}
 		formulaReviews := make([]common.FormulaReview, 0)
 		for k := 0; k < len(formulas); k++ {
@@ -807,7 +809,7 @@ func (c *UserController) GetBasicReview() {
 		var hds []*models.HDifficulty
 		_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&hds)
 		if err != nil {
-			logs.Warning("重难点获取失败")
+			c.Abort500(err)
 		}
 		hdReviews := make([]common.HDifficultReview, 0)
 		for k := 0; k < len(hds); k++ {
@@ -827,7 +829,7 @@ func (c *UserController) GetBasicReview() {
 		var tests []*models.ExaminationCenter
 		_, err = o.QueryTable("examination_center").Filter("basic_content_id", basicContets[i].Id).Filter("review__lte", 3).All(&tests)
 		if err != nil {
-			logs.Warning("考点获取失败")
+			c.Abort500(err)
 		}
 		testReviews := make([]common.TestReview, 0)
 		for k := 0; k < len(tests); k++ {
@@ -852,8 +854,7 @@ func (c *UserController) GetBasicReview() {
 		}
 		basicReviews = append(basicReviews, basicReview)
 	}
-	c.Data["json"] = basicReviews
-	c.ServeJSON()
+	c.JSONOkData(0, basicReviews)
 }
 
 //审核通过基础知识
@@ -861,7 +862,7 @@ func (c *UserController) GetBasicReview() {
 func (c *UserController) PassBasic() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		logs.Warning("id 不为数字")
+		c.Abort500(err)
 	}
 	group := c.Ctx.Input.Param(":group")
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
@@ -872,12 +873,12 @@ func (c *UserController) PassBasic() {
 		}
 		err = o.Read(&formula)
 		if err != nil {
-			logs.Warning("不存在")
+			c.Abort500(err)
 		}
 		formula.Review += 1
 		_, err = o.Update(&formula, "review")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 
 	} else if group == "E" {
@@ -886,12 +887,12 @@ func (c *UserController) PassBasic() {
 		}
 		err = o.Read(&test)
 		if err != nil {
-			logs.Warning("不存在")
+			c.Abort500(err)
 		}
 		test.Review += 1
 		_, err = o.Update(&test, "review")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "H" {
 		hd := models.HDifficulty{
@@ -899,12 +900,12 @@ func (c *UserController) PassBasic() {
 		}
 		err = o.Read(&hd)
 		if err != nil {
-			logs.Warning("不存在")
+			c.Abort500(err)
 		}
 		hd.Review += 1
 		_, err = o.Update(&hd, "review")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "K" {
 		know := models.KnowledgeImportant{
@@ -912,12 +913,12 @@ func (c *UserController) PassBasic() {
 		}
 		err = o.Read(&know)
 		if err != nil {
-			logs.Warning("不存在")
+			c.Abort500(err)
 		}
 		know.Review += 1
 		_, err = o.Update(&know, "review")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "B" {
 		basic := models.BasicContent{
@@ -925,15 +926,15 @@ func (c *UserController) PassBasic() {
 		}
 		err = o.Read(&basic)
 		if err != nil {
-			logs.Warning("不存在")
+			c.Abort500(err)
 		}
 		basic.Review += 1
 		_, err = o.Update(&basic, "review")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else {
-		logs.Warning("group 不在分组内")
+		c.Abort500(errors.New("group 不在分组内"))
 	}
 
 	record := models.BasicReviewRecord{
@@ -944,11 +945,11 @@ func (c *UserController) PassBasic() {
 		},
 	}
 	_, err = o.Insert(&record)
+	logs.Debug(err)
 	if err != nil {
-		logs.Warning("插入记录失败", err)
+		c.Abort500(err)
 	}
-
-	c.ServeJSON()
+	c.JSONOk("审核通过")
 }
 
 //需要修改基础知识
@@ -956,7 +957,7 @@ func (c *UserController) PassBasic() {
 func (c *UserController) ChangeBasic() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		logs.Warning(":id 不为数字")
+		c.Abort500(err)
 	}
 	group := c.Ctx.Input.Param(":group")
 	o := orm.NewOrm()
@@ -964,42 +965,41 @@ func (c *UserController) ChangeBasic() {
 		var basic models.BasicContent
 		err = o.QueryTable("basic_content").Filter("id", id).One(&basic)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		}
-		c.Data["json"] = basic.Concept
+		c.JSONOkData(1, basic.Concept)
 	} else if group == "H" {
 		var hd models.HDifficulty
 		err = o.QueryTable("h_difficulty").Filter("id", id).One(&hd)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		}
-		c.Data["json"] = hd.Content
-
+		c.JSONOkData(1, hd.Content)
 	} else if group == "E" {
 		var test models.ExaminationCenter
 		err = o.QueryTable("examination_center").Filter("id", id).One(&test)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		}
-		c.Data["json"] = test.Content
+		c.JSONOkData(1, test.Content)
 	} else if group == "F" {
 		var formula models.Formula
 		err = o.QueryTable("formula").Filter("id", id).One(&formula)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		}
-		c.Data["json"] = formula.Content
+		c.JSONOkData(1, formula.Content)
 	} else if group == "K" {
 		var know models.KnowledgeImportant
 		err = o.QueryTable("knowledge_important").Filter("id", id).One(&know)
 		if err != nil {
-			logs.Warning("获取失败", err)
+			c.Abort500(err)
 		}
-		c.Data["json"] = know.Content
+		c.JSONOkData(1, know.Content)
 	} else {
-		logs.Warning("group 不在分组内")
+		c.Abort500(errors.New("group 不在分组内"))
 	}
-	c.ServeJSON()
+	c.JSONOk("获取成功")
 }
 
 //更新基础知识
@@ -1007,7 +1007,7 @@ func (c *UserController) ChangeBasic() {
 func (c *UserController) UpdateBasic() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		logs.Warning("id 不为数字")
+		c.Abort500(err)
 	}
 	content := c.GetString("content")
 	group := c.GetString("group")
@@ -1015,47 +1015,62 @@ func (c *UserController) UpdateBasic() {
 	if group == "B" {
 		var basic models.BasicContent
 		err = o.QueryTable("basic_content").Filter("id", id).One(&basic)
+		if err != nil {
+			c.Abort500(err)
+		}
 		basic.Concept = content
 		_, err = o.Update(&basic, "concept")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "F" {
 		var formula models.Formula
 		err = o.QueryTable("formula").Filter("id", id).One(&formula)
+		if err != nil {
+			c.Abort500(err)
+		}
 		formula.Content = content
 		_, err = o.Update(&formula, "content")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "H" {
 		var hd models.HDifficulty
 		err = o.QueryTable("h_difficulty").Filter("id", id).One(&hd)
+		if err != nil {
+			c.Abort500(err)
+		}
 		hd.Content = content
 		_, err = o.Update(&hd, "content")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "K" {
 		var know models.KnowledgeImportant
 		err = o.QueryTable("knowledge_important").Filter("id", id).One(&know)
+		if err != nil {
+			c.Abort500(err)
+		}
 		know.Content = content
 		_, err = o.Update(&know, "content")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else if group == "E" {
 		var test models.ExaminationCenter
 		err = o.QueryTable("examination_center").Filter("id", id).One(&test)
+		if err != nil {
+			c.Abort500(err)
+		}
 		test.Content = content
 		_, err = o.Update(&test, "content")
 		if err != nil {
-			logs.Warning("更新失败")
+			c.Abort500(err)
 		}
 	} else {
-		logs.Warning("group 不在分组内")
+		c.Abort500(errors.New("group 不在分组内"))
 	}
-	c.ServeJSON()
+	c.JSONOk("更新成功")
 }
 
 // 检索基础知识种类
@@ -1066,10 +1081,68 @@ func (c *UserController) BasicCommon() {
 	newOrm := orm.NewOrm()
 	num, err := newOrm.QueryTable("basic_common").All(&basicCommons)
 	if err != nil {
-		logs.Debug("基础知识种类获取失败！")
+		c.Abort500(err)
 	} else {
 		logs.Debug("基础知识种类共获取:", num, "个")
 	}
-	c.Data["json"] = basicCommons
-	c.ServeJSON()
+	c.JSONOkData(int(num), basicCommons)
+
+}
+
+//基础知识详情
+// @router /user/basicContent/:id [get]
+func (c *UserController) BasicContent() {
+	id := c.Ctx.Input.Param(":id")
+	logs.Debug("获取", id, reflect.TypeOf(id))
+	o := orm.NewOrm()
+	if id == "-1" {
+		var basicContents []*models.BasicCommon
+		_, err := o.QueryTable("basic_common").All(&basicContents)
+		for _, common := range basicContents {
+			_, err := o.QueryTable("basic_content").Filter("basic_common_id", (*common).Id).RelatedSel().All(&common.BasicContent)
+			if err != nil {
+				logs.Debug("BasicContent 获取失败")
+			}
+			for _, value := range common.BasicContent {
+				_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
+				_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", (*value).Id).All(&value.KnowledgeImportant)
+				_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
+				_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
+				if err != nil {
+					logs.Debug("BasicContent 其他信息获取失败")
+				}
+			}
+		}
+		if err != nil {
+			logs.Debug("基础知识详情获取失败1")
+		}
+		c.JSONOkData(1, basicContents)
+	} else {
+		Id, err := strconv.Atoi(id)
+		if err != nil {
+			logs.Debug("id转换int失败")
+		}
+		basicContent := models.BasicCommon{Id: Id}
+
+		err = o.Read(&basicContent)
+
+		_, err = o.QueryTable("basic_content").Filter("basic_common_id", basicContent.Id).RelatedSel().All(&basicContent.BasicContent)
+		if err != nil {
+			logs.Debug("BasicContent 获取失败")
+		}
+		for _, value := range basicContent.BasicContent {
+			_, err := o.QueryTable("formula").Filter("basic_content_id", (*value).Id).All(&value.Formula)
+			_, err = o.QueryTable("knowledge_important").Filter("basic_content_id", (*value).Id).All(&value.KnowledgeImportant)
+			_, err = o.QueryTable("examination_center").Filter("basic_content_id", (*value).Id).All(&value.ExaminationCenter)
+			_, err = o.QueryTable("h_difficulty").Filter("basic_content_id", (*value).Id).All(&value.HDifficulty)
+			if err != nil {
+				logs.Debug("BasicContent 其他信息获取失败")
+			}
+		}
+
+		if err != nil {
+			logs.Debug("基础知识详情获取失败1")
+		}
+		c.JSONOkData(1, basicContent)
+	}
 }

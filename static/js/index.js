@@ -169,7 +169,7 @@ $(function () {
                 $(threeUl).append(`<li role="presentation"><a href="#SpecialPractice" aria-controls="SpecialPractice" role="tab"
                                                            data-toggle="tab" data-id="` + Data[i].Id + `" role-tab="sp">` + Data[i].Name + `<br></a></li>`);
             }
-            // /lzhphantomAdminService/getQuestionByCommonId/:id
+            // /user/getQuestionByCommonId/:id
             $('a[role-tab="sp"]').on('hide.bs.tab', (e) => {
                 let controls = $(e.target).attr("href");
                 $(controls).empty();
@@ -251,7 +251,7 @@ $(function () {
                 let ans = $("#showAnswerSelect").val();
                 if (content.length > 0) {
                     $.post(
-                        "/lzhphantomAdminService/uploadQuestion",
+                        "/user/uploadQuestion",
                         {
                             data: JSON.stringify({
                                 content: content,
@@ -289,7 +289,7 @@ $(function () {
                 }
                 if (content.length > 0) {
                     $.post(
-                        "/lzhphantomAdminService/uploadQuestion",
+                        "/user/uploadQuestion",
                         {
                             data: JSON.stringify(db),
                             role: 3,

@@ -1,6 +1,7 @@
 package front
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego/logs"
@@ -1235,6 +1236,61 @@ func (c *UserController) UpdateBasic() {
 		c.Abort500(errors.New("group 不在分组内"))
 	}
 	c.JSONOk("更新成功")
+}
+
+//上传题
+// @router /user/uploadQuestion [post]
+func (c *UserController) UploadQuestion() {
+	newQuestion := models.Question{}
+
+	data := c.GetString("data")
+	dataMap := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &dataMap)
+	if err != nil {
+		c.Abort500(err)
+	}
+
+	newQuestion.Content = dataMap["content"].(string)
+	role, err := c.GetUint8("role")
+	if err != nil {
+		c.Abort500(err)
+	}
+	logs.Debug(role)
+	newQuestion.RoleQuestion = uint8(role)
+
+	if role == 1 { //如果是选择题，则录入选项
+		newQuestion.Choices = dataMap["choices"].(string)
+	}
+
+	if answer, ok := dataMap["answer"].(string); ok {
+		newQuestion.Answer = answer
+	}
+	idRole, err := strconv.Atoi(dataMap["role"].(string))
+	if err != nil {
+		c.Abort500(err)
+	}
+
+	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
+	newQuestion.User = &models.User{
+		Id: loginUser.Id,
+	}
+	o := orm.NewOrm()
+	newQuestion.BasicCommon = &models.BasicCommon{
+		Id: idRole,
+	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	_, err = o.Insert(&newQuestion)
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+	}
+	c.JSONOk("上传成功")
 }
 
 // 检索基础知识种类

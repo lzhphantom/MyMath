@@ -1,6 +1,6 @@
 //为login检测
 function notLogin() {
-    alert("请登录在进行其他操作！");
+    infoAlert("请登录在进行其他操作！");
     $("#login").modal("show");
 }
 

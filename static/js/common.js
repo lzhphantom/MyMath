@@ -5,7 +5,7 @@ function notLogin() {
 }
 
 function UNACTION() {
-    alert("该功能正在修建中...");
+    infoAlert("该功能正在修建中...");
 }
 
 /**
@@ -41,7 +41,7 @@ function number_format(number, decimals, dec_point, thousands_sep) {
     return s.join(dec);
 }
 
-function delPagraph(text,allowLength) {
+function delPagraph(text, allowLength) {
     let arr = text.split(/<p>\\\(|\\\)<\/p>/);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i] === "") {
@@ -121,4 +121,83 @@ function isStringLengthIncludeChinese(text) {
         }
     }
     return length
+}
+
+// function sweetAlert() {
+//     swal({
+//         text: "",//显示文本
+//         title: "",//标题
+//         icon: "",//图标[warning,error,success,info]
+//         button: "",//[string,boolean,buttonOptions]
+//         content: "",//[Node,string]
+//         closeOnClickOutside: false, //点击提示框外部是否可以关闭提示框
+//         closeOnEsc: false,//esc关闭提示框
+//         dangerMode:false,//true,确认按钮变为红色，并且默认焦点设置在取消按钮上。 在显示确认方式很危险的警告模式（例如删除项目）时，这很方便。
+//         buttons:false,
+//         timer:1000,//1s后关闭modal，通常和buttons:false联合使用
+//         className:"",//将自定义类添加到SweetAlert模态。 这对于更改外观非常方便。
+//     });
+// }
+/**
+ * 警告提示框
+ * @param message 文本内容
+ */
+function warningAlert(message) {
+    swal({
+        title: "m(｡≧ｴ≦｡)m警告",
+        text: message,
+        icon: "warning",
+        buttons: false,
+        timer: 1000,
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+    });
+}
+
+/**
+ * 成功提示框
+ * @param message 文本内容
+ */
+function successAlert(message) {
+    swal({
+        title: "ξ( ✿＞◡❛)恭喜",
+        text: message,
+        icon: "success",
+        buttons: false,
+        timer: 1000,
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+    });
+}
+
+/**
+ * 错误提示框
+ * @param message 文本内容
+ */
+function errorAlert(message) {
+    swal({
+        title: "(;´༎ຶД༎ຶ`)出错啦!",
+        text: message,
+        icon: "error",
+        buttons: false,
+        timer: 1000,
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+    });
+}
+
+/**
+ * 消息提示框
+ * @param message 文本内容
+ */
+function infoAlert(message) {
+    swal({
+        title: "ε٩(๑> ₃ <)۶з嗨！",
+        text: message,
+        icon: "info",
+        buttons: false,
+        timer: 1000,
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+    });
 }

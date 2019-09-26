@@ -1,8 +1,8 @@
 $(() => {
     window.onload = function () {
         $.get("/center/trainingAnalysis", (data) => {
-            if (data.code===0) {
-                let Data=data.data;
+            if (data.code === 0) {
+                let Data = data.data;
                 if (Data === null || Data.length === 0) {
                     $("#trainingAnalysis").append(`<p class="text-warning">暂无记录无法分析</p>`)
                     return
@@ -38,6 +38,9 @@ $(() => {
                     }]
                 });
                 chart.render();
+            } else {
+                errorAlert(data.msg);
+                return
             }
         });
 

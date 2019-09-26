@@ -17,7 +17,7 @@ $(() => {
                     reqData,
                     function (Data) {
                         if (Data.code !== 0) {
-                            alert(Data.msg);
+                            errorAlert(Data.msg);
                             return
                         }
                         let data = Data.data;

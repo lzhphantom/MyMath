@@ -103,11 +103,11 @@ $(function () {
 
 function getUploadRecord(pageNow, id, total) {
     if (pageNow < 1) {
-        alert("已经是第一页了，别按了!")
+        infoAlert("已经是第一页了，别按了!")
         return;
     }
     if (pageNow > total) {
-        alert("已经是最后一页了，我是有底线的!")
+        infoAlert("已经是最后一页了，我是有底线的!")
         return
     }
     $.get("/center/uploadRecord/" + pageNow, (Data) => {
@@ -195,11 +195,11 @@ function getUploadRecord(pageNow, id, total) {
 
 function getSingleAnswerHistory(pageNow, id, total) {
     if (pageNow < 1) {
-        alert("已经是第一页了，别按了!")
+        infoAlert("已经是第一页了，别按了!")
         return;
     }
     if (pageNow > total) {
-        alert("已经是最后一页了，我是有底线的!")
+        infoAlert("已经是最后一页了，我是有底线的!")
         return
     }
     $.get("/center/trainingHistory/" + pageNow, (Data) => {
@@ -287,33 +287,33 @@ function getSingleAnswerHistory(pageNow, id, total) {
 function personalCheck(f) {
     let name = f.UserName.value;
     if (name.length == 0) {
-        alert("姓名不能为空");
+        warningAlert("姓名不能为空");
         return false;
     } else if (!(/\p{Unified_Ideograph}/ug.test(name))) {
-        alert("姓名必须为中文");
+        warningAlert("姓名必须为中文");
         return false;
     }
     let tel = f.Tel.value;
     if (tel.length < 11) {
-        alert("联系电话位数不符");
+        warningAlert("联系电话位数不符");
         return false;
     } else if (!(/^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/.test(tel))) {
-        alert("联系电话输入不规范");
+        warningAlert("联系电话输入不规范");
         return false;
     }
     let province = f.province.value;
     if (province.length == 0) {
-        alert("请选择省份");
+        warningAlert("请选择省份");
         return false;
     }
     let city = f.city.value;
     if (city.length == 0) {
-        alert("请选择城市");
+        warningAlert("请选择城市");
         return false;
     }
     let street = f.street.value;
     if (street == 0) {
-        alert("请选择乡镇/街道");
+        warningAlert("请选择乡镇/街道");
         return false;
     }
 }

@@ -11,7 +11,7 @@ $(function () {
     $(chooseType).on("click", function () {
         $.get("/LS/basicCommon", function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
                 return
             }
             let data = Data.data;
@@ -25,7 +25,7 @@ $(function () {
     $(chooseContent).on("click", function () {
         $.get("/LS/basicContent/-1", function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
             }
             let data = Data.data;
             chooseContentShow(basicContent, data);
@@ -130,7 +130,7 @@ $(function () {
             Data,
             function (Data) {
                 if (Data.code !== 0) {
-                    alert(Data.msg);
+                    errorAlert(Data.msg);
                     return
                 }
                 let data = Data.data;
@@ -152,7 +152,7 @@ $(function () {
     $("#basicContentAdd").on("show.bs.modal", function () {
         $.get("/LS/basicCommon", function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
                 return
             }
             let data = Data.data;
@@ -167,14 +167,14 @@ $(function () {
     });
     $("#basicContentAdd").on("hide.bs.modal", function (e) {
         if (typeof (editor) !== "undefined" && editor != null) {
-            alert("正在编辑中...");
+            warningAlert("正在编辑中...");
             e.preventDefault();
             return;
         }
     });
     $("#basicContentChange").on('hide.bs.modal', (e) => {
         if (typeof (editor) !== "undefined" && editor != null) {
-            alert("正在编辑中...");
+            warningAlert("正在编辑中...");
             e.preventDefault();
             return;
         }
@@ -183,21 +183,21 @@ $(function () {
     $("#contentAdd").on("click", function () {
         let typeSelect = $("#typeSelect").val();
         if (typeSelect === "0") {
-            alert("请选择类型")
+            warningAlert("请选择类型")
             return
         }
         let contentSelect = $("#contentSelect").val();
         if (contentSelect === "0") {
-            alert("请选择版块")
+            warningAlert("请选择版块")
             return
         }
         if ($("#showBasicPublishContent").attr("data-content") === undefined) {
-            alert("请填充内容")
+            warningAlert("请填充内容")
             return
         }
         let basicPublishContent = $("#showBasicPublishContent").attr("data-content");
         if (basicPublishContent.length === 0) {
-            alert("请填充内容")
+            warningAlert("请填充内容")
             return
         }
 
@@ -218,7 +218,7 @@ $(function () {
     //修改基础知识内容
     $("#contentChange").on("click", function (e) {
         if (typeof (editor) !== "undefined" && editor != null) {
-            alert("正在编辑中...");
+            warningAlert("正在编辑中...");
             e.preventDefault();
             return;
         }
@@ -256,7 +256,7 @@ $(function () {
             },
             function (Data) {
                 if (Data.code !== 0) {
-                    alert(Data.msg);
+                    warningAlert(Data.msg);
                     return
                 }
                 let data = Data.data;
@@ -270,7 +270,7 @@ $(function () {
     $("#blankUpBtn").on("click", () => {
         let blank = $("#showBlank");
         if (typeof ($(blank).attr("data-content")) === "undefined") {
-            alert("无可上传的内容");
+            warningAlert("无可上传的内容");
         } else {
             let content = $(blank).attr("data-content");
             let role = $("#blankQuestionRole").val();
@@ -290,21 +290,25 @@ $(function () {
                         role: 2,
                     },
                     (Data) => {
-                        alert(Data.msg);
+
                         if (Data.code === 0) {
+                            successAlert(Data.msg);
                             backToUp("#showBlank")
+                        } else {
+                            errorAlert(Data.msg);
+                            return
                         }
                     }
                 );
             } else {
-                alert("无可上传的内容")
+                warningAlert("无可上传的内容")
             }
         }
     });
     $("#solveUpBtn").on("click", () => {
         let blank = $("#showSolve");
         if (typeof ($(blank).attr("data-content")) === "undefined") {
-            alert("无可上传的内容");
+            warningAlert("无可上传的内容");
         } else {
             let content = $(blank).attr("data-content");
             let role = $("#solveQuestionRole").val();
@@ -324,14 +328,17 @@ $(function () {
                         role: 3,
                     },
                     (Data) => {
-                        alert(Data.msg);
                         if (Data.code === 0) {
+                            successAlert(Data.msg);
                             backToUp("#showSolve")
+                        } else {
+                            errorAlert(Data.msg);
+                            return
                         }
                     }
                 );
             } else {
-                alert("无可上传的内容")
+                warningAlert("无可上传的内容")
             }
         }
     });
@@ -352,11 +359,11 @@ $(function () {
             }
         }
         if (typeof ($(select).attr("data-content")) === "undefined") {
-            alert("无可上传的内容");
+            warningAlert("无可上传的内容");
         } else if (choice.length <= 0) {
-            alert("请填写选择选项");
+            warningAlert("请填写选择选项");
         } else if (choiceNum <= 3) {
-            alert("选择数量不足")
+            warningAlert("选择数量不足")
         } else {
             let content = $(select).attr("data-content");
             let role = $("#selectQuestionRole").val();
@@ -374,14 +381,17 @@ $(function () {
                         role: 1,
                     },
                     (Data) => {
-                        alert(Data.msg);
                         if (Data.code === 0) {
+                            successAlert(Data.msg);
                             backToUp("#showSelectContent")
+                        } else {
+                            errorAlert(Data.msg);
+                            return
                         }
                     }
                 );
             } else {
-                alert("无可上传的内容")
+                warningAlert("无可上传的内容")
             }
         }
     });
@@ -560,7 +570,7 @@ function backToLast(backGroup, editorName) {
 //显示富文本编辑器
 async function showEditor(obj, editorName, backGroup) {
     if (typeof (editor) !== "undefined" && editor != null) {
-        alert("正在编辑中...");
+        warningAlert("正在编辑中...");
         return
     }
     $(obj).removeAttr("onclick");
@@ -623,7 +633,7 @@ function delBasicType(id) {
         {id: id},
         function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
                 return
             }
             let data = Data.data;
@@ -639,7 +649,7 @@ function delBasicContent(id) {
         {id: id},
         function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
                 return
             }
             let data = Data.data;
@@ -658,7 +668,7 @@ function showChangeBasicContent(id, changeModal) {
         {id: id},
         function (Data) {
             if (Data.code !== 0) {
-                alert(Data.msg);
+                errorAlert(Data.msg);
                 return
             }
             let data = Data.data;
@@ -694,7 +704,7 @@ function showChangeBasicContent(id, changeModal) {
                                                                         </div>`);
             $(changeModal).find("#contentSelect").on("change", function () {
                 if (typeof (editor) !== "undefined" && editor != null) {
-                    alert("正在编辑中...");
+                    warningAlert("正在编辑中...");
                     return
                 }
                 let showId = $(this).children('option:selected').val();

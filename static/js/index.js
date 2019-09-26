@@ -40,7 +40,7 @@ $(function () {
                     let controls = $(e.target).attr("href");
                     $.get("/user/basicContent/" + id, function (data) {
                         if (data.code !== 0) {
-                            alert(data.msg);
+                            errorAlert(data.msg);
                             return
                         }
                         let Data = data.data;
@@ -241,11 +241,11 @@ $(function () {
                 }
             }
             if (typeof ($(select).attr("data-content")) === "undefined") {
-                alert("无可上传的内容");
+                warningAlert("无可上传的内容");
             } else if (choice.length <= 0) {
-                alert("请填写选择选项");
+                warningAlert("请填写选择选项");
             } else if (choiceNum <= 3) {
-                alert("选择数量不足");
+                warningAlert("选择数量不足");
             } else {
                 let content = $(select).attr("data-content");
                 let ans = $("#showAnswerSelect").val();
@@ -261,21 +261,26 @@ $(function () {
                             }),
                             role: 1,
                         },
-                        (data, status) => {
-                            if (status === "success") {
+                        (Data) => {
+                            if (Data.code === 0) {
+                                successAlert(Data.msg);
                                 clearSelect();
+                            } else {
+                                errorAlert(Data.msg);
+                                return
                             }
+
                         }
                     );
                 } else {
-                    alert("无可上传的内容")
+                    warningAlert("无可上传的内容")
                 }
             }
         });
         $("#solveUpBtn").on("click", () => {
             let blank = $("#showSolve");
             if (typeof ($(blank).attr("data-content")) === "undefined") {
-                alert("无可上传的内容");
+                warningAlert("无可上传的内容");
             } else {
                 let content = $(blank).attr("data-content");
                 let role = $("#blankQuestionRole").val();
@@ -294,14 +299,18 @@ $(function () {
                             data: JSON.stringify(db),
                             role: 3,
                         },
-                        (data, status) => {
-                            if (status === "success") {
+                        (Data) => {
+                            if (Data.code === 0) {
+                                successAlert(Data.msg);
                                 clearBlank();
+                            } else {
+                                errorAlert(Data.msg);
+                                return
                             }
                         }
                     );
                 } else {
-                    alert("无可上传的内容")
+                    warningAlert("无可上传的内容")
                 }
             }
         });
@@ -367,7 +376,7 @@ var editor;
 
 async function showEditor(obj, editorName, backGroup) {
     if (typeof (editor) !== "undefined" && editor != null) {
-        alert("正在编辑中...");
+        warningAlert("正在编辑中...");
         return
     }
     $(obj).removeAttr("onclick");
@@ -601,7 +610,7 @@ function getUnSelectFirst(controls) {
             return
         }
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -651,7 +660,7 @@ function getUnSelectFirst(controls) {
                     let commitData = {answer: userAnswer};
                     getUnSelect(controls, QueueNum, commitData)
                 } else {
-                    alert("请填写你的答案！");
+                    warningAlert("请填写你的答案！");
                 }
             }
         });
@@ -669,7 +678,7 @@ function getUnSelect(controls, num, commitData) {
             return
         }
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -719,7 +728,7 @@ function getUnSelect(controls, num, commitData) {
                     let commitData = {answer: userAnswer};
                     getUnSelect(controls, QueueNum, commitData)
                 } else {
-                    alert("请填写你的答案！");
+                    warningAlert("请填写你的答案！");
                 }
             }
         });
@@ -732,16 +741,17 @@ function commitUnSelect(controls) {
     if (userAnswer !== undefined && userAnswer.length > 0) {
         $(controls).empty();
     } else {
-        alert("请填写你的答案！");
+        warningAlert("请填写你的答案！");
         return
     }
     $.post("/user/commitTraining/unselect",
         {answer: userAnswer},
         (data) => {
             if (data.code !== 0) {
-                alert(data.msg);
+                errorAlert(data.msg);
                 return
             }
+            infoAlert("训练完成！辛苦啦！");
             let Data = data.data;
             let tbody = ``;
             for (let i = 0; i < Data.UnSelects.length; i++) {
@@ -808,7 +818,7 @@ function getSelectFirst(controls) {
             return
         }
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -857,7 +867,7 @@ function getSelectFirst(controls) {
                     let commitData = {answer: userAnswer};
                     getSelect(controls, QueueNum, commitData);
                 } else {
-                    alert("请选择你认为正确的答案！");
+                    warningAlert("请选择你认为正确的答案！");
                 }
             }
         });
@@ -875,7 +885,7 @@ function getSelect(controls, num, commitData) {
             return
         }
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -924,7 +934,7 @@ function getSelect(controls, num, commitData) {
                     let commitData = {answer: userAnswer};
                     getSelect(controls, QueueNum, commitData);
                 } else {
-                    alert("请选择你认为正确的答案！");
+                    warningAlert("请选择你认为正确的答案！");
                 }
             }
         });
@@ -937,16 +947,17 @@ function commitSelect(controls) {
     if (userAnswer !== undefined) {
         $(controls).empty();
     } else {
-        alert("请选择你认为正确的答案！");
+        warningAlert("请选择你认为正确的答案！");
         return
     }
     $.post("/user/commitTraining/select",
         {answer: userAnswer},
         (data) => {
             if (data.code !== 0) {
-                alert(data.msg);
+                errorAlert(data.msg);
                 return
             }
+            infoAlert("训练完成！辛苦啦！");
             let Data = data.data;
             let tbody = ``;
             for (let i = 0; i < Data.Selects.length; i++) {
@@ -1005,7 +1016,7 @@ function commitSelect(controls) {
 function getSpecialPracticeFirst(sp, id) {
     $.get("/user/getQuestionByCommonId/" + id, (data) => {
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -1059,7 +1070,7 @@ function getSpecialPracticeFirst(sp, id) {
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
                 } else {
-                    alert("请选择你认为正确的答案！");
+                    warningAlert("请选择你认为正确的答案！");
                 }
 
             });
@@ -1096,7 +1107,7 @@ function getSpecialPracticeFirst(sp, id) {
                     let commitData = {answer: userAnswer}
                     getSpecialPractice(sp, QueueNum, commitData);
                 } else {
-                    alert("请填写你的答案！");
+                    warningAlert("请填写你的答案！");
                 }
             });
         }
@@ -1107,7 +1118,7 @@ function getSpecialPracticeFirst(sp, id) {
 function getSpecialPractice(sp, num, commitData) {
     $.post("/user/getPractice/" + num, commitData, (data) => {
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let Data = data.data;
@@ -1161,7 +1172,7 @@ function getSpecialPractice(sp, num, commitData) {
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
                 } else {
-                    alert("请选择你认为正确的答案！");
+                    warningAlert("请选择你认为正确的答案！");
                 }
 
             });
@@ -1198,7 +1209,7 @@ function getSpecialPractice(sp, num, commitData) {
                     let commitData = {answer: userAnswer};
                     getSpecialPractice(sp, QueueNum, commitData);
                 } else {
-                    alert("请填写你的答案！");
+                    warningAlert("请填写你的答案！");
                 }
             });
         }
@@ -1213,7 +1224,7 @@ function commitPractice(sp, role) {
         if (userAnswer !== undefined) {
             $(sp).empty();
         } else {
-            alert("请选择你认为正确的答案！");
+            warningAlert("请选择你认为正确的答案！");
             return
         }
     } else {
@@ -1221,7 +1232,7 @@ function commitPractice(sp, role) {
         if (userAnswer !== undefined && userAnswer.length > 0) {
             $(sp).empty();
         } else {
-            alert("请填写你的答案！");
+            warningAlert("请填写你的答案！");
             return
         }
     }
@@ -1229,9 +1240,10 @@ function commitPractice(sp, role) {
         {answer: userAnswer},
         (data) => {
             if (data.code !== 0) {
-                alert(data.msg);
+                errorAlert(data.msg);
                 return
             }
+            infoAlert("训练完成！辛苦啦!");
             let Data = data.data;
             let tbody = ``;
             for (let i = 0; i < Data.Practices.length; i++) {
@@ -1303,7 +1315,7 @@ function commitPractice(sp, role) {
 function getQuestionReview(controls) {
     $.get("/user/getQuestionReview", (data) => {
         if (data.code !== 0) {
-            alert(data.msg);
+            errorAlert(data.msg);
             return
         }
         let tbody = ``;
@@ -1470,7 +1482,7 @@ function passBasic(id, group) {
     let g = String.fromCharCode(group);
     $.get("/user/passBasic/" + id + "/" + g, (data) => {
         if (data.code === 0) {
-            alert(data.msg);
+            successAlert(data.msg);
             getBasicReview('#KnowledgeReview')
         }
     });
@@ -1518,7 +1530,7 @@ function changeBasic(id, group) {
                     },
                     (data) => {
                         if (data.code === 0) {
-                            alert(data.msg);
+                            successAlert(data.msg);
                             getBasicReview(controls);
                         }
                     })
@@ -1628,7 +1640,7 @@ function ChangeReview(id, controls) {
                         }
                     }
                     if (choiceNum < 4) {
-                        alert("选项不充足");
+                        warningAlert("选项不充足");
                         return
                     }
                     changeData = {
@@ -1651,7 +1663,7 @@ function ChangeReview(id, controls) {
                     changeData,
                     (data) => {
                         if (data.code === 0) {
-                            alert(data.msg);
+                            successAlert(data.msg);
                             getQuestionReview(controls);
                         }
                     });
@@ -1663,7 +1675,7 @@ function ChangeReview(id, controls) {
 function QuestionReviewPass(id, controls) {
     $.get("/user/passQuestionReview/" + id, (data) => {
         if (data.code === 0) {
-            alert(data.msg);
+            successAlert(data.msg);
             getQuestionReview(controls)
         }
     })

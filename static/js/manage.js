@@ -396,6 +396,25 @@ $(function () {
         }
     });
 
+    $('[data-toggle="tooltip"]').tooltip();
+    $('a[data-for="main"]').on("click", (e) => {
+        let val = $(e.currentTarget).attr("data-val");
+        let id = "#" + $(e.currentTarget).attr("data-for");
+        let id2 = "#" + $(e.currentTarget).attr("data-for2");
+        if (val === "on") {
+            $(id).removeClass("hide");
+            $(e.currentTarget).attr("data-val", "off")
+            $(id2).removeClass("col-xs-12");
+            $(id2).addClass("col-xs-9");
+
+        } else if (val === "off") {
+            $(e.currentTarget).attr("data-val", "on");
+            $(id).addClass("hide");
+            $(id2).removeClass("col-xs-9");
+            $(id2).addClass("col-xs-12");
+
+        }
+    });
 })
 ;
 

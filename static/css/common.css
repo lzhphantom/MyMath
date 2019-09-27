@@ -28,4 +28,11 @@ td > a.btn {
     white-space: normal !important;
 }
 
+.pt15 {
+    padding-top: 15px;
+}
+
+.pb15 {
+    padding-bottom: 15px;
+}
 

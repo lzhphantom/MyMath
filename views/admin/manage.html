@@ -15,19 +15,27 @@
 {{template "admin/manage-nav.html"}}
 <div class="container-fluid" id="Content-Body">
     <div class="row">
-        <div id="main" class="col-sm-3 col-md-2">
+        <div id="main" class="col-xs-3">
             <ul class="nav nav-pills nav-stacked" role="tablist">
-                <li class="active" role="presentation"><a href="#home" aria-controls="home" role="tab"
-                                                          data-toggle="tab">基础知识</a></li>
-                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">题目上传</a>
+                <li class="active" role="presentation">
+                    <a href="#home" aria-controls="home" role="tab" data-toggle="tab"><i
+                                class="glyphicon glyphicon-bold"></i>基础知识</a>
                 </li>
-                <li role="presentation"><a href="#messages" aria-controls="profile" role-tab="rank" role="tab" data-toggle="tab">统计</a>
+                <li role="presentation">
+                    <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab"><i
+                                class="glyphicon glyphicon-circle-arrow-up"></i>题目上传</a>
                 </li>
-                <li role="presentation"><a href="#settings" aria-controls="profile" role="tab"
-                                           data-toggle="tab">用户管理</a></li>
+                <li role="presentation">
+                    <a href="#messages" aria-controls="profile" role-tab="rank" role="tab" data-toggle="tab"><i
+                                class="glyphicon glyphicon-stats"></i>统计</a>
+                </li>
+                <li role="presentation">
+                    <a href="#settings" aria-controls="profile" role="tab" data-toggle="tab"><i
+                                class="glyphicon glyphicon-user"></i>用户管理</a>
+                </li>
             </ul>
         </div>
-        <div class="col-sm-9 col-md-10 tab-content">
+        <div class="col-xs-9 tab-content" id="main_menu">
             {{template "admin/manage-basic.html"}}
             {{template "admin/manage-upload.html"}}
             {{template "admin/manage-studentRanking.html"}}

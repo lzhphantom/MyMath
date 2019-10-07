@@ -9,7 +9,13 @@ const KeyLoginAdmin string = "LoginAdmin"
 const KeyNotLogin int = 264
 
 //学生Role
-const KeyRoleStudent byte = 0
+const KeyRoleStudent byte = 1
+
+//教师Role
+const KeyRoleTeacher byte = 2
+
+//管理员Role
+const KeyRoleAdmin byte = 0
 
 //存储非选择题
 const KeyUnSelects string = "UnSelects"

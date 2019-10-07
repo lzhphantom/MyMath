@@ -40,6 +40,8 @@ func (c *UserController) GetQuestion() {
 		if num > 12 {
 			start = rand.Intn(len(questions) - 12)
 			end = start + 12
+		} else if num == 0 {
+			c.Abort500(errors.New("暂无题库"))
 		} else {
 			start = 0
 			end = len(questions)
@@ -71,6 +73,8 @@ func (c *UserController) GetQuestion() {
 		if num > 12 {
 			start = rand.Intn(len(questions) - 12)
 			end = start + 12
+		} else if num == 0 {
+			c.Abort500(errors.New("暂无题库"))
 		} else {
 			start = 0
 			end = len(questions)
@@ -338,7 +342,7 @@ func (c *UserController) GetQuestionByCommonId() {
 	o := orm.NewOrm()
 	var questions []*models.Question
 	rand.Seed(time.Now().UnixNano())
-	num, err := o.QueryTable("question").Filter("basic_common_id", role).All(&questions)
+	num, err := o.QueryTable("question").Filter("basic_common_id", role).Filter("review__gte",3).All(&questions)
 	if err != nil {
 		c.Abort500(err)
 	} else {
@@ -349,6 +353,8 @@ func (c *UserController) GetQuestionByCommonId() {
 	if num > 12 {
 		start = rand.Intn(len(questions) - 12)
 		end = start + 12
+	} else if num == 0 {
+		c.Abort500(errors.New("暂无题库"))
 	} else {
 		start = 0
 		end = len(questions)

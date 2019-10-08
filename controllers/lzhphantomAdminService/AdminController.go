@@ -670,14 +670,28 @@ func (c *AdminController) Ranking() {
 }
 
 //获取需要审核的题目
-// @router /LS/getQuestionReview [get]
+// @router /LS/getQuestionReview/:pageNum [get]
 func (c *AdminController) GetQuestionReview() {
+	pageNum, err := strconv.Atoi(c.Ctx.Input.Param(":pageNum"))
+	if err != nil {
+		c.Abort500(err)
+	}
 	o := orm.NewOrm()
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
-	o.QueryTable("question").Filter("review__lt", 3).All(&questions)
+	total, err := o.QueryTable("question").Filter("review__lt", 3).Count()
+	if err != nil {
+		c.Abort500(err)
+	}
+	var pages int
+	if total%7 > 0 {
+		pages = int(total)/7 + 1
+	} else {
+		pages = int(total) / 7
+	}
+	o.QueryTable("question").Filter("review__lt", 3).Limit(7, (pageNum-1)*5).All(&questions)
 	res := make(orm.Params)
-	_, err := o.Raw("select id,name from basic_common").RowsToMap(&res, "id", "name")
+	_, err = o.Raw("select id,name from basic_common").RowsToMap(&res, "id", "name")
 	if err != nil {
 		c.Abort500(err)
 	}
@@ -741,5 +755,5 @@ func (c *AdminController) GetQuestionReview() {
 		}
 		reviewQuestions = append(reviewQuestions, reviewQuestion)
 	}
-	c.JSONOkData(len(reviewQuestions), reviewQuestions)
+	c.JSONOkData(pages, reviewQuestions)
 }

@@ -115,31 +115,7 @@ $(function () {
 
     $("a[role-tab='review']").on('show.bs.tab', (e) => {
         let id = $(e.target).attr("href");
-        $.get("/LS/getQuestionReview", (Data) => {
-            if (Data.code === 0) {
-                let data = Data.data;
-                let tbody = ``;
-                for (let i = 0; i < data.length; i++) {
-                    tbody += `
-                    <tr>
-                    <td>` + (i + 1) + `</td>
-                    <td>` + data[i].QuestionRole + `</td>
-                    <td>` + data[i].Content + `</td>
-                    <td>` + data[i].Addition + `</td>
-                    <td>` + data[i].Answer + `</td>
-                    <td>`+data[i].Creater+`</td>
-                    <td>`+dayjs(data[i].CreateTime).format('YYYY年MM月DD日')+`</td>
-                    <td>`+dayjs(data[i].UpdateTime).format('YYYY年MM月DD日')+`</td>
-                    <td><a href="#" class="btn btn-success">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
-</tr>
-                    `;
-                }
-                $(id).find("tbody").empty().append(tbody);
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
-            } else {
-                errorAlert(Data.msg);
-            }
-        })
+        getReviewQuestion(1, id, 1);
     });
 
 
@@ -444,8 +420,83 @@ $(function () {
 
         }
     });
-})
-;
+});
+
+function getReviewQuestion(pageNow, id, total) {
+    if (pageNow < 1) {
+        infoAlert("已经是第一页了，别按了!")
+        return;
+    }
+    if (pageNow > total) {
+        infoAlert("已经是最后一页了，我是有底线的!")
+        return
+    }
+    $.get("/LS/getQuestionReview/" + pageNow, (Data) => {
+        if (Data.code === 0) {
+            let data = Data.data;
+            let tbody = ``;
+            for (let i = 0; i < data.length; i++) {
+                tbody += `
+                    <tr>
+                    <td>` + (i + 1) + `</td>
+                    <td>` + data[i].QuestionRole + `</td>
+                    <td>` + data[i].Content + `</td>
+                    <td>` + data[i].Addition + `</td>
+                    <td>` + data[i].Answer + `</td>
+                    <td>` + data[i].Creater + `</td>
+                    <td>` + dayjs(data[i].CreateTime).format('YYYY年MM月DD日') + `</td>
+                    <td>` + dayjs(data[i].UpdateTime).format('YYYY年MM月DD日') + `</td>
+                    <td><a href="#" class="btn btn-success">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
+                </tr>
+                    `;
+            }
+            $(id).empty().append(`<table class="table table-hover">
+        <caption><h1 class="text-muted text-center">题目初次审核</h1></caption>
+        <thead>
+        <th width="4%">No.</th>
+        <th width="8%">范围</th>
+        <th>题目</th>
+        <th>附加</th>
+        <th>答案</th>
+        <th width="8%">创建人</th>
+        <th width="8%">创建时间</th>
+        <th width="8%">修改时间</th>
+        <th width="8%">操作</th>
+        </thead>
+        <tbody>
+        ` + tbody + `
+        </tbody>
+    </table>`);
+            if (Data.count >= 2) {
+                let pages = ``;
+                for (let i = 1; i <= Data.count; i++) {
+                    pages += `<li><a href="javascript:void(0)" onclick="getReviewQuestion(` + i + `,'` + id + `',` + Data.count + `)">` + i + `</a></li>`
+                }
+                let beforePage = pageNow - 1;
+                let nextPage = pageNow + 1;
+                $(id).append(`<nav aria-label="Page navigation" class="text-center">
+                    <ul class="pagination">
+                    <li>
+                    <a href="javascript:void(0);" onclick="getReviewQuestion(` + beforePage + `,'` + id + `',` + Data.count + `)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
+                    ` + pages + `
+                <li>
+                <a href="javascript:void(0);" onclick="getReviewQuestion(` + nextPage + `,'` + id + `',` + Data.count + `)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+                </ul>
+                </nav>`);
+            }
+
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
+        } else {
+            errorAlert(Data.msg);
+        }
+    })
+}
 
 //准备生成富文本编辑器
 function editorCheck(show) {

@@ -82,32 +82,41 @@ func (c *LoginController) Register() {
 func (c *LoginController) Center() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	o := orm.NewOrm()
-	var userInfo models.UserInfo
-	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
-	if err != nil {
-		c.Abort500(err)
-	}
 	var user models.User
-	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
+	err := o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
 	if err != nil {
 		c.Abort500(err)
 	}
-	var sex string
-	if userInfo.Sex == 1 {
-		sex = "男"
+
+	var userInfo models.UserInfo
+	if o.QueryTable("user_info").Filter("user_id", loginUser.Id).Exist() {
+		err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+		if err != nil {
+			c.Abort500(err)
+		}
+		var sex string
+		if userInfo.Sex == 1 {
+			sex = "男"
+		} else {
+			sex = "女"
+		}
+		info := common.UserInfo{
+			user.UserName,
+			userInfo.Name,
+			sex,
+			userInfo.Tel,
+			userInfo.Address,
+		}
+		c.Data["info"] = info
 	} else {
-		sex = "女"
+		info := common.UserInfo{
+			LoginName: user.UserName,
+		}
+		c.Data["info"] = info
 	}
-	info := common.UserInfo{
-		user.UserName,
-		userInfo.Name,
-		sex,
-		userInfo.Tel,
-		userInfo.Address,
-	}
+
 	c.Data["user"] = loginUser
 	c.Data["isExist"] = true
-	c.Data["info"] = info
 	c.TplName = "user/center.html"
 }
 
@@ -116,29 +125,38 @@ func (c *LoginController) Center() {
 func (c *LoginController) GetPersonalInfo() {
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
 	o := orm.NewOrm()
-	var userInfo models.UserInfo
-	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
-	if err != nil {
-		c.Abort500(err)
-	}
 	var user models.User
-	err = o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
+	err := o.QueryTable("user").Filter("id", loginUser.Id).One(&user)
 	if err != nil {
 		c.Abort500(err)
 	}
-	var sex string
-	if userInfo.Sex == 1 {
-		sex = "男"
+	var info common.UserInfo
+	if o.QueryTable("user_info").Filter("user_id", loginUser.Id).Exist() {
+		var userInfo models.UserInfo
+		err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+		if err != nil {
+			c.Abort500(err)
+		}
+
+		var sex string
+		if userInfo.Sex == 1 {
+			sex = "男"
+		} else {
+			sex = "女"
+		}
+		info = common.UserInfo{
+			user.UserName,
+			userInfo.Name,
+			sex,
+			userInfo.Tel,
+			userInfo.Address,
+		}
 	} else {
-		sex = "女"
+		info = common.UserInfo{
+			LoginName: user.UserName,
+		}
 	}
-	info := common.UserInfo{
-		user.UserName,
-		userInfo.Name,
-		sex,
-		userInfo.Tel,
-		userInfo.Address,
-	}
+
 	c.JSONOkData(1, info)
 }
 
@@ -146,6 +164,7 @@ func (c *LoginController) GetPersonalInfo() {
 func (c *LoginController) ChangePersonalInfo() {
 	userName := c.GetString("UserName")
 	tel := c.GetString("Tel")
+
 	province := c.GetString("province")
 	city := c.GetString("city")
 	street := c.GetString("street")
@@ -155,28 +174,60 @@ func (c *LoginController) ChangePersonalInfo() {
 		loginUser.Name = userName
 		c.SetSession(common.KeyLoginUser, loginUser)
 	}
-	var userInfo models.UserInfo
-	err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
-	if err != nil {
-		c.Abort500(err)
-	}
-	userInfo.Name = userName
-	userInfo.Tel = tel
-	address := province + " " + city + " " + street
-	userInfo.Address = address
-	if err := o.Begin(); err != nil {
-		c.Abort500(err)
-	}
-	num, err := o.Update(&userInfo, "name", "tel", "address")
-	if err != nil {
-		o.Rollback()
-		c.Abort500(err)
-	} else {
-		if err := o.Commit(); err != nil {
+
+	if o.QueryTable("user_info").Filter("user_id", loginUser.Id).Exist() {
+		var userInfo models.UserInfo
+		err := o.QueryTable("user_info").Filter("user_id", loginUser.Id).One(&userInfo)
+		if err != nil {
 			c.Abort500(err)
 		}
-		logs.Info("更新成功", num)
+		userInfo.Name = userName
+		userInfo.Tel = tel
+		address := province + " " + city + " " + street
+		userInfo.Address = address
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
+		num, err := o.Update(&userInfo, "name", "tel", "address")
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+			logs.Info("更新成功", num)
+		}
+	} else {
+		sex, err := c.GetInt("Sex")
+		if err != nil {
+			c.Abort500(err)
+		}
+		address := province + " " + city + " " + street
+		userinfo := models.UserInfo{
+			Name:    userName,
+			Sex:     byte(sex),
+			Tel:     tel,
+			Address: address,
+			User: &models.User{
+				Id: loginUser.Id,
+			},
+		}
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
+		num, err := o.Insert(&userinfo)
+		if err != nil {
+			o.Rollback()
+			c.Abort500(err)
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+			logs.Info("更新成功", num)
+		}
 	}
+
 	c.Redirect("/center", 302)
 
 }

@@ -28,6 +28,30 @@ $(function () {
         $.get('/center/getPersonalInfo', (Data) => {
             if (Data.code === 0) {
                 let data = Data.data;
+                console.log(data.sex);
+                let sex = ``;
+                if (data.Sex === undefined) {
+                    sex = `<div class="form-group">
+                            <label class="control-label col-xs-4">性别：</label>
+                            <div class="col-xs-8">
+                                <label>男&nbsp;<input type="radio" name="Sex" value="1" required></label>
+                                <label>女&nbsp;<input type="radio" name="Sex" value="0" required></label>
+                                <span class="help-block"><small>提交后无法更改</small></span>
+                            </div>
+                            
+                        </div>`;
+                } else {
+                    sex = `<div class="form-group">
+                        <div class="row">
+                            <label class="control-label col-xs-4">性别：</label>
+                            <div class="col-xs-8">
+                                <span>
+                                    ` + data.Sex + `
+                                </span>
+                            </div>
+                        </div>
+                    </div>`;
+                }
                 $("#personal").empty().append(`
         <form class="col-xs-12 form-horizontal" method="post" action="/center/changePersonalInfo" onsubmit="return personalCheck(this);">
                     <div><h1 class="text-muted text-center">个人信息详情修改</h1></div>
@@ -49,16 +73,7 @@ $(function () {
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="control-label col-xs-4">性别：</label>
-                            <div class="col-xs-8">
-                                <span>
-                                    ` + data.Sex + `
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    ` + sex + `
                     <div class="form-group">
                         <div class="row">
                             <label class="control-label col-xs-4">联系电话：</label>
@@ -301,6 +316,7 @@ function personalCheck(f) {
         warningAlert("联系电话输入不规范");
         return false;
     }
+
     let province = f.province.value;
     if (province.length == 0) {
         warningAlert("请选择省份");

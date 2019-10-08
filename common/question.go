@@ -1,5 +1,7 @@
 package common
 
+import "time"
+
 type UnSelect struct {
 	Train      *TrainingUnSelect
 	Answer     string
@@ -42,10 +44,14 @@ type ReviewQuestion struct {
 	Id           int
 	Content      string
 	QuestionType string
+	QuestionRole string
 	Addition     []string
 	Answer       string
 	ViewNum      int
 	Reviewers    []string
+	Creater      string
+	CreateTime   time.Time
+	UpdateTime   time.Time
 }
 
 type AnswerRanking struct {
@@ -96,4 +102,3 @@ type KnowledgeReview struct {
 	Content string
 	Review  int
 }
-

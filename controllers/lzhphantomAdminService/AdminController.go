@@ -11,6 +11,7 @@ import (
 	"github.com/lzhphantom/MyMath/models"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type AdminController struct {
@@ -214,7 +215,7 @@ func (c *AdminController) AddPublishContent() {
 	if err != nil {
 		c.Abort500(err)
 	}
-	if o.QueryTable("basic_content").Filter("basic_common_id",id).Exist(){
+	if o.QueryTable("basic_content").Filter("basic_common_id", id).Exist() {
 		err = o.QueryTable("basic_content").Filter("basic_common_id", id).RelatedSel().One(&basicContent)
 		if err != nil {
 			c.Abort500(err)
@@ -666,4 +667,79 @@ func (c *AdminController) Ranking() {
 	}
 	c.JSONOkData(int(num), answerRankings)
 
+}
+
+//获取需要审核的题目
+// @router /LS/getQuestionReview [get]
+func (c *AdminController) GetQuestionReview() {
+	o := orm.NewOrm()
+	questions := make([]models.Question, 0)
+	reviewQuestions := make([]common.ReviewQuestion, 0)
+	o.QueryTable("question").Filter("review__lt", 3).All(&questions)
+	res := make(orm.Params)
+	_, err := o.Raw("select id,name from basic_common").RowsToMap(&res, "id", "name")
+	if err != nil {
+		c.Abort500(err)
+	}
+	author := make(orm.Params)
+	_, err = o.Raw("select user.id,user_info.name from user left join user_info on user.id=user_info.user_id").RowsToMap(&author, "id", "name")
+	if err != nil {
+		c.Abort500(err)
+	}
+	for i := 0; i < len(questions); i++ {
+		var records []models.QuestionReviewRecord
+		num, err := o.QueryTable("question_review_record").Filter("question_id", questions[i].Id).All(&records)
+		if err != nil {
+			c.Abort500(err)
+		} else {
+			logs.Info("获取成功", num, "条")
+		}
+
+		var reviewers []string
+		if len(records) > 0 {
+			for j := 0; j < len(records); j++ {
+				var userInfo models.UserInfo
+				o.QueryTable("user_info").Filter("user_id", records[j].User.Id).One(&userInfo)
+				reviewers = append(reviewers, userInfo.Name)
+			}
+		}
+
+		var questionType string
+		var choices []string
+		if questions[i].RoleQuestion == 1 {
+			choices = strings.Split(questions[i].Choices, "~￥")
+			for i := 0; i < len(choices); i++ {
+				if len(choices[i]) == 0 {
+					choices = append(choices[:i], choices[i+1:]...)
+				}
+			}
+			questionType = "选择题"
+		} else {
+			questionType = "非选择题"
+		}
+
+		var creater string
+
+		if questions[i].User.Id == 0 {
+			creater = "管理员"
+		} else {
+			creater = author[strconv.Itoa(questions[i].User.Id)].(string)
+		}
+
+		reviewQuestion := common.ReviewQuestion{
+			Id:           questions[i].Id,
+			Content:      questions[i].Content,
+			QuestionType: questionType,
+			QuestionRole: res[strconv.Itoa(questions[i].BasicCommon.Id)].(string),
+			Addition:     choices,
+			Answer:       questions[i].Answer,
+			ViewNum:      questions[i].Review,
+			Reviewers:    reviewers,
+			Creater:      creater,
+			CreateTime:   questions[i].Created,
+			UpdateTime:   questions[i].Updated,
+		}
+		reviewQuestions = append(reviewQuestions, reviewQuestion)
+	}
+	c.JSONOkData(len(reviewQuestions), reviewQuestions)
 }

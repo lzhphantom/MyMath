@@ -113,6 +113,35 @@ $(function () {
 
     });
 
+    $("a[role-tab='review']").on('show.bs.tab', (e) => {
+        let id = $(e.target).attr("href");
+        $.get("/LS/getQuestionReview", (Data) => {
+            if (Data.code === 0) {
+                let data = Data.data;
+                let tbody = ``;
+                for (let i = 0; i < data.length; i++) {
+                    tbody += `
+                    <tr>
+                    <td>` + (i + 1) + `</td>
+                    <td>` + data[i].QuestionRole + `</td>
+                    <td>` + data[i].Content + `</td>
+                    <td>` + data[i].Addition + `</td>
+                    <td>` + data[i].Answer + `</td>
+                    <td>`+data[i].Creater+`</td>
+                    <td>`+dayjs(data[i].CreateTime).format('YYYY年MM月DD日')+`</td>
+                    <td>`+dayjs(data[i].UpdateTime).format('YYYY年MM月DD日')+`</td>
+                    <td><a href="#" class="btn btn-success">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
+</tr>
+                    `;
+                }
+                $(id).find("tbody").empty().append(tbody);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
+            } else {
+                errorAlert(Data.msg);
+            }
+        })
+    });
+
 
     //基础知识大纲添加
     let basicTypeAdd = document.getElementById("basicTypeAdd");

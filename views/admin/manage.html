@@ -33,6 +33,10 @@
                     <a href="#settings" aria-controls="profile" role="tab" data-toggle="tab"><i
                                 class="glyphicon glyphicon-user"></i>用户管理</a>
                 </li>
+                <li role="presentation">
+                    <a href="#review" aria-controls="profile" role="tab" role-tab="review" data-toggle="tab"><i
+                                class="glyphicon glyphicon-education"></i>题目审核</a>
+                </li>
             </ul>
         </div>
         <div class="col-xs-9 tab-content" id="main_menu">
@@ -40,6 +44,7 @@
             {{template "admin/manage-upload.html"}}
             {{template "admin/manage-studentRanking.html"}}
             {{template "admin/manage-userManage.html"}}
+            {{template "admin/manage-review.html"}}
         </div>
     </div>
 </div>

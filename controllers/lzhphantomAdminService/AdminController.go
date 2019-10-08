@@ -689,7 +689,10 @@ func (c *AdminController) GetQuestionReview() {
 	} else {
 		pages = int(total) / 7
 	}
-	o.QueryTable("question").Filter("review__lt", 3).Limit(7, (pageNum-1)*5).All(&questions)
+	_, err = o.QueryTable("question").Filter("review__lt", 3).Limit(7, (pageNum-1)*5).All(&questions)
+	if err != nil {
+		c.Abort500(err)
+	}
 	res := make(orm.Params)
 	_, err = o.Raw("select id,name from basic_common").RowsToMap(&res, "id", "name")
 	if err != nil {

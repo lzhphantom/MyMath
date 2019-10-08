@@ -28,9 +28,8 @@ $(function () {
         $.get('/center/getPersonalInfo', (Data) => {
             if (Data.code === 0) {
                 let data = Data.data;
-                console.log(data.sex);
                 let sex = ``;
-                if (data.Sex === undefined) {
+                if (data.Sex === undefined || data.Sex === "") {
                     sex = `<div class="form-group">
                             <label class="control-label col-xs-4">性别：</label>
                             <div class="col-xs-8">

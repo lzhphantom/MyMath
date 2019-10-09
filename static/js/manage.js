@@ -446,7 +446,7 @@ function getReviewQuestion(pageNow, id, total) {
                     <td>` + data[i].Creater + `</td>
                     <td>` + dayjs(data[i].CreateTime).format('YYYY年MM月DD日') + `</td>
                     <td>` + dayjs(data[i].UpdateTime).format('YYYY年MM月DD日') + `</td>
-                    <td><a href="#" class="btn btn-success">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
+                    <td><a href="#" class="btn btn-success" onclick="passQuestion(` + data[i].Id + `,'` + id + `')">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
                 </tr>
                     `;
             }
@@ -496,6 +496,17 @@ function getReviewQuestion(pageNow, id, total) {
             errorAlert(Data.msg);
         }
     })
+}
+
+function passQuestion(id, controls) {
+    $.get("/LS/passQuestionReview/" + id, (Data) => {
+        if (Data.code === 0) {
+            successAlert(Data.msg);
+            getReviewQuestion(1, controls, 1)
+        } else {
+            errorAlert(Data.msg);
+        }
+    });
 }
 
 //准备生成富文本编辑器

@@ -679,7 +679,7 @@ func (c *AdminController) GetQuestionReview() {
 	o := orm.NewOrm()
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
-	total, err := o.QueryTable("question").Filter("review__lt", 3).Count()
+	total, err := o.QueryTable("question").Filter("review", 0).Count()
 	if err != nil {
 		c.Abort500(err)
 	}
@@ -689,7 +689,7 @@ func (c *AdminController) GetQuestionReview() {
 	} else {
 		pages = int(total) / 7
 	}
-	_, err = o.QueryTable("question").Filter("review__lt", 3).Limit(7, (pageNum-1)*5).All(&questions)
+	_, err = o.QueryTable("question").Filter("review", 0).Limit(7, (pageNum-1)*5).All(&questions)
 	if err != nil {
 		c.Abort500(err)
 	}
@@ -759,4 +759,52 @@ func (c *AdminController) GetQuestionReview() {
 		reviewQuestions = append(reviewQuestions, reviewQuestion)
 	}
 	c.JSONOkData(pages, reviewQuestions)
+}
+
+//题目审核通过
+// @router /LS/passQuestionReview/:id [get]
+func (c *AdminController) PassQuestionReview() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		c.Abort500(err)
+	}
+	newRecord := models.QuestionReviewRecord{
+		User: &models.User{
+			Id: 0,
+		},
+		Question: &models.Question{
+			Id: id,
+		},
+	}
+	o := orm.NewOrm()
+	var question models.Question
+	o.QueryTable("question").Filter("id", id).One(&question)
+	question.Review = question.Review + 1
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	num, err := o.Update(&question, "review")
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+		logs.Info("更了", num, "条")
+	}
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	num, err = o.Insert(&newRecord)
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+		logs.Info("成功插入", num)
+	}
+	c.JSONOk("审核通过")
 }

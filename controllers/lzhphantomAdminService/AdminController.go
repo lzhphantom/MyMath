@@ -808,3 +808,35 @@ func (c *AdminController) PassQuestionReview() {
 	}
 	c.JSONOk("审核通过")
 }
+
+//重置用户密码
+// @router /LS/resetPassword/:id [get]
+func (c *AdminController) ResetPassword() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		c.Abort500(err)
+	}
+	user := models.User{
+		Id: id,
+	}
+	o := orm.NewOrm()
+	err = o.Read(&user)
+	if err != nil {
+		c.Abort500(err)
+	}
+	logs.Debug(user)
+	user.Password = fmt.Sprintf("%x",common.MD5Password(user.UserName))
+	err = o.Begin()
+	if err != nil {
+		c.Abort500(err)
+	}
+	_, err = o.Update(&user, "password")
+	if err != nil {
+		o.Rollback()
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+	}
+	c.JSONOk("重置成功")
+}

@@ -440,9 +440,9 @@ function getReviewQuestion(pageNow, id, total) {
                     <tr>
                     <td>` + (i + 1) + `</td>
                     <td>` + data[i].QuestionRole + `</td>
-                    <td>` + data[i].Content + `</td>
+                    <td>` + delPagraph(data[i].Content, 20) + `</td>
                     <td>` + data[i].Addition + `</td>
-                    <td>` + data[i].Answer + `</td>
+                    <td>` + delPagraph(data[i].Answer, 20) + `</td>
                     <td>` + data[i].Creater + `</td>
                     <td>` + dayjs(data[i].CreateTime).format('YYYY年MM月DD日') + `</td>
                     <td>` + dayjs(data[i].UpdateTime).format('YYYY年MM月DD日') + `</td>

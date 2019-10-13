@@ -332,7 +332,7 @@ $(function () {
             let target = $(e.target).attr("href");
             $(target).removeClass("hidden");
             if (target === "#QuestionReview") {
-                getQuestionReview(target);
+                getQuestionReview(1,target, 1);
             } else if (target === "#KnowledgeReview") {
                 getBasicReview(target);
             }
@@ -1312,8 +1312,16 @@ function commitPractice(sp, role) {
         });
 }
 
-function getQuestionReview(controls) {
-    $.get("/user/getQuestionReview", (data) => {
+function getQuestionReview(pageNow,controls, total) {
+    if (pageNow < 1) {
+        infoAlert("已经是第一页了，别按了!");
+        return;
+    }
+    if (pageNow > total) {
+        infoAlert("已经是最后一页了，我是有底线的!");
+        return
+    }
+    $.get("/user/getQuestionReview/" + pageNow, (data) => {
         if (data.code !== 0) {
             errorAlert(data.msg);
             return
@@ -1367,6 +1375,29 @@ function getQuestionReview(controls) {
                         ` + tbody + `
                         </tbody>
                     </table>`);
+        if (data.count >= 2) {
+            let pages = ``;
+            for (let i = 1; i <= data.count; i++) {
+                pages += `<li><a href="javascript:void(0)" onclick="getQuestionReview(` + i + `,'` + controls + `',` + data.count + `)">` + i + `</a></li>`
+            }
+            let beforePage = pageNow - 1;
+            let nextPage = pageNow + 1;
+            $(controls).append(`<nav aria-label="Page navigation" class="text-center">
+                    <ul class="pagination">
+                    <li>
+                    <a href="javascript:void(0);" onclick="getQuestionReview(` + beforePage + `,'` + controls + `',` + data.count + `)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
+                    ` + pages + `
+                <li>
+                <a href="javascript:void(0);" onclick="getQuestionReview(` + nextPage + `,'` + controls + `',` + data.count + `)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+                </ul>
+                </nav>`);
+        }
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, controls.substring(1)]);
     })
 }
@@ -1664,7 +1695,7 @@ function ChangeReview(id, controls) {
                     (data) => {
                         if (data.code === 0) {
                             successAlert(data.msg);
-                            getQuestionReview(controls);
+                            getQuestionReview(1,controls, 1);
                         }
                     });
             });
@@ -1676,7 +1707,7 @@ function QuestionReviewPass(id, controls) {
     $.get("/user/passQuestionReview/" + id, (data) => {
         if (data.code === 0) {
             successAlert(data.msg);
-            getQuestionReview(controls)
+            getQuestionReview(1,controls, 1)
         }
     })
 }

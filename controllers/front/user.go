@@ -644,13 +644,27 @@ func (c *UserController) ChangePassword() {
 }
 
 //获取需要审核的题目
-// @router /user/getQuestionReview [get]
+// @router /user/getQuestionReview/:page [get]
 func (c *UserController) GetQuestionReview() {
+	page, err := strconv.Atoi(c.Ctx.Input.Param(":page"))
 	o := orm.NewOrm()
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
-	o.QueryTable("question").Filter("review__lt", 3).Filter("deleted__isnull", true).Exclude("user_id", loginUser.Id).All(&questions)
+	total, err := o.QueryTable("question").Filter("review__lt", 3).Filter("deleted__isnull", true).Exclude("user_id", loginUser.Id).Count()
+	if err != nil {
+		c.Abort500(err)
+	}
+	var pages int
+	if total%7 == 0 {
+		pages = int(total) / 7
+	} else {
+		pages = int(total)/7 + 1
+	}
+	_, err = o.QueryTable("question").Filter("review__lt", 3).Filter("deleted__isnull", true).Exclude("user_id", loginUser.Id).Limit(7, (page-1)*7).All(&questions)
+	if err != nil {
+		c.Abort500(err)
+	}
 Loop:
 	for i := 0; i < len(questions); i++ {
 		var records []models.QuestionReviewRecord
@@ -698,7 +712,7 @@ Loop:
 		}
 		reviewQuestions = append(reviewQuestions, reviewQuestion)
 	}
-	c.JSONOkData(len(reviewQuestions), reviewQuestions)
+	c.JSONOkData(pages, reviewQuestions)
 }
 
 //题目审核通过

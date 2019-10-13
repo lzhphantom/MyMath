@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AdminController struct {
@@ -679,7 +680,7 @@ func (c *AdminController) GetQuestionReview() {
 	o := orm.NewOrm()
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
-	total, err := o.QueryTable("question").Filter("review", 0).Count()
+	total, err := o.QueryTable("question").Filter("review", 0).Filter("deleted__isnull", true).Count()
 	if err != nil {
 		c.Abort500(err)
 	}
@@ -689,7 +690,7 @@ func (c *AdminController) GetQuestionReview() {
 	} else {
 		pages = int(total) / 7
 	}
-	_, err = o.QueryTable("question").Filter("review", 0).Limit(7, (pageNum-1)*5).All(&questions)
+	_, err = o.QueryTable("question").Filter("review", 0).Filter("deleted__isnull", true).Limit(7, (pageNum-1)*5).All(&questions)
 	if err != nil {
 		c.Abort500(err)
 	}
@@ -825,7 +826,7 @@ func (c *AdminController) ResetPassword() {
 		c.Abort500(err)
 	}
 	logs.Debug(user)
-	user.Password = fmt.Sprintf("%x",common.MD5Password(user.UserName))
+	user.Password = fmt.Sprintf("%x", common.MD5Password(user.UserName))
 	err = o.Begin()
 	if err != nil {
 		c.Abort500(err)
@@ -833,10 +834,64 @@ func (c *AdminController) ResetPassword() {
 	_, err = o.Update(&user, "password")
 	if err != nil {
 		o.Rollback()
+		c.Abort500(err)
 	} else {
 		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
 	}
 	c.JSONOk("重置成功")
+}
+
+//扣留题目
+// @router /LS/detainQuestion/:id [get]
+func (c *AdminController) DetainQuestion() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		c.Abort500(err)
+	}
+	o := orm.NewOrm()
+	q := models.Question{
+		Id: id,
+	}
+	err = o.Read(&q)
+	if err != nil {
+		c.Abort500(err)
+	}
+	q.Deleted = time.Now()
+
+	if err = o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	_, err = o.Update(&q, "deleted")
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+	}
+	if err = o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	qr := models.QuestionReviewRecord{
+		User: &models.User{
+			Id: 0,
+		},
+		Question: &models.Question{
+			Id: id,
+		},
+	}
+	_, err = o.Insert(&qr)
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+	}
+
+	c.JSONOk("扣留成功")
 }

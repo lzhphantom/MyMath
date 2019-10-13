@@ -11,6 +11,7 @@ type Question struct {
 	RoleQuestion uint8                   `description:"1选择题,2填空题,3解答题"`
 	Created      time.Time               `orm:"auto_now_add;type(datetime)"`
 	Updated      time.Time               `orm:"auto_now;type(datetime)"`
+	Deleted      time.Time               `orm:"null"`
 	Review       int                     `description:"大于等于3，审核完毕"`
 	BasicCommon  *BasicCommon            `orm:"rel(fk)"`
 	ReviewRecord []*QuestionReviewRecord `orm:"reverse(many)"`

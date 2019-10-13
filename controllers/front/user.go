@@ -342,7 +342,7 @@ func (c *UserController) GetQuestionByCommonId() {
 	o := orm.NewOrm()
 	var questions []*models.Question
 	rand.Seed(time.Now().UnixNano())
-	num, err := o.QueryTable("question").Filter("basic_common_id", role).Filter("review__gte",3).All(&questions)
+	num, err := o.QueryTable("question").Filter("basic_common_id", role).Filter("review__gte", 3).All(&questions)
 	if err != nil {
 		c.Abort500(err)
 	} else {
@@ -650,7 +650,7 @@ func (c *UserController) GetQuestionReview() {
 	questions := make([]models.Question, 0)
 	reviewQuestions := make([]common.ReviewQuestion, 0)
 	loginUser := c.GetSession(common.KeyLoginUser).(common.LoginUser)
-	o.QueryTable("question").Filter("review__lt", 3).Exclude("user_id", loginUser.Id).All(&questions)
+	o.QueryTable("question").Filter("review__lt", 3).Filter("deleted__isnull", true).Exclude("user_id", loginUser.Id).All(&questions)
 Loop:
 	for i := 0; i < len(questions); i++ {
 		var records []models.QuestionReviewRecord

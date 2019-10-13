@@ -422,6 +422,7 @@ $(function () {
     });
 });
 
+//获取需要审核的题目
 function getReviewQuestion(pageNow, id, total) {
     if (pageNow < 1) {
         infoAlert("已经是第一页了，别按了!")
@@ -446,7 +447,10 @@ function getReviewQuestion(pageNow, id, total) {
                     <td>` + data[i].Creater + `</td>
                     <td>` + dayjs(data[i].CreateTime).format('YYYY年MM月DD日') + `</td>
                     <td>` + dayjs(data[i].UpdateTime).format('YYYY年MM月DD日') + `</td>
-                    <td><a href="#" class="btn btn-success" onclick="passQuestion(` + data[i].Id + `,'` + id + `')">通过</a><a href="#" class="btn btn-danger">扣留</a></td>
+                    <td>
+                    <a href="#" class="btn btn-success" onclick="passQuestion(` + data[i].Id + `,'` + id + `')">通过</a>
+                    <a href="#" class="btn btn-danger" onclick="detainQuestion(` + data[i].Id + `,'` + id + `')">扣留</a>
+                    </td>
                 </tr>
                     `;
             }
@@ -494,6 +498,18 @@ function getReviewQuestion(pageNow, id, total) {
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, id.substring(1)]);
         } else {
             errorAlert(Data.msg);
+        }
+    })
+}
+
+//扣留题目
+function detainQuestion(id, controls) {
+    $.get("/LS/detainQuestion/" + id, (data) => {
+        if (data.code === 0) {
+            successAlert(data.msg);
+            getReviewQuestion(1, controls, 1)
+        } else {
+            errorAlert(data.msg);
         }
     })
 }

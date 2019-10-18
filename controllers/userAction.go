@@ -50,6 +50,12 @@ func (c *LoginController) LoginOut() {
 	c.Redirect("/", 302)
 }
 
+//注册页面
+// @router /toRegister [get]
+func (c *LoginController) ToRegister() {
+	c.TplName = "register.html"
+}
+
 //注册用户
 // @router /register [post]
 func (c *LoginController) Register() {

@@ -1,36 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>lzhphantom-Math 用户注册</title>
+    <link href="/static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cookie">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <link rel="stylesheet" href="/static/css/basic.css">
+    <link rel="stylesheet" href="/static/css/index-header.css">
+    <link rel="stylesheet" href="/static/css/simple-footer.css">
+    <link rel="shortcut icon" href="/static/img/logo.png" type="image/x-icon">
+</head>
+<body>
+{{template "index-header.html" .}}
 <!-- 注册画面 -->
-<div id="register" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title text-center" id="myModalLabel">用户注册</h4>
-            </div>
-            <div class="modal-body">
-                <form action="/register" method="post">
-                    <div class="row">
-                        <div class="form-group col-xs-4 col-sm-offset-4">
-                            <label for="registerName" class="control-label">用户名：</label>
-                            <input type="text" name="registerName" id="registerName" class="form-control">
+<div id="Content-Body" class="container">
+    <div id="register" class="row">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-center" id="myModalLabel">用户注册</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="/register" method="post" onsubmit="return checkRegister(this);">
+                        <div class="row">
+                            <div class="col-xs-4 col-sm-offset-2">
+                                <div class="input-group input-group-lg ">
+                                <span class="input-group-addon" id="basic-addon1"><i
+                                            class="glyphicon glyphicon-user"></i></span>
+                                    <input type="text" name="registerName" placeholder="请输入用户名"
+                                           class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-sm-offset-1">
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-addon" id="basic-addon1"><i class="icon-key"></i></span>
+                                    <input type="password" name="pwd" class="form-control" placeholder="请输入密码">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-xs-4 col-sm-offset-4">
-                            <label for="pwd" class="control-label">密&nbsp;&nbsp;&nbsp;&nbsp;码：</label>
-                            <input type="password" name="pwd" id="pwd" class="form-control">
+                        <div class="row">
+                            <div class="col-xs-4 col-sm-offset-2">
+                                <div class="input-group input-group-lg ">
+                                <span class="input-group-addon" id="basic-addon1"><i
+                                            class="glyphicon glyphicon-envelope"></i></span>
+                                    <input type="email" name="email"  class="form-control"
+                                           placeholder="请输入邮件">
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-sm-offset-1">
+                                <div class="input-group input-group-lg">
+                                <span class="input-group-addon" id="basic-addon1"><i
+                                            class="glyphicon glyphicon-earphone"></i></span>
+                                    <input type="text" name="phone"  class="form-control"
+                                           placeholder="请输入手机号">
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-offset-5">
-                            <button type="submit" class="btn btn-primary">注册</button>
-                            <a class="btn btn-danger" data-toggle="modal" data-target="#login">返回</a>
+                        <div class="row">
+                            <div class="col-xs-4 col-sm-offset-2">
+                                <div class="input-group input-group-lg">
+                                <span class="input-group-addon" id="basic-addon1"><i
+                                            class="glyphicon glyphicon-earphone"></i></span>
+                                    <input type="text" name="name" class="form-control"
+                                           placeholder="请输入姓名">
+                                </div>
+                            </div>
+                            <div class="col-xs-5 col-sm-offset-1">
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-addon">
+                                    <input type="radio" name="sex" value="1">
+                                  </span>
+                                    <input type="text" class="form-control" value="男" readonly>
+                                    <span class="input-group-addon">
+                                        <input type="radio" name="sex" value="0">
+                                    </span>
+                                    <input type="text" class="form-control" value="女" readonly>
+                                </div>
+
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <p class="text-center text-muted">欢迎来到lzhpahntom-Math训练基地</p>
+                        <div class="row">
+                            <div class="form-group col-sm-offset-5">
+                                <button type="submit" class="btn btn-primary">注册</button>
+                                <a class="btn btn-danger" data-toggle="modal" data-target="#login">返回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="text-center text-muted">欢迎来到lzhpahntom-Math训练基地</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+{{ template "index-footer.html"}}
+</body>
+</html>

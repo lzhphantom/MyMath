@@ -24,3 +24,31 @@ li{
 #personal form div span{
     font-size: 20px;
 }
+
+/***********************新加字体样式***************************/
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url("../fonts/key.eot") format("embedded-opentype"),
+    url("../fonts/key.svg") format("svg"),
+    url("../fonts/key.ttf") format("truetype"),
+    url("../fonts/key.woff") format("woff");
+}
+
+[class^="icon-"],
+[class*=" icon-"]{
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    position: relative;
+    top: 1px;
+    -webkit-font-smoothing: antialiased;
+}
+/*自定义字体样式*/
+.icon-key::before{
+    content: '\e98d';
+    font-size: 19px;
+}
+
+
+/***********************新加字体样式***************************/

@@ -61,16 +61,24 @@ func (c *LoginController) ToRegister() {
 func (c *LoginController) Register() {
 	loginName := c.GetString("registerName")
 	pwd := c.GetString("pwd")
+	email := c.GetString("email")
+	tel := c.GetString("phone")
+	name := c.GetString("name")
+	sex, err := c.GetInt("sex")
+	if err != nil {
+		c.Abort500(err)
+	}
 	user := models.User{
 		UserName: loginName,
 		Password: fmt.Sprintf("%x", common.MD5Password(pwd)),
 		Role:     common.KeyRoleStudent,
 	}
+
 	o := orm.NewOrm()
 	if err := o.Begin(); err != nil {
 		c.Abort500(err)
 	}
-	_, err := o.Insert(&user)
+	id, err := o.Insert(&user)
 	if err != nil {
 		o.Rollback()
 		c.Abort500(err)
@@ -78,8 +86,29 @@ func (c *LoginController) Register() {
 		if err := o.Commit(); err != nil {
 			c.Abort500(err)
 		}
-		logs.Info("注册成功", user)
 	}
+
+	if err := o.Begin(); err != nil {
+		c.Abort500(err)
+	}
+	userinfo := models.UserInfo{
+		Name:  name,
+		Sex:   byte(sex),
+		Tel:   tel,
+		Email: email,
+		User: &models.User{
+			Id: int(id),
+		},
+	}
+	if err != nil {
+		o.Rollback()
+		c.Abort500(err)
+	} else {
+		if err := o.Commit(); err != nil {
+			c.Abort500(err)
+		}
+	}
+	_,err=o.Insert(&userinfo)
 	c.Redirect("/", 302)
 }
 

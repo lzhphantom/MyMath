@@ -49,6 +49,7 @@ function searchUser(id, reqData) {
                                 <td>` + data[i].UserInfo.Name.replace(/(\S{1})\S*/, '$1**') + `</td>
                                 <td>` + sex + `</td>
                                 <td>` + data[i].UserInfo.Tel.replace(/\d{7}(\d{4})/, '*******$1') + `</td>
+                                <td>` + data[i].UserInfo.Email + `</td>
                                 <td>` + data[i].UserInfo.Address + `</td>
                                 <td><a href="javascript:void(0);" class="btn btn-warning" onclick="resetUserPassword(` + data[i].Id + `,'` + id + `',` + reqData.group + `)">重置密码</a></td>
                             </tr>`)

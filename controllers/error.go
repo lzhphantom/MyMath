@@ -56,7 +56,7 @@ func (c *ErrorController) Error500() {
 	if c.IsAjax() {
 		c.jsonerror(dserr)
 	} else {
-		c.Data["content"] = "w(ﾟДﾟ)w!!!，服务器出错啦<br>" + fmt.Sprintf("错误：%s", dserr.Error())
+		c.Data["content"] = "w(ﾟДﾟ)w!!!，服务器出错啦<br/>" + fmt.Sprintf("错误：%s", dserr.Error())
 		c.Data["errorTittle"] = "500"
 	}
 }

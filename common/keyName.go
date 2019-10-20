@@ -25,3 +25,5 @@ const KeySelects string = "Selects"
 
 //储存类型训练题
 const KeyPractices string = "Practices"
+
+const KeyAES string = "KLTkjLDFDEUN2O9q"

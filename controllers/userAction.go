@@ -31,6 +31,9 @@ func (c *LoginController) Login() {
 	if err != nil {
 		c.Abort500(errors.New("用户或密码不正确"))
 	}
+	if user.Verify != 1 {
+		c.Abort500(errors.New("当前用户未验证"))
+	}
 
 	var userInfo models.UserInfo
 	o.QueryTable("user_info").Filter("user_id", user.Id).One(&userInfo)
@@ -54,6 +57,43 @@ func (c *LoginController) LoginOut() {
 // @router /toRegister [get]
 func (c *LoginController) ToRegister() {
 	c.TplName = "register.html"
+}
+
+//用户认证
+// @router /verify
+func (c *LoginController) Verify() {
+	code := c.GetString("code")
+
+	loginName, err := common.AESDecrypt([]byte(common.KeyAES), code)
+	if err != nil {
+		c.Abort500(errors.New("解密失败"))
+	}
+	user := models.User{
+		UserName: loginName,
+	}
+	o := orm.NewOrm()
+	err = o.Read(&user, "user_name")
+	if err != nil {
+		c.Abort500(err)
+	}
+	if user.Verify == 1 {
+		c.Data["message"] = "用户已认证"
+	} else {
+		if err := o.Begin(); err != nil {
+			c.Abort500(err)
+		}
+		user.Verify = byte(1)
+		_, err = o.Update(&user, "verify")
+		if err != nil {
+			o.Rollback()
+		} else {
+			if err := o.Commit(); err != nil {
+				c.Abort500(err)
+			}
+		}
+		c.Data["message"] = "用户认证成功"
+	}
+	c.TplName = "email.html"
 }
 
 //注册用户
@@ -108,7 +148,16 @@ func (c *LoginController) Register() {
 			c.Abort500(err)
 		}
 	}
-	_,err=o.Insert(&userinfo)
+	To := []string{email}
+	Subject := "lzhphantom-Math 用户认证"
+	HTML := "抱歉打扰到你，这只是一封测试邮件"
+	code, err := common.AESEncrypt([]byte(common.KeyAES), loginName)
+	if err != nil {
+		c.Abort500(errors.New("加密失败"))
+	}
+	HTML += code
+	common.SendEmail(To, Subject, HTML)
+	_, err = o.Insert(&userinfo)
 	c.Redirect("/", 302)
 }
 

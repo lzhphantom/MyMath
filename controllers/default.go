@@ -47,7 +47,7 @@ func (c *MainController) SendEmail() {
 <style>
 .verify{
 	display: inline-block;
-    margin: 0 50%;
+    margin: 0 auto;
     width: 100px;
     height: 40px;
     background-color: #1e8e45;
@@ -69,13 +69,45 @@ func (c *MainController) SendEmail() {
 </style>	
 </head>
 <body>
-<h1 class="text-center">用户认证</h1>
-<div class="text-center">
-	<p>恭喜您加入了lzhphantom-Math！想学习基础知识吗？ 看看我们的学习中心指南。</p>
-    <a href="http://127.0.0.1:8080/verify?code=` + code + `" class="verify">认证</a>
-	<p>认证员1,</p>
-	<p>lzhphantom-Math 认证小组</p>
-</div>
+<table>
+    <tbody>
+    <tr>
+        <td>认证邮件</td>
+    </tr>
+    <tr>
+        <td>
+            罗志辉,
+            <br>
+            <br>
+            你好,恭喜您加入了lzhphantom-Math！想学习基础知识吗？ 看看我们的学习中心指南。
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <br>
+            <div class="text-center"><a href="http://127.0.0.1:8080/verify?code=` + code + `" class="verify">认证</a></div>
+            <br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            认证员1,
+            <br>
+            lzhphantom-Math 认证小组
+            <br>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>`
 	common.SendEmail(To, Subject, HTML)

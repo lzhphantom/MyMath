@@ -150,12 +150,82 @@ func (c *LoginController) Register() {
 	}
 	To := []string{email}
 	Subject := "lzhphantom-Math 用户认证"
-	HTML := "抱歉打扰到你，这只是一封测试邮件"
 	code, err := common.AESEncrypt([]byte(common.KeyAES), loginName)
 	if err != nil {
 		c.Abort500(errors.New("加密失败"))
 	}
-	HTML += code
+	HTML := `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户认证</title>
+<style>
+.verify{
+	display: inline-block;
+    margin: 0 auto;
+    width: 100px;
+    height: 40px;
+    background-color: #1e8e45;
+    border-radius: 2px;
+    color: #fff;
+    text-decoration: none !important;
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 40px;
+    transition-duration: 0.2s;
+    transition-property: background-color;
+    transition-timing-function: ease;
+    text-align: center;
+    padding: 1px;
+}
+.text-center{
+  text-align:center;
+}
+</style>	
+</head>
+<body>
+<table>
+    <tbody>
+    <tr>
+        <td>认证邮件</td>
+    </tr>
+    <tr>
+        <td>
+            ` + name + `,
+            <br>
+            <br>
+            你好,恭喜您加入了lzhphantom-Math！想学习基础知识吗？ 看看我们的学习中心指南。
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <br>
+            <div class="text-center"><a href="http://127.0.0.1:8080/verify?code=` + code + `" class="verify">认证</a></div>
+            <br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            认证员1,
+            <br>
+            lzhphantom-Math 认证小组
+            <br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>`
+
 	common.SendEmail(To, Subject, HTML)
 	_, err = o.Insert(&userinfo)
 	c.Redirect("/", 302)

@@ -191,7 +191,7 @@ func (c *LoginController) Register() {
     </tr>
     <tr>
         <td>
-            ` + name + `,
+            罗志辉,
             <br>
             <br>
             你好,恭喜您加入了lzhphantom-Math！想学习基础知识吗？ 看看我们的学习中心指南。
@@ -205,7 +205,7 @@ func (c *LoginController) Register() {
     <tr>
         <td>
             <br>
-            <div class="text-center"><a href="http://127.0.0.1:8080/verify?code=` + code + `" class="verify">认证</a></div>
+            <div class="text-center"><a href="http://lzhphantom.xyz/verify?code=` + code + `" class="verify">认证</a></div>
             <br>
         </td>
     </tr>
@@ -226,7 +226,7 @@ func (c *LoginController) Register() {
 </body>
 </html>`
 
-	common.SendEmail(To, Subject, HTML)
+	common.SendSSLEmail(To, Subject, HTML)
 	_, err = o.Insert(&userinfo)
 	c.Redirect("/", 302)
 }

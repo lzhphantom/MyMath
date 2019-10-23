@@ -33,7 +33,7 @@ func (c *MainController) ErrorTest() {
 // @router /sendEmail [get]
 func (c *MainController) SendEmail() {
 
-	To := []string{"987090402@qq.com"}
+	To := []string{"math@lzhphantom.xyz"}
 	Subject := "lzhphantom-Math 测试邮件"
 	//HTML := "抱歉打扰到你，这只是一封测试邮件"
 	key := "KLTkjLDFDEUN2O9q"
@@ -110,7 +110,7 @@ func (c *MainController) SendEmail() {
 </table>
 </body>
 </html>`
-	common.SendEmail(To, Subject, HTML)
-
+	//common.SendEmail(To, Subject, HTML)
+	common.SendSSLEmail(To, Subject, HTML)
 	c.ServeJSON()
 }

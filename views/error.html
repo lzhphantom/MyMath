@@ -17,7 +17,9 @@
 <div id="Content-Body" class="container">
     <div class="jumbotron">
         <h1 class="text-center text-danger"><strong>{{.errorTittle}}</strong></h1>
-        <h2 class="text-center text-muted">{{ str2html .content}}</h2>
+        {{ if .content}}
+            <h2 class="text-center text-muted">{{ str2html .content}}</h2>
+        {{end}}
     </div>
 
 </div>

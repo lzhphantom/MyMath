@@ -26,6 +26,7 @@ func init() {
 	gob.Register(common.BasicCommonReview{})
 	gob.Register(common.ChangeQuestion{})
 	gob.Register(common.Practice{})
+	gob.Register([]common.Practice{})
 	gob.Register(common.ReviewQuestion{})
 	gob.Register(common.TrainingSelect{})
 	gob.Register(common.TrainingUnSelect{})

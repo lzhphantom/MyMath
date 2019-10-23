@@ -33,7 +33,6 @@ func (c *ErrorController) jsonerror(err syserrors.Error) {
 }
 
 func (c *ErrorController) Error500() {
-
 	c.TplName = "error.html"
 	var derr error
 	err, ok := c.Data["error"].(error)

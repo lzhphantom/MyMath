@@ -201,3 +201,15 @@ function infoAlert(message) {
         closeOnEsc: false,
     });
 }
+
+function errorJump(back) {
+
+    setInterval(function () {
+        if (back === 1) {
+            window.history.back(-1);
+        }else {
+            window.location.href="/"
+        }
+    }, 3000);
+
+}
